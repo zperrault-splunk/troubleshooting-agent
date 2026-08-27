@@ -5,3 +5,12 @@
   {{- end -}}
 <link rel="stylesheet" href="{{ $css.RelPermalink }}"{{ with $css.Data.Integrity }} integrity="{{ . }}"{{ end }}>
 {{- end -}}
+{{- $js := resources.Get "js/workshop-fixes.js" -}}
+{{- if $js -}}
+  {{- $opts := dict "minify" true "targetPath" "js/workshop-fixes.js" -}}
+  {{- $bundle := $js | js.Build $opts -}}
+  {{- if hugo.IsProduction -}}
+    {{- $bundle = $bundle | resources.Fingerprint -}}
+  {{- end -}}
+<script type="module" src="{{ $bundle.RelPermalink }}" defer{{ with $bundle.Data.Integrity }} integrity="{{ . }}"{{ end }}></script>
+{{- end -}}
