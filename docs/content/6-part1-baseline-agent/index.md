@@ -1,6 +1,6 @@
 ---
 title: "Part 1 — Baseline Agent"
-description: "Run the minimal MCP-only ReAct agent, interpret terminal and Galileo traces, and establish a baseline investigation for comparison with Parts 2 and 3."
+description: "Run the minimal MCP-only ReAct agent, interpret terminal and Agent Observability traces, and establish a baseline investigation for comparison with Parts 2 and 3."
 weight: 6
 navTitle: "Part 1 — Baseline Agent"
 duration: "20 minutes"
@@ -17,13 +17,13 @@ The goal is not perfection. You are establishing what the agent does **without p
 | **Agent loop** | LangGraph ReAct: `agent` (LLM) → `tools` (MCP) → repeat |
 | **Tools** | Splunk Observability MCP only (`o11y_*` prefix) |
 | **Skills** | None — the model decides the investigation path on its own |
-| **Observability** | Terminal trace, JSONL logs, Galileo session |
+| **Observability** | Terminal trace, JSONL logs, Agent Observability session |
 
 If you want to skim the code before running:
 
 | File | Purpose |
 |------|---------|
-| `part1_agent/agent.py` | ReAct graph, MCP wiring, Galileo callbacks |
+| `part1_agent/agent.py` | ReAct graph, MCP wiring, observability callbacks |
 | `part1_agent/prompt.py` | System prompt — requires calling `o11y_*` tools for live data |
 
 ## Run your first investigation
@@ -112,12 +112,12 @@ Cleared your terminal before you could review the trace? You have two easy optio
   ```bash
   ls -t ~/troubleshooting-agent/shared/logs/investigations/*.jsonl | head -1
   ```
-- **Re-run the same command** — run `troubleshooting-agent chat "Why does payment have errors in the sre-agent-workshop environment?"` again. You will get a new trace (and a new Galileo session), but the investigation flow is the same.
+- **Re-run the same command** — run `troubleshooting-agent chat "Why does payment have errors in the sre-agent-workshop environment?"` again. You will get a new trace (and a new Agent Observability session), but the investigation flow is the same.
 {{< /notice >}}
 
-## Review the run in Galileo
+## Review the run in Splunk Agent Observability
 
-After your chat completes, open the **Galileo console** and navigate to:
+After your chat completes, open the **Splunk Agent Observability console** and navigate to:
 
 1. **Project** — the name you set (for example, `sre-agent-wkshp-shw-2cb1`)
 2. **Agent Stream** — your log stream from `.env` (for example, `sre-agent-wkshp`)
@@ -137,12 +137,12 @@ Agent
 └── should_continue
 ```
 
-Click **`tools`** and the nested MCP span to inspect arguments and JSON responses. Compare what Galileo captured with what the terminal trace showed — they should tell the same story.
+Click **`tools`** and the nested MCP span to inspect arguments and JSON responses. Compare what Agent Observability captured with what the terminal trace showed — they should tell the same story.
 
-{{< diagram src="images/part1-galileo-trace.png" alt="Galileo Agent Stream showing a Part 1 session with trace tree, chat, and empty Evaluators tab" caption="Part 1 in Agent Stream. Evaluators are empty until the next section." width="960" >}}
+{{< diagram src="images/part1-galileo-trace.png" alt="Splunk Agent Observability Agent Stream showing a Part 1 session with trace tree, chat, and empty Evaluators tab" caption="Part 1 in Agent Stream. Evaluators are empty until the next section." width="960" >}}
 
 {{< notice title="Tip" style="tip" >}}
-Keep the Galileo console open in a browser tab during the workshop. After each investigation, refresh and locate your session — it is the fastest way to compare Part 1, Part 2, and Part 3 on the same alert.
+Keep the Splunk Agent Observability console open in a browser tab during the workshop. After each investigation, refresh and locate your session — it is the fastest way to compare Part 1, Part 2, and Part 3 on the same alert in one Agent Stream.
 {{< /notice >}}
 
 ## Baseline exercise
@@ -153,7 +153,7 @@ Work through this checklist using the workshop defaults — **`payment`** in env
 |------|--------|
 | 1 | Run `troubleshooting-agent chat "Why does payment have errors in the sre-agent-workshop environment?"` |
 | 2 | Read the terminal trace — list tools called vs. tools skipped |
-| 3 | Open Galileo — find your session and expand agent/tool spans |
+| 3 | Open Splunk Agent Observability — find your session and expand agent/tool spans |
 | 4 | Answer: *Did the agent ground its conclusion in MCP data?* |
 | 5 | Answer: *Where might it have hallucinated if MCP had returned empty results?* |
 | 6 | **Save your notes** — you will re-run the same scenario in Part 2 and Part 3 |
@@ -166,9 +166,9 @@ Part 1 intentionally has **no playbook**. Expect variation between runs — that
 
 - Part 1 proves the agent **can** call live Observability MCP tools and synthesize an answer.
 - Without skills, **tool selection and investigation depth vary** from run to run.
-- **Terminal traces** give immediate feedback; **Galileo** preserves the full session for review and comparison.
+- **Terminal traces** give immediate feedback; **Splunk Agent Observability** preserves the full session for review and comparison.
 - This baseline sets up the core workshop question: *How much do skills and graph structure improve investigation quality?*
 
 ---
 
-**Next:** [Part 2 — Skill Playbooks]({{< ref "8-part2-skill-playbooks" >}}) — see how keyword-injected skills change investigation quality and Galileo traces.
+**Next:** [Configure Evaluators]({{< ref "7-galileo-logstream-evaluators" >}}) — enable log stream evaluators before comparing Parts 2 and 3.

@@ -1,12 +1,12 @@
 ---
 title: "Part 2 — Skill Playbooks"
-description: "Run the skill-injected ReAct agent, compare Galileo traces and evaluators to Part 1, and author your own error-rate playbook."
+description: "Run the skill-injected ReAct agent, compare Agent Observability traces and evaluators to Part 1, and author your own error-rate playbook."
 weight: 8
 navTitle: "Part 2 — Skill Playbooks"
 duration: "30 minutes"
 ---
 
-Part 2 uses the **same ReAct loop as Part 1**, but adds **playbooks** — markdown skills that tell the agent which MCP tools to call, in what order, and how to format the answer. You will run the Part 2 agent, see what changes in **Galileo**, then complete your own **`error-rate`** skill and run the agent again.
+Part 2 uses the **same ReAct loop as Part 1**, but adds **playbooks** — markdown skills that tell the agent which MCP tools to call, in what order, and how to format the answer. You will run the Part 2 agent, see what changes in **Splunk Agent Observability**, then complete your own **`error-rate`** skill and run the agent again.
 
 For background on why skills matter, see [AI Skills]({{< ref "2-ai-skills" >}}). This section focuses on **doing** Part 2.
 
@@ -17,8 +17,8 @@ For background on why skills matter, see [AI Skills]({{< ref "2-ai-skills" >}}).
 | **Agent loop** | LangGraph ReAct | Same ReAct loop |
 | **Playbooks** | None | One **domain** skill + always-on **`investigation-report`** |
 | **Routing** | — | Keyword match on your chat/alert text (`alert_signals` in SKILL.md YAML) |
-| **Galileo session** | `chat-… \| part1_agent` | `chat-… \| part2_agent` |
-| **Extra Galileo trace** | — | **`skill_router`** — all skills injected **before** the ReAct loop |
+| **Agent Observability session** | `chat-… \| part1_agent` | `chat-… \| part2_agent` |
+| **Extra Agent Observability trace** | — | **`skill_router`** — all skills injected **before** the ReAct loop |
 
 ```text
 Your message → keyword router → SKILL.md → system prompt → ReAct loop (LLM + MCP tools)
@@ -33,9 +33,13 @@ Your message → keyword router → SKILL.md → system prompt → ReAct loop (L
 
 ## Run Part 2 agent
 
-Make sure [Part 1]({{< ref "6-part1-baseline-agent" >}}) and [Galileo Evaluators]({{< ref "7-galileo-logstream-evaluators" >}}) are done — you will compare against those sessions.
+Make sure [Part 1]({{< ref "6-part1-baseline-agent" >}}) and [Configure Evaluators]({{< ref "7-galileo-logstream-evaluators" >}}) are done — you will compare against those sessions.
 
 From `part2_agent`, run a **latency** investigation. Use the workshop defaults — service **`payment`**, environment **`sre-agent-workshop`**:
+
+{{< notice title="Same log stream" style="tip" >}}
+Do **not** change `GALILEO_LOG_STREAM` in `.env` when you switch to `part2_agent`. Part 2 sessions appear in the same Agent Stream as Part 1 — look for the `part2_agent` suffix in the session name.
+{{< /notice >}}
 
 {{< tabs >}}
 {{% tab title="Script" open="true" %}}
@@ -56,7 +60,7 @@ The keyword router should select **`latency-spike`** because the message contain
 Use **`payment`** and **`sre-agent-workshop`** for all Part 2 chat commands unless your facilitator says otherwise — same service and environment as Part 1.
 {{< /notice >}}
 
-## Review Part 2 in Galileo
+## Review Part 2 in Splunk Agent Observability
 
 Open **Agent Stream** and find the newest session named `chat-… | part2_agent`.
 
@@ -65,7 +69,7 @@ Playbooks are appended to the **system prompt** before the ReAct loop runs. You 
 
 To confirm skills loaded, check:
 1. **Terminal** — lines like `[N] Skill loaded: latency-spike` and `[N] Skill loaded: investigation-report`
-2. **Galileo** — a separate **`skill_router`** trace in the same session (sibling to **`Agent`**, not nested inside it)
+2. **Splunk Agent Observability** — a separate **`skill_router`** trace in the same session (sibling to **`Agent`**, not nested inside it)
 3. **Chat JSON** — the system message includes `## Active playbook` and `## Reporting requirements`
 {{< /notice >}}
 
@@ -73,7 +77,7 @@ To confirm skills loaded, check:
 
 Part 2 logs a **`skill_router`** trace **before** the main **`Agent`** trace in the same session. Compare your Part 1 session (left) to a Part 2 latency demo (right):
 
-{{< diagram src="images/part1-vs-part2-galileo-compare.png" alt="Side-by-side Galileo Agent Stream: Part 1 Agent-only trace vs Part 2 with skill_router and load_skill spans" caption="Part 1 (left): Agent trace only. Part 2 (right): skill_router injects playbooks before the Agent loop." width="1200" >}}
+{{< diagram src="images/part1-vs-part2-galileo-compare.png" alt="Side-by-side Splunk Agent Observability Agent Stream: Part 1 Agent-only trace vs Part 2 with skill_router and load_skill spans" caption="Part 1 (left): Agent trace only. Part 2 (right): skill_router injects playbooks before the Agent loop." width="1200" >}}
 
 On the Part 2 session (right):
 
@@ -226,14 +230,14 @@ troubleshooting-agent chat "Investigate elevated 5xx errors on payment in the sr
 {{% /tab %}}
 {{< /tabs >}}
 
-### Confirm in Galileo
+### Confirm in Splunk Agent Observability
 
 1. Open the new **`part2_agent`** session in Agent Stream.
 2. Expand **`skill_router`** — expect **`load_skill:error-rate`** and **`load_skill:investigation-report`**.
 3. Expand the main trace — expect at least **`o11y_search_alerts_or_incidents`** and **`o11y_get_apm_service_errors_and_requests`** under **`tools`** spans.
 4. Open **Evaluators** — compare scores to your Part 1 and latency-demo Part 2 sessions.
 
-{{< diagram src="images/part2-error-rate-galileo.png" alt="Galileo Agent Stream showing Part 2 error-rate skill_router, MCP tool calls, and evaluator scores" caption="Part 2 after completing the error-rate skill — skill_router, playbook tools, and evaluator scores." width="1200" >}}
+{{< diagram src="images/part2-error-rate-galileo.png" alt="Splunk Agent Observability Agent Stream showing Part 2 error-rate skill_router, MCP tool calls, and evaluator scores" caption="Part 2 after completing the error-rate skill — skill_router, playbook tools, and evaluator scores." width="1200" >}}
 
 Work through this checklist:
 
@@ -251,7 +255,7 @@ If the wrong skill loads, check **`alert_signals`** spelling and re-run with cle
 
 - Part 2 is still a **single ReAct loop** — skills change the **system prompt**, not the graph shape.
 - **`alert_signals`** drive keyword routing; **`investigation-report`** always loads for consistent handoffs.
-- Galileo **`skill_router`** makes injection visible — you can audit which playbook ran.
+- Splunk Agent Observability **`skill_router`** makes injection visible — you can audit which playbook ran.
 - Authoring a skill means defining **signals, tool order, interpretation, and guardrails** — not new Python code.
 - Evaluators help quantify whether skills improved **tool selection** and **completion** vs the Part 1 baseline.
 
@@ -265,7 +269,7 @@ Part 2 deliberately stops short of a full production workflow:
 | Skills per run | One domain + report | Product skill + log search + full report |
 | Exemplar traces | Not in playbooks | Yes |
 | Alert anchoring | Keyword routing | Strict detector / incident matching |
-| Skill timing in Galileo | **`skill_router`** trace, then **`Agent`** | **`load_skill:*`** under each graph node — see [Part 3]({{< ref "9-part3-full-workflow" >}}) |
+| Skill timing in Agent Observability | **`skill_router`** trace, then **`Agent`** | **`load_skill:*`** under each graph node — see [Part 3]({{< ref "9-part3-full-workflow" >}}) |
 
 ---
 

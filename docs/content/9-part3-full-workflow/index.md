@@ -1,16 +1,16 @@
 ---
 title: "Part 3 — Full Workflow"
-description: "Run the four-node LangGraph agent, compare how skills load per workflow step in Galileo, and contrast with Part 2's upfront keyword router."
+description: "Run the four-node LangGraph agent, compare how skills load per workflow step in Splunk Agent Observability, and contrast with Part 2's upfront keyword router."
 weight: 9
 navTitle: "Part 3 — Full Workflow"
 duration: "30 minutes"
 ---
 
-Part 3 replaces the single ReAct loop with a **four-node LangGraph workflow**: **identify → categorize → investigate → report**. The same `SKILL.md` playbook format from Part 2 applies — but **when and where** skills load in Galileo looks different on purpose.
+Part 3 replaces the single ReAct loop with a **four-node LangGraph workflow**: **identify → categorize → investigate → report**. The same `SKILL.md` playbook format from Part 2 applies — but **when and where** skills load in Splunk Agent Observability looks different on purpose.
 
 Complete [Part 2 — Skill Playbooks]({{< ref "8-part2-skill-playbooks" >}}) first so you have a baseline for keyword injection and the upfront **`skill_router`** trace.
 
-## Part 2 vs Part 3 — how skills load in Galileo
+## Part 2 vs Part 3 — how skills load in Splunk Agent Observability
 
 Both parts inject playbooks into the **system prompt** — skills are not MCP tools. The difference is **timing and orchestration**.
 
@@ -19,7 +19,7 @@ Both parts inject playbooks into the **system prompt** — skills are not MCP to
 | **Orchestration** | Single ReAct loop (same as Part 1) | Four-node graph — each step has its own prompt |
 | **Skill selection** | Keyword router on your chat/alert text | Python categorizer on the alert payload (APM / IM / RUM / Synthetics) |
 | **When skills load** | **All at once**, before the agent's first LLM turn | **One step at a time**, when that graph node runs |
-| **Galileo trace shape** | Separate **`skill_router`** trace, then **`Agent`** | **`load_skill:*`** spans **inside** each node (`identify`, `investigate`, `report`) |
+| **Agent Observability trace shape** | Separate **`skill_router`** trace, then **`Agent`** | **`load_skill:*`** spans **inside** each node (`identify`, `investigate`, `report`) |
 | **Skills per run** | One domain skill + always-on `investigation-report` | Different skills per phase — see table below |
 
 {{< notice title="Don't expect skill_router in Part 3" style="primary" >}}
@@ -28,7 +28,7 @@ If you just finished Part 2, you may look for a top-level **`skill_router`** blo
 
 ### Part 2 trace (what you saw in Part 2)
 
-Skills load **before** the ReAct loop starts. Galileo shows a sibling trace:
+Skills load **before** the ReAct loop starts. Splunk Agent Observability shows a sibling trace:
 
 ```text
 Session: chat-… | part2_agent
@@ -86,6 +86,10 @@ Participants run Part 3 from the CLI with a **mock Observability alert** — no 
 
 From `part3_agent`:
 
+{{< notice title="Same log stream" style="tip" >}}
+Do **not** change `GALILEO_LOG_STREAM` in `.env` when you switch to `part3_agent`. Part 3 sessions appear in the same Agent Stream as Parts 1 and 2 — look for the `part3_agent` suffix in the session name.
+{{< /notice >}}
+
 {{< tabs >}}
 {{% tab title="Script" open="true" %}}
 
@@ -103,9 +107,9 @@ troubleshooting-agent chat "Troubleshoot the Splunk Observability alert: payment
 The workshop prompt mirrors a Slack alert: **service** (`payment`), **environment** (`sre-agent-workshop`), **detector ID**, and **rule name**. Part 3 uses these to fetch the alert payload, categorize as APM, run **`troubleshoot-apm-incidents`** + **`search-logs`**, then format **`troubleshoot-report`**.
 {{< /notice >}}
 
-Galileo sessions are named `chat-… | part3_agent`. Expect **`part3_investigation`** with nodes **`identify` → `categorize` → `investigate` → `report`** — not a single ReAct **`Agent`** trace.
+Agent Observability sessions are named `chat-… | part3_agent`. Expect **`part3_investigation`** with nodes **`identify` → `categorize` → `investigate` → `report`** — not a single ReAct **`Agent`** trace.
 
-## Review Part 3 in Galileo
+## Review Part 3 in Splunk Agent Observability
 
 1. Open **Agent Stream** and find a session ending in **`part3_agent`**.
 2. Expand **`part3_investigation`** — confirm **named nodes** (`identify`, `categorize`, `investigate`, `report`), not repeated generic `Agent:Agent` spans.

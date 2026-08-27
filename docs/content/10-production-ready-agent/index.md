@@ -6,7 +6,7 @@ navTitle: "Production-Ready Agent"
 duration: "10 minutes"
 ---
 
-After [Part 3 — Full Workflow]({{< ref "9-part3-full-workflow" >}}), you have a working four-node agent with skills, MCP tools, and Galileo tracing. Part 3 is a **teaching workflow** — the graph, skills, and MCP wiring are real, but several workshop shortcuts would need hardening before you run this on live incidents at scale.
+After [Part 3 — Full Workflow]({{< ref "9-part3-full-workflow" >}}), you have a working four-node agent with skills, MCP tools, and Splunk Agent Observability tracing. Part 3 is a **teaching workflow** — the graph, skills, and MCP wiring are real, but several workshop shortcuts would need hardening before you run this on live incidents at scale.
 
 This page summarizes practical next steps. It is optional reading — no lab steps required.
 
@@ -20,7 +20,7 @@ This page summarizes practical next steps. It is optional reading — no lab ste
 
 - **Keep the graph; tighten the nodes** — The identify → categorize → investigate → report shape scales well. Production gains come from stricter node contracts (required outputs, max tool calls per node) and clearer handoff state between steps.
 - **Hybrid routing** — The Python categorizer is fast and deterministic; add LLM fallback only for `unknown` product types, with explicit logging when routing is ambiguous.
-- **Version and test playbooks** — Treat `SKILL.md` files like code: PR review, golden-path tests per product type, and Galileo evaluators (see [Galileo Logstream Evaluators]({{< ref "7-galileo-logstream-evaluators" >}})) on report structure and tool-use completeness.
+- **Version and test playbooks** — Treat `SKILL.md` files like code: PR review, golden-path tests per product type, and Agent Observability evaluators (see [Configure Evaluators]({{< ref "7-galileo-logstream-evaluators" >}})) on report structure and tool-use completeness.
 
 ## MCP, Splunk, and reliability
 
@@ -31,16 +31,16 @@ This page summarizes practical next steps. It is optional reading — no lab ste
 ## Safety, trust, and operations
 
 - **Human-in-the-loop for actions** — This agent is read-only (investigate + report). Any production extension that posts to Slack, opens tickets, or runs remediations should use a two-step confirm flow.
-- **Secrets and tenancy** — API tokens via vault/KMS, not `.env` on shared hosts; scope MCP credentials per environment; redact tokens and PII in logs and Galileo traces.
+- **Secrets and tenancy** — API tokens via vault/KMS, not `.env` on shared hosts; scope MCP credentials per environment; redact tokens and PII in logs and Agent Observability traces.
 - **Observability of the agent itself** — Session IDs, node timings, tool failure rates, and evaluator scores should feed dashboards and alerts — you are operating a service, not a one-off script.
 - **Cost and latency budgets** — Set recursion limits, cap parallel MCP calls, and track LLM token usage per investigation; Part 3’s investigate node is the main cost driver.
 
 {{< notice title="Workshop → production path" style="tip" >}}
-A practical next step after the workshop: pick one alert type (e.g. APM error rate), wire real Slack or webhook intake, add one Galileo evaluator for **`troubleshoot-report`** completeness, and run shadow mode (agent reports, humans act) until scores stabilize.
+A practical next step after the workshop: pick one alert type (e.g. APM error rate), wire real Slack or webhook intake, add one Agent Observability evaluator for **`troubleshoot-report`** completeness, and run shadow mode (agent reports, humans act) until scores stabilize.
 {{< /notice >}}
 
 ## Related reading
 
-- [Part 3 — Full Workflow]({{< ref "9-part3-full-workflow" >}}) — graph nodes and Galileo trace shape
+- [Part 3 — Full Workflow]({{< ref "9-part3-full-workflow" >}}) — graph nodes and Agent Observability trace shape
 - [AI Skills]({{< ref "2-ai-skills" >}}) — authoring and testing playbooks
-- [Galileo Logstream Evaluators]({{< ref "7-galileo-logstream-evaluators" >}}) — quality gates for agent outputs
+- [Configure Evaluators]({{< ref "7-galileo-logstream-evaluators" >}}) — quality gates for agent outputs
