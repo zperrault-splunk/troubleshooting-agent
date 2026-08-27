@@ -9,7 +9,7 @@ An **AI skill** (also called a **playbook**) is a markdown file that tells the a
 
 Think of it this way: **tools** are what the agent *can* do (query a database, search logs, fetch metrics). A **skill** is the procedure you want it to *follow* when doing a specific kind of work — like an SOP, runbook, or checklist you would give a new team member. The language model reads the skill and uses it to decide how to apply its tools.
 
-In this workshop, skills live under `skills/<skill-name>/SKILL.md`. You will author and run them hands-on in [Part 2]({{< ref "8-part2-skill-playbooks" >}}) and see them load at each workflow step in [Part 3]({{< ref "9-part3-full-workflow" >}}).
+In this workshop, skills live under `skills/<skill-name>/SKILL.md`. You will author and run them hands-on in [Part 2]({{< relref "8-part2-skill-playbooks" >}}) and see them load at each workflow step in [Part 3]({{< relref "9-part3-full-workflow" >}}).
 
 ## Why skills matter
 
@@ -33,7 +33,7 @@ Skills are especially valuable in production because they:
 - **Enable safe iteration** — tighten one skill without rewriting the whole agent
 
 {{< notice title="Workshop tie-in" style="tip" >}}
-In [Part 1]({{< ref "6-part1-baseline-agent" >}}) you run an agent with **tools only** — no skills. Parts 2 and 3 add playbooks so you can compare how much structure improves investigation quality on the same alert.
+In [Part 1]({{< relref "6-part1-baseline-agent" >}}) you run an agent with **tools only** — no skills. Parts 2 and 3 add playbooks so you can compare how much structure improves investigation quality on the same alert.
 {{< /notice >}}
 
 ## Skills, tools, and prompts — three different layers
@@ -137,12 +137,12 @@ This page is conceptual background. Hands-on work comes later:
 
 | When | What |
 |------|------|
-| [Part 1]({{< ref "6-part1-baseline-agent" >}}) | Agent with tools only — baseline with no playbooks |
-| [Part 2]({{< ref "8-part2-skill-playbooks" >}}) | Run a skill-injected agent; complete the **`error-rate`** skill lab |
-| [Part 3]({{< ref "9-part3-full-workflow" >}}) | Full workflow — skills load per graph node, including log search and structured reports |
+| [Part 1]({{< relref "6-part1-baseline-agent" >}}) | Agent with tools only — baseline with no playbooks |
+| [Part 2]({{< relref "8-part2-skill-playbooks" >}}) | Run a skill-injected agent; complete the **`error-rate`** skill lab |
+| [Part 3]({{< relref "9-part3-full-workflow" >}}) | Full workflow — skills load per graph node, including log search and structured reports |
 
 Skill authoring details (YAML fields, checklist, MCP tool names) are covered in Part 2 when you edit `SKILL.md` files yourself.
 
 ---
 
-**Next:** [Connect to EC2]({{< ref "3-connect-ec2" >}}) when you are ready to set up your workshop environment, or return to [Overview of AI Agents]({{< ref "1-ai-agents-overview" >}}) if you want to review orchestration and tools first.
+**Next:** [Connect to EC2]({{< relref "3-connect-ec2" >}}) when you are ready to set up your workshop environment, or return to [Overview of AI Agents]({{< relref "1-ai-agents-overview" >}}) if you want to review orchestration and tools first.

@@ -20,7 +20,7 @@ Evaluators answer questions that are hard to judge by eye across dozens of runs:
 
 | Requirement | Why |
 |-------------|-----|
-| [Part 1 investigation completed]({{< ref "6-part1-baseline-agent" >}}) | We will use the session/trace from the previous section to compare the before and after enabling evaluators |
+| [Part 1 investigation completed]({{< relref "6-part1-baseline-agent" >}}) | We will use the session/trace from the previous section to compare the before and after enabling evaluators |
 | `.env` Agent Observability settings saved | Same `GALILEO_PROJECT` and `GALILEO_LOG_STREAM` you used in Part 1 |
 | Splunk Agent Observability console access | Open the project your facilitator shared (or the one you created with `GALILEO_PROJECT`) |
 
@@ -215,4 +215,4 @@ Part 1 intentionally has **no playbook**, so results can range from weak to stro
 
 ---
 
-**Next:** [Part 2 — Skill Playbooks]({{< ref "8-part2-skill-playbooks" >}}) — run the skill-injected agent, compare evaluators, and author your own playbook.
+**Next:** [Part 2 — Skill Playbooks]({{< relref "8-part2-skill-playbooks" >}}) — run the skill-injected agent, compare evaluators, and author your own playbook.

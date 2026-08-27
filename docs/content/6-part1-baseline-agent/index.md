@@ -28,7 +28,7 @@ If you want to skim the code before running:
 
 ## Run your first investigation
 
-Make sure you completed [Configure Environment]({{< ref "5-configure-agent-environment" >}}) — virtual environment installed, `.env` configured, and both doctor commands passing.
+Make sure you completed [Configure Environment]({{< relref "5-configure-agent-environment" >}}) — virtual environment installed, `.env` configured, and both doctor commands passing.
 
 Start with a CLI investigation using the workshop defaults — service **`payment`**, environment **`sre-agent-workshop`**:
 
@@ -171,4 +171,4 @@ Part 1 intentionally has **no playbook**. Expect variation between runs — that
 
 ---
 
-**Next:** [Configure Evaluators]({{< ref "7-galileo-logstream-evaluators" >}}) — enable log stream evaluators before comparing Parts 2 and 3.
+**Next:** [Configure Evaluators]({{< relref "7-galileo-logstream-evaluators" >}}) — enable log stream evaluators before comparing Parts 2 and 3.

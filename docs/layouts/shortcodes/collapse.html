@@ -5,7 +5,9 @@
   ...
   {{< /collapse >}}
 */}}
-<details class="collapse"{{ if eq (.Get "open") "true" }} open{{ end }}>
-  <summary class="collapse__summary">{{ .Get "title" | default "Show details" }}</summary>
-  <div class="collapse__body">{{ .Inner | .Page.RenderString }}</div>
+{{- $title := .Get "title" | default "Show details" -}}
+{{- $open := eq (.Get "open") "true" -}}
+<details class="solution expand"{{ if $open }} open{{ end }}>
+<summary class="solution__summary">{{ $title }}</summary>
+<div class="solution__body">{{ .Inner | .Page.RenderString }}</div>
 </details>

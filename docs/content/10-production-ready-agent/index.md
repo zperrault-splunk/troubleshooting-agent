@@ -6,7 +6,7 @@ navTitle: "Production-Ready Agent"
 duration: "10 minutes"
 ---
 
-After [Part 3 — Full Workflow]({{< ref "9-part3-full-workflow" >}}), you have a working four-node agent with skills, MCP tools, and Splunk Agent Observability tracing. Part 3 is a **teaching workflow** — the graph, skills, and MCP wiring are real, but several workshop shortcuts would need hardening before you run this on live incidents at scale.
+After [Part 3 — Full Workflow]({{< relref "9-part3-full-workflow" >}}), you have a working four-node agent with skills, MCP tools, and Splunk Agent Observability tracing. Part 3 is a **teaching workflow** — the graph, skills, and MCP wiring are real, but several workshop shortcuts would need hardening before you run this on live incidents at scale.
 
 This page summarizes practical next steps. It is optional reading — no lab steps required.
 
@@ -20,7 +20,7 @@ This page summarizes practical next steps. It is optional reading — no lab ste
 
 - **Keep the graph; tighten the nodes** — The identify → categorize → investigate → report shape scales well. Production gains come from stricter node contracts (required outputs, max tool calls per node) and clearer handoff state between steps.
 - **Hybrid routing** — The Python categorizer is fast and deterministic; add LLM fallback only for `unknown` product types, with explicit logging when routing is ambiguous.
-- **Version and test playbooks** — Treat `SKILL.md` files like code: PR review, golden-path tests per product type, and Agent Observability evaluators (see [Configure Evaluators]({{< ref "7-galileo-logstream-evaluators" >}})) on report structure and tool-use completeness.
+- **Version and test playbooks** — Treat `SKILL.md` files like code: PR review, golden-path tests per product type, and Agent Observability evaluators (see [Configure Evaluators]({{< relref "7-galileo-logstream-evaluators" >}})) on report structure and tool-use completeness.
 
 ## MCP, Splunk, and reliability
 
@@ -41,6 +41,6 @@ A practical next step after the workshop: pick one alert type (e.g. APM error ra
 
 ## Related reading
 
-- [Part 3 — Full Workflow]({{< ref "9-part3-full-workflow" >}}) — graph nodes and Agent Observability trace shape
-- [AI Skills]({{< ref "2-ai-skills" >}}) — authoring and testing playbooks
-- [Configure Evaluators]({{< ref "7-galileo-logstream-evaluators" >}}) — quality gates for agent outputs
+- [Part 3 — Full Workflow]({{< relref "9-part3-full-workflow" >}}) — graph nodes and Agent Observability trace shape
+- [AI Skills]({{< relref "2-ai-skills" >}}) — authoring and testing playbooks
+- [Configure Evaluators]({{< relref "7-galileo-logstream-evaluators" >}}) — quality gates for agent outputs

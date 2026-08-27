@@ -29,20 +29,20 @@ All three parts use the same command — `troubleshooting-agent` — from their 
 
 ## Prerequisites
 
-You need access to your workshop instance (see [Connect to EC2]({{< ref "3-connect-ec2" >}})). The repository and credentials are already set up on the instance — complete [Configure Environment]({{< ref "5-configure-agent-environment" >}}) before Part 1.
+You need access to your workshop instance (see [Connect to EC2]({{< relref "3-connect-ec2" >}})). The repository and credentials are already set up on the instance — complete [Configure Environment]({{< relref "5-configure-agent-environment" >}}) before Part 1.
 
 ## Getting started
 
 The repository is at `~/troubleshooting-agent` on your instance. Follow the workshop steps in order:
 
-1. [Connect to EC2]({{< ref "3-connect-ec2" >}})
-2. [Deploy the OpenTelemetry Collector]({{< ref "4-deploy-otel-collector" >}})
-3. [Configure Environment]({{< ref "5-configure-agent-environment" >}})
-4. [Part 1 — Baseline Agent]({{< ref "6-part1-baseline-agent" >}})
-5. [Configure Evaluators]({{< ref "7-galileo-logstream-evaluators" >}})
-6. [Part 2 — Skill Playbooks]({{< ref "8-part2-skill-playbooks" >}})
-7. [Part 3 — Full Workflow]({{< ref "9-part3-full-workflow" >}})
-8. [Production-Ready Agent]({{< ref "10-production-ready-agent" >}}) *(optional)*
+1. [Connect to EC2]({{< relref "3-connect-ec2" >}})
+2. [Deploy the OpenTelemetry Collector]({{< relref "4-deploy-otel-collector" >}})
+3. [Configure Environment]({{< relref "5-configure-agent-environment" >}})
+4. [Part 1 — Baseline Agent]({{< relref "6-part1-baseline-agent" >}})
+5. [Configure Evaluators]({{< relref "7-galileo-logstream-evaluators" >}})
+6. [Part 2 — Skill Playbooks]({{< relref "8-part2-skill-playbooks" >}})
+7. [Part 3 — Full Workflow]({{< relref "9-part3-full-workflow" >}})
+8. [Production-Ready Agent]({{< relref "10-production-ready-agent" >}}) *(optional)*
 
 {{< notice title="Tips" style="tip" >}}
 - Run commands from the **part directory** (`part1_agent/`, `part2_agent/`, `part3_agent/`) — the CLI picks up the agent for that part automatically.
