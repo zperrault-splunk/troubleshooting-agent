@@ -35,3 +35,5 @@ uv.lock
 # Hugo
 docs/public/
 docs/resources/
+docs/_vendor/
+docs/assets/jsconfig.json
