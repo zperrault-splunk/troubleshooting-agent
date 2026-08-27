@@ -64,7 +64,7 @@ GALILEO_LOG_STREAM="sre-agent-wkshp"
 ```
 
 {{< notice title="Tip" style="tip" >}}
-Use the same Agent Observability project across Parts 1–3 so all your investigations appear in one place.
+Use the same **`GALILEO_PROJECT`** and **`GALILEO_LOG_STREAM`** across Parts 1–3. Do not change the log stream when you switch to `part2_agent` or `part3_agent` — all sessions land in one **Agent Stream** so you can compare Part 1, Part 2, and Part 3 side by side.
 {{< /notice >}}
 
 Save and exit (`Ctrl + O`, `Enter`, `Ctrl + X` in nano). Your file should look similar to this:

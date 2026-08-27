@@ -39,7 +39,7 @@ The repository is at `~/troubleshooting-agent` on your instance. Follow the work
 2. [Deploy the OpenTelemetry Collector]({{< ref "4-deploy-otel-collector" >}})
 3. [Configure Environment]({{< ref "5-configure-agent-environment" >}})
 4. [Part 1 — Baseline Agent]({{< ref "6-part1-baseline-agent" >}})
-5. [Configure Galileo Log Stream Evaluators]({{< ref "7-galileo-logstream-evaluators" >}})
+5. [Configure Evaluators]({{< ref "7-galileo-logstream-evaluators" >}})
 6. [Part 2 — Skill Playbooks]({{< ref "8-part2-skill-playbooks" >}})
 7. [Part 3 — Full Workflow]({{< ref "9-part3-full-workflow" >}})
 8. [Production-Ready Agent]({{< ref "10-production-ready-agent" >}}) *(optional)*

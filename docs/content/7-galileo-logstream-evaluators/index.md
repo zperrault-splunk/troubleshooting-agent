@@ -1,12 +1,12 @@
 ---
-title: "Configure Galileo Log Stream Evaluators"
-description: "Enable Galileo evaluators on your log stream to score agent responses, tool selection, hallucination risk, and investigation quality."
+title: "Configure Log Stream Evaluators"
+description: "Enable Agent Observability evaluators on your log stream to score agent responses, tool selection, hallucination risk, and investigation quality."
 weight: 7
-navTitle: "Galileo Evaluators"
+navTitle: "Configure Evaluators"
 duration: "15 minutes"
 ---
 
-You already send agent traces to Galileo from Part 1. In this section you turn on **log stream evaluators** so Galileo automatically scores each investigation — not just records it.
+You already send agent traces to Splunk Agent Observability from Part 1. In this section you turn on **log stream evaluators** so the platform automatically scores each investigation — not just records it.
 
 Evaluators answer questions that are hard to judge by eye across dozens of runs:
 
@@ -21,14 +21,14 @@ Evaluators answer questions that are hard to judge by eye across dozens of runs:
 | Requirement | Why |
 |-------------|-----|
 | [Part 1 investigation completed]({{< ref "6-part1-baseline-agent" >}}) | We will use the session/trace from the previous section to compare the before and after enabling evaluators |
-| `.env` Galileo settings saved | Same `GALILEO_PROJECT` and `GALILEO_LOG_STREAM` you used in Part 1 |
-| Galileo console access | Open the project your facilitator shared (or the one you created with `GALILEO_PROJECT`) |
+| `.env` Agent Observability settings saved | Same `GALILEO_PROJECT` and `GALILEO_LOG_STREAM` you used in Part 1 |
+| Splunk Agent Observability console access | Open the project your facilitator shared (or the one you created with `GALILEO_PROJECT`) |
 
-Most out-of-the-box evaluators use an **SLM** (Galileo Luna) or **LLM-as-a-judge** to score traces. Prefer **SLM** when configuring evaluators. Your workshop instance should already have an LLM integration configured in Galileo. If evaluator scores stay empty after several minutes, ask your facilitator to verify **Integrations** in the Galileo console.
+Most out-of-the-box evaluators use an **SLM** (Luna) or **LLM-as-a-judge** to score traces. Prefer **SLM** when configuring evaluators. Your workshop instance should already have an LLM integration configured. If evaluator scores stay empty after several minutes, ask your facilitator to verify **Integrations** in the Splunk Agent Observability console.
 
 ## Open your log stream
 
-1. Sign in to the Galileo console.
+1. Sign in to the Splunk Agent Observability console.
 2. Open **Projects** and select your project (for example, `sre-agent-wkshp-shw-2cb1`).
 3. Select **Agent Stream** in the sidebar — this is the log stream named in your `.env` (for example, `sre-agent-wkshp`).
 4. Confirm you see at least one session from Part 1 (for example, `chat-9265e3375c8b | part1_agent`).
@@ -38,7 +38,7 @@ Most out-of-the-box evaluators use an **SLM** (Galileo Luna) or **LLM-as-a-judge
 1. From the log stream view, click **Configure Evaluators**.
 2. Search or filter the evaluator list.
 3. Turn on the evaluators in the tables below.
-4. When Galileo offers a choice between **LLM** and **SLM** (Luna), select **SLM** — same scoring intent, with lower latency and cost during the workshop.
+4. When the console offers a choice between **LLM** and **SLM** (Luna), select **SLM** — same scoring intent, with lower latency and cost during the workshop.
 5. Click **Apply** to save your evaluator selections. Toggles alone do not take effect until you apply.
 6. When Agent Observability asks whether to compute evaluators on **past logs**, click **Not Now**. Your Part 1 session stays as the **without evaluators** baseline; you will run a fresh investigation next so you can compare both traces side by side.
 
@@ -46,12 +46,12 @@ Most out-of-the-box evaluators use an **SLM** (Galileo Luna) or **LLM-as-a-judge
 Keep your first Part 1 session un-scored on purpose. After you re-run the same chat command, you will have two sessions in the same log stream: one **trace only** (Part 1) and one **trace + evaluator scores** (this section). That makes the before/after difference easy to see.
 {{< /notice >}}
 {{< notice title="Prefer SLM when available" style="tip" >}}
-Many built-in evaluators have an **SLM** variant powered by Galileo Luna models. Use SLM for workshop runs unless your facilitator asks you to compare against the full LLM judge. If you do not see an SLM option for an evaluator, the LLM variant is fine.
+Many built-in evaluators have an **SLM** variant powered by Luna models. Use SLM for workshop runs unless your facilitator asks you to compare against the full LLM judge. If you do not see an SLM option for an evaluator, the LLM variant is fine.
 {{< /notice >}}
 
 ## Recommended evaluators
 
-Enable evaluators from **two categories** that map directly to troubleshooting-agent quality. Not every evaluator applies to every span type — Galileo only scores where the node type matches.
+Enable evaluators from **two categories** that map directly to troubleshooting-agent quality. Not every evaluator applies to every span type — the platform only scores where the node type matches.
 
 ### Agent behavior — tools and progress
 
@@ -82,12 +82,12 @@ These evaluators judge the **final answer** against the evidence available in th
 **Minimum set for hallucination checks:** turn on **Context adherence** and **Instruction adherence**.
 
 {{< notice title="Context adherence vs. correctness" style="tip" >}}
-**Context adherence** is the primary hallucination signal for this workshop: it checks whether claims appear in the **context Galileo sees** (tool outputs attached to the trace). **Correctness** is broader factuality and is most useful when you have a known-good answer or rich tool results to compare against.
+**Context adherence** is the primary hallucination signal for this workshop: it checks whether claims appear in the **context Agent Observability sees** (tool outputs attached to the trace). **Correctness** is broader factuality and is most useful when you have a known-good answer or rich tool results to compare against.
 {{< /notice >}}
 
 After you click **Apply**, reopen **Configure Evaluators** to confirm your selections. It should look similar to this:
 
-{{< diagram src="images/evaluators-selection.png" alt="Galileo Configure Evaluators pane with workshop evaluators enabled" >}}
+{{< diagram src="images/evaluators-selection.png" alt="Splunk Agent Observability Configure Evaluators pane with workshop evaluators enabled" >}}
 
 
 
@@ -115,9 +115,9 @@ troubleshooting-agent chat "Why does payment have errors in the sre-agent-worksh
 You can also paste alert text from the facilitator's demo. Use **`payment`** and **`sre-agent-workshop`** when asking about the workshop demo service.
 
 
-### Review the run in Galileo
+### Review the run in Splunk Agent Observability
 
-After your chat completes, open the **Galileo console** and navigate to:
+After your chat completes, open the **Splunk Agent Observability console** and navigate to:
 
 1. **Project** — the name you set (for example, `sre-agent-wkshp-shw-2cb1`)
 2. **Agent Stream** — your log stream from `.env` (for example, `sre-agent-wkshp`)
@@ -145,16 +145,16 @@ The center panel shows the **chat** — your query and the agent's final respons
 
 - **Action Advancement (SLM)** — did each step move the investigation forward?
 - **Action Completion (SLM)** — did the agent finish the job, or stop at summaries and "next steps"?
-- **Agent Efficiency** — was the path reasonably direct? (may show **System error** if Galileo cannot score that run — ask your facilitator)
+- **Agent Efficiency** — was the path reasonably direct? (may show **System error** if the platform cannot score that run — ask your facilitator)
 
 Click into each **`tools`** span to inspect MCP inputs, outputs, and span-level evaluators. Use the **chat** panel and **Evaluators** tab together — a detailed-sounding answer can still score low if the agent did not complete the investigation.
 
-{{< diagram src="images/part1-galileo-trace-with-env.png" alt="Galileo Agent Stream showing a Part 1 re-run with evaluator scores in the Agent Quality panel" caption="Part 1 re-run with evaluators enabled. Low action scores are common when the agent stops at suggested next steps." width="960" >}}
+{{< diagram src="images/part1-galileo-trace-with-env.png" alt="Splunk Agent Observability Agent Stream showing a Part 1 re-run with evaluator scores in the Agent Quality panel" caption="Part 1 re-run with evaluators enabled. Low action scores are common when the agent stops at suggested next steps." width="960" >}}
 
 Work through this checklist using **`payment`** in environment **`sre-agent-workshop`**:
 
 1. Run `troubleshooting-agent chat "Why does payment have errors in the sre-agent-workshop environment?"` (same as Part 1).
-2. Open Galileo **Agent Stream** — find **both** sessions using the session picker (for example, **Session 2 of 3** for the scored re-run).
+2. Open Splunk Agent Observability **Agent Stream** — find **both** sessions using the session picker (for example, **Session 2 of 3** for the scored re-run).
 3. On the **newest** session, expand the trace tree — confirm multiple **`tools`** spans ran (not just a single environment lookup).
 4. Click each MCP span — do the numbers and facts in the **chat** response match the tool JSON?
 5. Open the **Evaluators** tab and record scores under **Agent Quality** (and other groups if present).
@@ -196,7 +196,7 @@ If evaluator scores do not appear:
 1. Confirm you ran a **new** investigation after saving evaluator settings
 2. Check **Configure Evaluators** — the evaluator toggle is still on and you clicked **Apply**
 3. Verify sampling is **100%** under **Evaluator Sampling** in the same pane
-4. Ask your facilitator to confirm the Galileo **LLM integration** is configured
+4. Ask your facilitator to confirm the **LLM integration** is configured in Splunk Agent Observability
 
 {{% /tab %}}
 {{< /tabs >}}
@@ -215,4 +215,4 @@ Part 1 intentionally has **no playbook**, so results can range from weak to stro
 
 ---
 
-**Next:** [Part 2 — Skill Playbooks]({{< ref "8-part2-skill-playbooks" >}}) — run the skill-injected agent, compare Galileo evaluators, and author your own playbook.
+**Next:** [Part 2 — Skill Playbooks]({{< ref "8-part2-skill-playbooks" >}}) — run the skill-injected agent, compare evaluators, and author your own playbook.
