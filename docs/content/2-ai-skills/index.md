@@ -118,7 +118,7 @@ Before deeper investigation on any monitoring alert.
 - Invent alert IDs if the search returns nothing — say what you tried
 ```
 
-Full source: [`part2_agent/skills/alert-triage/SKILL.md`](https://github.com/iortiz-splunk/troubleshooting-agent/blob/main/part2_agent/skills/alert-triage/SKILL.md).
+Full source: [`part2_agent/skills/alert-triage/SKILL.md`](https://github.com/zperrault-splunk/troubleshooting-agent/blob/main/part2_agent/skills/alert-triage/SKILL.md).
 
 Larger skills in this workshop add product-specific steps (APM latency, log search, structured reports). The pattern is the same: **procedure in markdown**, loaded when the agent needs that kind of expertise.
 
