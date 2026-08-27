@@ -1,17 +1,74 @@
 baseURL = 'https://zperrault-splunk.github.io/troubleshooting-agent/'
-languageCode = 'en-us'
+locale = 'en-us'
 title = 'Troubleshooting Agent Workshop'
 enableRobotsTXT = true
 disableKinds = ['taxonomy', 'term']
 
+[module]
+  [module.hugoVersion]
+    extended = true
+    min = "0.161.1"
+  [[module.imports]]
+    path = "github.com/splunk/hugo-theme-splunk-workshop"
+
 [markup]
-  [markup.highlight]
-    noClasses = false
   [markup.goldmark.renderer]
     unsafe = true
+  [markup.highlight]
+    noClasses = false
+
+[outputs]
+  home = ["HTML", "RSS", "JSON"]
+  section = ["HTML", "RSS"]
+  page = ["HTML"]
 
 [params]
-  brandColor = '#B01E5D'
-  workshopTitle = 'Troubleshooting Agent Workshop'
-  fontStack = 'system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
-  otelCollectorChartVersion = '0.118.0'
+  brandName = "splunk>"
+  brandTagline = ""
+  description = "Build and instrument an AI troubleshooting agent with LangChain, MCP, and Splunk Agent Observability."
+  copyright = "© {year} Splunk LLC All rights reserved."
+  workshopTitle = "Troubleshooting Agent Workshop"
+
+  logoLight = "images/splunk-logo-black.png"
+  logoDark = "images/splunk-logo-white.png"
+  logoHeight = "40"
+
+  defaultMode = "auto"
+  showThemeToggle = true
+  showSidebar = true
+  showToc = true
+  showProgress = true
+  showLightTrails = true
+  contentMaxWidth = "880px"
+
+  colorAccent = "#FF007F"
+  colorAccent2 = "#FF9000"
+  colorAccent3 = "#FFAB0F"
+  colorAccentDark = "#D4006B"
+  colorAccentText = "#BD0D5F"
+  colorAccentTextDark = "#FF7DBA"
+  colorInk = "#0C1724"
+  colorInkMuted = "#585B61"
+  colorPaper = "#FFFFFF"
+  colorSurface = "#F4F6FA"
+  colorSurfaceAlt = "#E9EDF2"
+  colorBorder = "#E1E5EC"
+  colorBorderStrong = "#C7CDD8"
+  colorInkDark = "#F4F1EA"
+  colorInkMutedDark = "#9CA3AF"
+  colorPaperDark = "#0C1724"
+  colorSurfaceDark = "#141E2F"
+  colorSurfaceAltDark = "#1B2740"
+  colorBorderDark = "#1F2C44"
+  colorBorderStrongDark = "#2A3A56"
+
+  splunkDataSansPro = true
+  fontUrl = "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+  fontDisplay = "'Splunk Data Sans Pro', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif"
+  fontBody = "'Splunk Data Sans Pro', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif"
+  fontMono = "'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, Monaco, Consolas, monospace"
+
+  otelCollectorChartVersion = "0.118.0"
+
+  [params.social]
+    github = "https://github.com/zperrault-splunk/troubleshooting-agent"

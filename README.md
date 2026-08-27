@@ -106,10 +106,11 @@ ruff check shared part1_agent part2_agent part3_agent tests
 
 Participant-facing workshop instructions: **[https://zperrault-splunk.github.io/troubleshooting-agent/](https://zperrault-splunk.github.io/troubleshooting-agent/)**
 
-To preview locally (requires [Hugo Extended](https://gohugo.io/installation/)):
+To preview locally (requires [Hugo Extended](https://gohugo.io/installation/) 0.161.1+ and Go):
 
 ```bash
 cd docs
+hugo mod get
 hugo server -D --config hugo.toml,config/local.toml
 ```
 
@@ -117,7 +118,7 @@ Open http://localhost:1313/
 
 ### Publishing the site
 
-The site deploys automatically from the **`workshop`** branch via GitHub Actions (see [`.github/workflows/hugo-pages.yml`](.github/workflows/hugo-pages.yml)). In repo **Settings → Environments → github-pages**, allow the **`workshop`** branch under **Deployment branches and tags** (or choose **All branches**).
+The site deploys automatically from the **`main`** branch via GitHub Actions (see [`.github/workflows/hugo-pages.yml`](.github/workflows/hugo-pages.yml)).
 
 - **[shared/README.md](shared/README.md)** — LLM, Splunk MCP, Slack, Galileo, OTel setup
 - **[part1_agent/README.md](part1_agent/README.md)** — baseline exercise
