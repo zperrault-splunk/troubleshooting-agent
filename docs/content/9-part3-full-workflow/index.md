@@ -8,7 +8,7 @@ duration: "30 minutes"
 
 Part 3 replaces the single ReAct loop with a **four-node LangGraph workflow**: **identify → categorize → investigate → report**. The same `SKILL.md` playbook format from Part 2 applies — but **when and where** skills load in Splunk Agent Observability looks different on purpose.
 
-Complete [Part 2 — Skill Playbooks]({{< ref "8-part2-skill-playbooks" >}}) first so you have a baseline for keyword injection and the upfront **`skill_router`** trace.
+Complete [Part 2 — Skill Playbooks]({{< relref "8-part2-skill-playbooks" >}}) first so you have a baseline for keyword injection and the upfront **`skill_router`** trace.
 
 ## Part 2 vs Part 3 — how skills load in Splunk Agent Observability
 
@@ -127,6 +127,6 @@ Side-by-side comparison: Part 2 loads **`investigation-report`** at the start wi
 - **Part 3** = graph nodes, skills per step, visible as **`load_skill:*`** under each node.
 - Production agents often look more like Part 3: workflow engine decides *when* to attach each runbook.
 
-For skill authoring details and the full Part 3 skill library, see [AI Skills]({{< ref "2-ai-skills" >}}).
+For skill authoring details and the full Part 3 skill library, see [AI Skills]({{< relref "2-ai-skills" >}}).
 
-**Next:** [Production-Ready Agent]({{< ref "10-production-ready-agent" >}}) — what to harden after the workshop before running on live incidents.
+**Next:** [Production-Ready Agent]({{< relref "10-production-ready-agent" >}}) — what to harden after the workshop before running on live incidents.

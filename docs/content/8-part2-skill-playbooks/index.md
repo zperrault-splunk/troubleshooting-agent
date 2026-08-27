@@ -8,7 +8,7 @@ duration: "30 minutes"
 
 Part 2 uses the **same ReAct loop as Part 1**, but adds **playbooks** — markdown skills that tell the agent which MCP tools to call, in what order, and how to format the answer. You will run the Part 2 agent, see what changes in **Splunk Agent Observability**, then complete your own **`error-rate`** skill and run the agent again.
 
-For background on why skills matter, see [AI Skills]({{< ref "2-ai-skills" >}}). This section focuses on **doing** Part 2.
+For background on why skills matter, see [AI Skills]({{< relref "2-ai-skills" >}}). This section focuses on **doing** Part 2.
 
 ## Part 1 vs Part 2 — agent differences
 
@@ -33,7 +33,7 @@ Your message → keyword router → SKILL.md → system prompt → ReAct loop (L
 
 ## Run Part 2 agent
 
-Make sure [Part 1]({{< ref "6-part1-baseline-agent" >}}) and [Configure Evaluators]({{< ref "7-galileo-logstream-evaluators" >}}) are done — you will compare against those sessions.
+Make sure [Part 1]({{< relref "6-part1-baseline-agent" >}}) and [Configure Evaluators]({{< relref "7-galileo-logstream-evaluators" >}}) are done — you will compare against those sessions.
 
 From `part2_agent`, run a **latency** investigation. Use the workshop defaults — service **`payment`**, environment **`sre-agent-workshop`**:
 
@@ -160,7 +160,7 @@ Part 2 also loads **`investigation-report`** automatically — it is not selecte
 Tool names must match **`mcp-doctor`** exactly (`o11y_*` prefix). Time ranges belong inside a **`params`** object: `{"start": "-1h", "stop": "now"}`.
 {{< /notice >}}
 
-For a blank starting point, copy `skills/_template/SKILL.md`. More examples live in [AI Skills]({{< ref "2-ai-skills" >}}).
+For a blank starting point, copy `skills/_template/SKILL.md`. More examples live in [AI Skills]({{< relref "2-ai-skills" >}}).
 
 ## Lab — complete the error-rate skill
 
@@ -168,7 +168,7 @@ Your task: finish the starter stub at **`part2_agent/skills/error-rate/SKILL.md`
 
 Work from **`latency-spike/SKILL.md`** — same structure, different tools and signals.
 
-Before you pick tools, review what the MCP servers expose. Your instance should match **`troubleshooting-agent mcp-doctor`** (see [Configure Environment]({{< ref "5-configure-agent-environment" >}})). **Bold** tools are the ones the error-rate lab expects; the rest are available if you extend your playbook.
+Before you pick tools, review what the MCP servers expose. Your instance should match **`troubleshooting-agent mcp-doctor`** (see [Configure Environment]({{< relref "5-configure-agent-environment" >}})). **Bold** tools are the ones the error-rate lab expects; the rest are available if you extend your playbook.
 
 {{< collapse title="Splunk Observability MCP tools (o11y_*) — click to expand" >}}
 | Tool | What it's for |
@@ -269,8 +269,8 @@ Part 2 deliberately stops short of a full production workflow:
 | Skills per run | One domain + report | Product skill + log search + full report |
 | Exemplar traces | Not in playbooks | Yes |
 | Alert anchoring | Keyword routing | Strict detector / incident matching |
-| Skill timing in Agent Observability | **`skill_router`** trace, then **`Agent`** | **`load_skill:*`** under each graph node — see [Part 3]({{< ref "9-part3-full-workflow" >}}) |
+| Skill timing in Agent Observability | **`skill_router`** trace, then **`Agent`** | **`load_skill:*`** under each graph node — see [Part 3]({{< relref "9-part3-full-workflow" >}}) |
 
 ---
 
-**Next:** [Part 3 — Full Workflow]({{< ref "9-part3-full-workflow" >}}) — same alert through a structured LangGraph pipeline; skills load **per step**, not upfront like Part 2.
+**Next:** [Part 3 — Full Workflow]({{< relref "9-part3-full-workflow" >}}) — same alert through a structured LangGraph pipeline; skills load **per step**, not upfront like Part 2.
