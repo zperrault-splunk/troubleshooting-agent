@@ -70,14 +70,17 @@ def _build_limited_tool_node(
     excluded_tool_names: frozenset[str] | None = None,
     tool_call_limits: dict[str, int] | None = None,
     default_tool_limit: int = 1,
-) -> Callable[[AgentState], Awaitable[dict[str, list[BaseMessage]]]]:
+) -> Callable[[AgentState, RunnableConfig], Awaitable[dict[str, list[BaseMessage]]]]:
     """ToolNode wrapper that skips excluded tools and enforces per-tool call budgets."""
     excluded = excluded_tool_names or frozenset()
     limits = tool_call_limits or {}
     tool_node = ToolNode(tools)
     call_counts: dict[str, int] = {}
 
-    async def limited_tools(state: AgentState) -> dict[str, list[BaseMessage]]:
+    async def limited_tools(
+        state: AgentState,
+        config: RunnableConfig,
+    ) -> dict[str, list[BaseMessage]]:
         messages = state["messages"]
         last = messages[-1] if messages else None
         if not isinstance(last, AIMessage) or not last.tool_calls:
@@ -119,7 +122,7 @@ def _build_limited_tool_node(
 
         if allowed_calls:
             filtered_ai = AIMessage(content=last.content, tool_calls=allowed_calls)
-            sub_result = await tool_node.ainvoke({"messages": [filtered_ai]})
+            sub_result = await tool_node.ainvoke({"messages": [filtered_ai]}, config)
             result_messages.extend(sub_result.get("messages", []))
 
         return {"messages": result_messages}
