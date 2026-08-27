@@ -3,7 +3,7 @@ name: Deploy Hugo site to GitHub Pages
 on:
   push:
     branches:
-      - workshop
+      - main
   workflow_dispatch:
 
 permissions:
@@ -33,7 +33,7 @@ jobs:
 
       - name: Build site
         working-directory: docs
-        run: hugo --minify --baseURL https://iortiz-splunk.github.io/troubleshooting-agent/
+        run: hugo --minify --baseURL https://zperrault-splunk.github.io/troubleshooting-agent/
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v4

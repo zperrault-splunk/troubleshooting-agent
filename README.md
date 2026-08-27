@@ -2,7 +2,7 @@
 
 AI troubleshooting agent for applications and systems. This repo is organized as a **three-part workshop**: shared integrations (MCP, Slack, LLM, observability) plus three agent implementations of increasing capability.
 
-**Workshop instructions:** [https://iortiz-splunk.github.io/troubleshooting-agent/](https://iortiz-splunk.github.io/troubleshooting-agent/)
+**Workshop instructions:** [https://zperrault-splunk.github.io/troubleshooting-agent/](https://zperrault-splunk.github.io/troubleshooting-agent/)
 
 ## Prerequisites
 
@@ -104,7 +104,7 @@ ruff check shared part1_agent part2_agent part3_agent tests
 
 ## Documentation
 
-Participant-facing workshop instructions: **[https://iortiz-splunk.github.io/troubleshooting-agent/](https://iortiz-splunk.github.io/troubleshooting-agent/)**
+Participant-facing workshop instructions: **[https://zperrault-splunk.github.io/troubleshooting-agent/](https://zperrault-splunk.github.io/troubleshooting-agent/)**
 
 To preview locally (requires [Hugo Extended](https://gohugo.io/installation/)):
 
