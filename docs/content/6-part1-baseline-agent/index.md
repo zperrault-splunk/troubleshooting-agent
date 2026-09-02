@@ -60,14 +60,14 @@ INFO [inv=chat:5a4dffc6d704] ═════════════════
 INFO HTTP Request: GET https://api.multitenant.galileocloud.io/healthcheck "HTTP/1.1 200 OK"
 INFO HTTP Request: POST https://api.multitenant.galileocloud.io/login/api_key "HTTP/1.1 200 OK"
 INFO HTTP Request: GET https://api.multitenant.galileocloud.io/current_user "HTTP/1.1 200 OK"
-INFO HTTP Request: GET https://api.multitenant.galileocloud.io/projects?project_name=sre-agent-wkshp-shw-2cb1&type=gen_ai "HTTP/1.1 200 OK"
+INFO HTTP Request: GET https://api.multitenant.galileocloud.io/projects?project_name=sre-agent-wkshp&type=gen_ai "HTTP/1.1 200 OK"
 INFO HTTP Request: POST https://api.multitenant.galileocloud.io/projects "HTTP/1.1 200 OK"
 INFO HTTP Request: GET https://api.multitenant.galileocloud.io/projects/26a65ecc-5b04-43b8-adf0-4aabf5af4b94/log_streams/paginated?include_counts=false&starting_token=0&limit=500 "HTTP/1.1 200 OK"
 INFO HTTP Request: POST https://api.multitenant.galileocloud.io/projects/26a65ecc-5b04-43b8-adf0-4aabf5af4b94/log_streams "HTTP/1.1 200 OK"
 INFO HTTP Request: GET https://api.multitenant.galileocloud.io/ingest/healthz "HTTP/1.1 200 OK"
 INFO HTTP Request: POST https://api.multitenant.galileocloud.io/v2/projects/26a65ecc-5b04-43b8-adf0-4aabf5af4b94/sessions/search "HTTP/1.1 200 OK"
 INFO HTTP Request: POST https://api.multitenant.galileocloud.io/v2/projects/26a65ecc-5b04-43b8-adf0-4aabf5af4b94/sessions "HTTP/1.1 200 OK"
-INFO Galileo session=chat-5a4dffc6d704 | part1_agent project=sre-agent-wkshp-shw-2cb1 stream=sre-agent-wkshp console=https://console.multitenant.galileocloud.io
+INFO Galileo session=chat-5a4dffc6d704 | part1_agent project=sre-agent-wkshp stream=sre-agent-wkshp-shw-2cb1 console=https://console.multitenant.galileocloud.io
 INFO HTTP Request: POST https://lite-llm-proxy.splunko11y.com/v1/chat/completions "HTTP/1.1 200 OK"
 INFO [inv=chat:5a4dffc6d704]  trace_id=963b3abe6a9c149c418f84c5fea67a82 [1] LLM turn 1 — calling tools: o11y_search_alerts_or_incidents
 INFO [inv=chat:5a4dffc6d704]  trace_id=963b3abe6a9c149c418f84c5fea67a82 [2] MCP o11y_search_alerts_or_incidents — OK
@@ -119,8 +119,8 @@ Cleared your terminal before you could review the trace? You have two easy optio
 
 After your chat completes, open the [Splunk Agent Observability console](https://console.multitenant.galileocloud.io) and navigate to:
 
-1. **Project** — the name you set (for example, `sre-agent-wkshp-shw-2cb1`)
-2. **Agent Stream** — your log stream from `.env` (for example, `sre-agent-wkshp`)
+1. **Project** — the shared workshop project (`sre-agent-wkshp`)
+2. **Agent Stream** — your log stream from `.env` (for example, `sre-agent-wkshp-shw-2cb1`)
 3. **Sessions** — find the most recent session (named `chat-9265e3375c8b | part1_agent`)
 
 Select the session to open the trace view. You should see three areas: the **trace tree** on the left, the **chat** in the center (user query and agent response), and detail tabs on the right.
