@@ -6,7 +6,7 @@ navTitle: "Configure Environment"
 duration: "10 minutes"
 ---
 
-Your workshop instance and credentials are already configured. Before Part 1, you will **install the agent dependencies** and **personalize your Agent Observability project name** so you can find your traces during the workshop.
+Your workshop instance and credentials are already configured. Before Part 1, you will **install the agent dependencies** and **personalize your Agent Observability log stream** so you can find your traces during the workshop.
 
 ## Install dependencies
 
@@ -40,7 +40,7 @@ Run `source .venv/bin/activate` whenever you open a new SSH session. Your prompt
 
 ## Personalize your Agent Observability settings
 
-Create your `.env` file and set a **unique Agent Observability project name** so your agent runs are easy to find:
+Create your `.env` file and set a **unique Agent Observability log stream** so your agent runs are easy to find:
 
 ```bash
 cd ~/troubleshooting-agent
@@ -48,19 +48,19 @@ cp .env.example .env
 vi .env
 ```
 
-Add or update these lines (use your instance name from `echo $INSTANCE` — see [Connect to EC2]({{< relref "3-connect-ec2" >}})):
+Add or update these lines. Use your instance name from `echo $INSTANCE` (see [Connect to EC2]({{< relref "3-connect-ec2" >}})) — replace `$INSTANCE` in the template with that printed value. Do not leave the dollar sign in `.env`:
 
 ```bash
 ENABLE_GALILEO=true
-GALILEO_PROJECT="sre-agent-wkshp-$INSTANCE"
-GALILEO_LOG_STREAM="sre-agent-wkshp"
+GALILEO_PROJECT="sre-agent-wkshp"
+GALILEO_LOG_STREAM="sre-agent-wkshp-$INSTANCE"
 ```
 
 For example, if `echo $INSTANCE` prints `shw-2cb1`:
 
 ```bash
-GALILEO_PROJECT="sre-agent-wkshp-shw-2cb1"
-GALILEO_LOG_STREAM="sre-agent-wkshp"
+GALILEO_PROJECT="sre-agent-wkshp"
+GALILEO_LOG_STREAM="sre-agent-wkshp-shw-2cb1"
 ```
 
 {{< notice title="Tip" style="tip" >}}
@@ -69,7 +69,7 @@ Use the same **`GALILEO_PROJECT`** and **`GALILEO_LOG_STREAM`** across Parts 1�
 
 Save and exit: press `Esc`, type `:wq`, then press Enter. Your file should look similar to this:
 
-{{< diagram src="images/env-example.png" alt="Example .env file with Agent Observability enabled and a personalized project name" >}}
+{{< diagram src="images/env-example.png" alt="Example .env file with Agent Observability enabled and a personalized log stream name" >}}
 
 ## Splunk Agent Observability
 

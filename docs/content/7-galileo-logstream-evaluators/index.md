@@ -22,15 +22,15 @@ Evaluators answer questions that are hard to judge by eye across dozens of runs:
 |-------------|-----|
 | [Part 1 investigation completed]({{< relref "6-part1-baseline-agent" >}}) | We will use the session/trace from the previous section to compare the before and after enabling evaluators |
 | `.env` Agent Observability settings saved | Same `GALILEO_PROJECT` and `GALILEO_LOG_STREAM` you used in Part 1 |
-| Splunk Agent Observability console access | Open the project your facilitator shared (or the one you created with `GALILEO_PROJECT`) |
+| Splunk Agent Observability console access | Open the shared project `sre-agent-wkshp`, then your instance Agent Stream |
 
 Most out-of-the-box evaluators use an **SLM** (Luna) or **LLM-as-a-judge** to score traces. Prefer **SLM** when configuring evaluators. Your workshop instance should already have an LLM integration configured. If evaluator scores stay empty after several minutes, ask your facilitator to verify **Integrations** in the Splunk Agent Observability console.
 
 ## Open your log stream
 
 1. Sign in to the [Splunk Agent Observability console](https://console.multitenant.galileocloud.io).
-2. Open **Projects** and select your project (for example, `sre-agent-wkshp-shw-2cb1`).
-3. Select **Agent Stream** in the sidebar — this is the log stream named in your `.env` (for example, `sre-agent-wkshp`).
+2. Open **Projects** and select the shared project `sre-agent-wkshp`.
+3. Select **Agent Stream** in the sidebar — this is the log stream named in your `.env` (for example, `sre-agent-wkshp-shw-2cb1`).
 4. Confirm you see at least one session from Part 1 (for example, `chat-9265e3375c8b | part1_agent`).
 
 ## Configure evaluators
@@ -110,8 +110,8 @@ You can also paste alert text from the facilitator's demo. Use **`paymentservice
 
 After your chat completes, open the [Splunk Agent Observability console](https://console.multitenant.galileocloud.io) and navigate to:
 
-1. **Project** — the name you set (for example, `sre-agent-wkshp-shw-2cb1`)
-2. **Agent Stream** — your log stream from `.env` (for example, `sre-agent-wkshp`)
+1. **Project** — the shared workshop project (`sre-agent-wkshp`)
+2. **Agent Stream** — your log stream from `.env` (for example, `sre-agent-wkshp-shw-2cb1`)
 3. **Sessions** — use the session picker (for example, **Session 2 of 2**) to find your two Part 1 runs: the original (trace only) and the newest (with evaluator scores)
 
 Select the **newest** session. When the environment is in the prompt, the trace tree often shows **multiple tool rounds** — the agent is trying, even if the final answer is still incomplete:
