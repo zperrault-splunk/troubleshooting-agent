@@ -32,7 +32,7 @@ If both `err` and `rc_err` return `trace_id` values, analyze **`rc_err` first**,
 2. Prefer the **deepest error span** in the call chain (leaf or last downstream failure), not only the alerted service's entry span.
 3. On that span, read **operation name** (`name`, `operation.name`) and **service** (`service.name`, `sf_service`).
 4. Extract **human-readable failure text** from attributes (see table below) — quote short snippets in RCA; redact secrets.
-5. Note **parent → child** path: e.g. `frontend → checkoutservice → payment` with error on `payment`.
+5. Note **parent → child** path: e.g. `frontend → checkoutservice → paymentservice` with error on `paymentservice`.
 6. If multiple traces show the same failing service + error message, mark RCA **Confirmed**; if only one exemplar, mark **Likely**.
 
 ---

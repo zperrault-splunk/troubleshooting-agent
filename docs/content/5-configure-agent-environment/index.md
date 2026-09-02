@@ -45,7 +45,7 @@ Create your `.env` file and set a **unique Agent Observability project name** so
 ```bash
 cd ~/troubleshooting-agent
 cp .env.example .env
-nano .env
+vi .env
 ```
 
 Add or update these lines (use your instance name from `echo $INSTANCE` — see [Connect to EC2]({{< relref "3-connect-ec2" >}})):
@@ -67,7 +67,7 @@ GALILEO_LOG_STREAM="sre-agent-wkshp"
 Use the same **`GALILEO_PROJECT`** and **`GALILEO_LOG_STREAM`** across Parts 1–3. Do not change the log stream when you switch to `part2_agent` or `part3_agent` — all sessions land in one **Agent Stream** so you can compare Part 1, Part 2, and Part 3 side by side.
 {{< /notice >}}
 
-Save and exit (`Ctrl + O`, `Enter`, `Ctrl + X` in nano). Your file should look similar to this:
+Save and exit: press `Esc`, type `:wq`, then press Enter. Your file should look similar to this:
 
 {{< diagram src="images/env-example.png" alt="Example .env file with Agent Observability enabled and a personalized project name" >}}
 
@@ -85,7 +85,7 @@ Save and exit (`Ctrl + O`, `Enter`, `Ctrl + X` in nano). Your file should look s
 | **JSONL files** | `shared/logs/investigations/` | Review after a run |
 | **Agent Observability sessions** | Splunk Agent Observability console | Comparing runs across Parts 1–3 |
 
-In **Part 1**, open **Agent Stream** in the Splunk Agent Observability console to see the ReAct loop — `Agent:agent` (LLM turns), `should_continue` (graph routing), and `tools` (MCP calls). Parts 2 and 3 add skills and named workflow nodes.
+In **Part 1**, open **Agent Stream** in the [Splunk Agent Observability console](https://console.multitenant.galileocloud.io) to see the ReAct loop — `Agent:agent` (LLM turns), `should_continue` (graph routing), and `tools` (MCP calls). Parts 2 and 3 add skills and named workflow nodes.
 
 Each investigation creates a **session** named like `chat-abc123 | part1_agent` in your Agent Observability project (terminal IDs use `chat:`; session names in the console use `chat-`).
 

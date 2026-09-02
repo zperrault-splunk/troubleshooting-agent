@@ -46,7 +46,7 @@ The repository is at `~/troubleshooting-agent` on your instance. Follow the work
 
 {{< notice title="Tips" style="tip" >}}
 - Run commands from the **part directory** (`part1_agent/`, `part2_agent/`, `part3_agent/`) — the CLI picks up the agent for that part automatically.
-- Workshop demo defaults: service **`payment`**, environment **`sre-agent-workshop`** — include both in chat prompts during Parts 1 and 2.
+- Workshop demo defaults: service **`paymentservice`**, environment **`splunk-hipster`** — include both in chat prompts during Parts 1 and 2.
 - Use `troubleshooting-agent chat "your question"` for investigations during the workshop.
 - If a tool call fails, check `troubleshooting-agent mcp-doctor` first — most issues are credential or gateway configuration.
 - Compare Part 1 and Part 3 responses on the **same alert** to see the impact of skills and graph structure.

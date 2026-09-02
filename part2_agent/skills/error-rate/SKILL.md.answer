@@ -22,7 +22,7 @@ Detector or Slack text mentions elevated errors or error rate.
 
 1. **o11y_search_alerts_or_incidents** (optional context)
    - `params.service_name` — exact APM service
-   - `params.environments` — list, e.g. `["sre-agent-workshop"]`
+   - `params.environments` — list, e.g. `["splunk-hipster"]`
    - `params.time_range` — `{"start": "-1h", "stop": "now"}`
    - **Do not** set `params.severity` unless the user explicitly asked for a severity filter.
    - If you must filter severity, use a **list**: `["critical"]` — never a bare string.

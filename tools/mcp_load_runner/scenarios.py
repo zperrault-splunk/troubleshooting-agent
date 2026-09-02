@@ -9,7 +9,7 @@ from mcp_load_runner.servers import McpServerSelection
 from workshop_shared.config import Settings
 
 
-DEFAULT_APM_SERVICE_NAME = "payment"
+DEFAULT_APM_SERVICE_NAME = "paymentservice"
 DEFAULT_SPLUNK_LOG_SERVICE = "payment"
 DEFAULT_EXEMPLAR_TYPE = "err"
 

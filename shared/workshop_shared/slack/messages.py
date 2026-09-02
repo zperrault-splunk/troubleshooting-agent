@@ -60,7 +60,7 @@ _O11Y_DETECTOR_ID_LABEL_RE = re.compile(
 )
 _O11Y_RULE_COLON_RE = re.compile(r"Rule:\s*(.+?)(?:\.\s|\.\s*$|$)", re.IGNORECASE)
 _O11Y_WORKSHOP_SERVICE_ENV_RE = re.compile(
-    r"\b([a-z][a-z0-9_-]*)\s+service\s+in\s+([a-z0-9_-]+)\s+environment\b",
+    r"\b([a-z][a-z0-9_-]*)(?:\s+service)?\s+in\s+([a-z0-9_-]+)\s+environment\b",
     re.IGNORECASE,
 )
 _O11Y_DETECTOR_URL_RE = re.compile(r"/detector/([A-Za-z0-9_-]+)", re.IGNORECASE)

@@ -42,7 +42,7 @@ Provider auto-detection: if `OPENAI_API_KEY` and `OPENAI_BASE_URL` are set, `ope
 | `SPLUNK_O11Y_REALM` | Observability realm (e.g. `us1`) |
 | `SPLUNK_O11Y_API_TOKEN` | Observability API token (`X-SF-TOKEN`) |
 | `SPLUNK_O11Y_TOOL_PREFIX` | Default `o11y_` |
-| `SPLUNK_O11Y_ENVIRONMENT` | Default APM environment for `o11y_get_apm_*` when alert/metadata omit `sf_environment` (default: `sre-agent-workshop`) |
+| `SPLUNK_O11Y_ENVIRONMENT` | Default APM environment for `o11y_get_apm_*` when alert/metadata omit `sf_environment` (default: `splunk-hipster`) |
 | `SPLUNK_SEARCH_INDEX` | Default Splunk index for `splunk_run_query` (default: `splunk4rookies-workshop`) |
 
 Auth uses `X-SF-REALM` + `X-SF-TOKEN` (not Splunk Cloud Bearer).
@@ -102,7 +102,7 @@ With `AGENT_LOG_TRACE=true` (default), every part prints a structured trace:
 ══════════════════════════════════════════════════════════════
  Investigation  chat:abc123  |  part2  |  cli
 ──────────────────────────────────────────────────────────────
- Query: Investigate latency on payment in the sre-agent-workshop environment
+ Query: Investigate latency on paymentservice in the splunk-hipster environment
  Skill: latency-spike
  LLM: ollama  |  MCP tools available: 12
 ══════════════════════════════════════════════════════════════

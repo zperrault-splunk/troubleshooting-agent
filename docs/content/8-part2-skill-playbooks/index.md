@@ -35,7 +35,7 @@ Your message → keyword router → SKILL.md → system prompt → ReAct loop (L
 
 Make sure [Part 1]({{< relref "6-part1-baseline-agent" >}}) and [Configure Evaluators]({{< relref "7-galileo-logstream-evaluators" >}}) are done — you will compare against those sessions.
 
-From `part2_agent`, run a **latency** investigation. Use the workshop defaults — service **`payment`**, environment **`sre-agent-workshop`**:
+From `part2_agent`, run a **latency** investigation. Use the workshop defaults — service **`paymentservice`**, environment **`splunk-hipster`**:
 
 {{< notice title="Same log stream" style="tip" >}}
 Do **not** change `GALILEO_LOG_STREAM` in `.env` when you switch to `part2_agent`. Part 2 sessions appear in the same Agent Stream as Part 1 — look for the `part2_agent` suffix in the session name.
@@ -48,7 +48,7 @@ Do **not** change `GALILEO_LOG_STREAM` in `.env` when you switch to `part2_agent
 cd ~/troubleshooting-agent
 source .venv/bin/activate
 cd part2_agent
-troubleshooting-agent chat "Investigate latency on payment in the sre-agent-workshop environment"
+troubleshooting-agent chat "Investigate latency on paymentservice in the splunk-hipster environment"
 ```
 
 {{% /tab %}}
@@ -57,12 +57,12 @@ troubleshooting-agent chat "Investigate latency on payment in the sre-agent-work
 The keyword router should select **`latency-spike`** because the message contains signals like `latency`. The agent should also load **`investigation-report`** on every Part 2 run (report formatting — not matched by keywords).
 
 {{< notice title="Workshop defaults" style="tip" >}}
-Use **`payment`** and **`sre-agent-workshop`** for all Part 2 chat commands unless your facilitator says otherwise — same service and environment as Part 1.
+Use **`paymentservice`** and **`splunk-hipster`** for all Part 2 chat commands unless your facilitator says otherwise — same service and environment as Part 1.
 {{< /notice >}}
 
 ## Review Part 2 in Splunk Agent Observability
 
-Open **Agent Stream** and find the newest session named `chat-… | part2_agent`.
+Open **Agent Stream** in the [Splunk Agent Observability console](https://console.multitenant.galileocloud.io) and find the newest session named `chat-… | part2_agent`.
 
 {{< notice title="Skills are prompt injection, not MCP tools" style="primary" >}}
 Playbooks are appended to the **system prompt** before the ReAct loop runs. You will **not** see `load_skill:investigation-report` or `load_skill:latency-spike` under **`Agent` → `tools`** — those spans only show MCP calls like `o11y_search_alerts_or_incidents`.
@@ -104,7 +104,7 @@ On the **Evaluators** tab, compare this session to your Part 1 baseline on a sim
 | Evaluator | What to look for |
 |-----------|------------------|
 | **Tool selection quality** | Did the agent call the tools the playbook names? |
-| **Action advancement / completion** | Did it get further than Part 1’s “please provide environment” or “here are next steps” stops? |
+| **Action Completion** | Did it get further than Part 1’s “please provide environment” or “here are next steps” stops? |
 | **Context adherence** | Are cited metrics present in MCP tool output? |
 | **Instruction adherence** | Did it follow the report skill (no raw JSON dumps)? |
 
@@ -224,7 +224,7 @@ After saving **`error-rate/SKILL.md`**, run an error-focused investigation:
 
 ```bash
 cd ~/troubleshooting-agent/part2_agent
-troubleshooting-agent chat "Investigate elevated 5xx errors on payment in the sre-agent-workshop environment"
+troubleshooting-agent chat "Investigate elevated 5xx errors on paymentservice in the splunk-hipster environment"
 ```
 
 {{% /tab %}}

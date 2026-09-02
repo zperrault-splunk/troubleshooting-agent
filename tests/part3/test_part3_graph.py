@@ -141,12 +141,12 @@ async def test_metadata_only_still_investigates() -> None:
         result = await app.ainvoke(
             {
                 "user_message": (
-                    "Troubleshoot payment service in sre-agent-workshop. "
+                    "Troubleshoot paymentservice in splunk-hipster. "
                     "DetectorId HNcv52_AwAA. Rule: SRE Agent - PaymentService High Error Rate."
                 ),
                 "investigation_metadata": {
-                    "service": "payment",
-                    "environment": "sre-agent-workshop",
+                    "service": "paymentservice",
+                    "environment": "splunk-hipster",
                     "detector_id": "HNcv52_AwAA",
                     "rule": "SRE Agent - PaymentService High Error Rate",
                 },
@@ -272,7 +272,7 @@ def test_investigate_user_content_uses_custom_index_from_settings() -> None:
 def test_investigate_user_content_skips_splunk_when_unavailable() -> None:
     content = _investigate_user_content(
         user_text="investigate errors",
-        alert={"sf_service": "payment", "sf_environment": "sre-agent-workshop"},
+        alert={"sf_service": "paymentservice", "sf_environment": "splunk-hipster"},
         investigation_metadata=None,
         product_type="apm",
         splunk_available=False,
@@ -353,7 +353,7 @@ async def test_investigate_subgraph_omits_search_logs_when_splunk_unavailable() 
     llm = _FakeLLM()
     apm_alert = {
         "originatingMetric": "request.error",
-        "customProperties": {"sf_service": "payment"},
+        "customProperties": {"sf_service": "paymentservice"},
     }
 
     with (
@@ -372,7 +372,7 @@ async def test_investigate_subgraph_omits_search_logs_when_splunk_unavailable() 
         result = await app.ainvoke(
             {
                 "user_message": "troubleshoot",
-                "investigation_metadata": {"service": "payment"},
+                "investigation_metadata": {"service": "paymentservice"},
                 "skills_loaded": [],
             }
         )

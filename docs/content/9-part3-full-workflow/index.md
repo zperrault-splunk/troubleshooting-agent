@@ -97,21 +97,21 @@ Do **not** change `GALILEO_LOG_STREAM` in `.env` when you switch to `part3_agent
 cd ~/troubleshooting-agent
 source .venv/bin/activate
 cd part3_agent
-troubleshooting-agent chat "Troubleshoot the Splunk Observability alert: payment service in sre-agent-workshop environment. DetectorId HNcv52_AwAA. Rule: SRE Agent - PaymentService High Error Rate. Find root cause of the high error rate and confirm whether it is resolved."
+troubleshooting-agent chat "Troubleshoot the Splunk Observability alert: paymentservice in splunk-hipster environment. DetectorId HNcv52_AwAA. Rule: SRE Agent - PaymentService High Error Rate. Find root cause of the high error rate and confirm whether it is resolved."
 ```
 
 {{% /tab %}}
 {{< /tabs >}}
 
 {{< notice title="Mock alert fields" style="tip" >}}
-The workshop prompt mirrors a Slack alert: **service** (`payment`), **environment** (`sre-agent-workshop`), **detector ID**, and **rule name**. Part 3 uses these to fetch the alert payload, categorize as APM, run **`troubleshoot-apm-incidents`** + **`search-logs`**, then format **`troubleshoot-report`**.
+The workshop prompt mirrors a Slack alert: **service** (`paymentservice`), **environment** (`splunk-hipster`), **detector ID**, and **rule name**. Part 3 uses these to fetch the alert payload, categorize as APM, run **`troubleshoot-apm-incidents`** + **`search-logs`**, then format **`troubleshoot-report`**.
 {{< /notice >}}
 
 Agent Observability sessions are named `chat-… | part3_agent`. Expect **`part3_investigation`** with nodes **`identify` → `categorize` → `investigate` → `report`** — not a single ReAct **`Agent`** trace.
 
 ## Review Part 3 in Splunk Agent Observability
 
-1. Open **Agent Stream** and find a session ending in **`part3_agent`**.
+1. Open **Agent Stream** in the [Splunk Agent Observability console](https://console.multitenant.galileocloud.io) and find a session ending in **`part3_agent`**.
 2. Expand **`part3_investigation`** — confirm **named nodes** (`identify`, `categorize`, `investigate`, `report`), not repeated generic `Agent:Agent` spans.
 3. Under **`identify`**, **`investigate`**, and **`report`**, expand **`load_skill:*`** spans — note **when** each playbook enters the prompt relative to MCP tool calls.
 4. Compare to your Part 2 session on a similar alert — same tools may run, but the trace **shape** and **skill timing** should differ.

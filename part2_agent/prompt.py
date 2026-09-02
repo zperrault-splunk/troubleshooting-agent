@@ -16,7 +16,7 @@ Investigation checklist:
 Observability tools (when connected):
 - You MUST invoke Splunk Observability MCP tools (o11y_* prefix) via the tool-calling interface.
 - MCP tools take a ``params`` object. Use params.service_name for the exact APM service name.
-- Use params.environments as a **list** (e.g. ["sre-agent-workshop"]) — not environment_name as a string.
+- Use params.environments as a **list** (e.g. ["splunk-hipster"]) — not environment_name as a string.
 - For time windows: params.time_range = {"start": "-1h", "stop": "now"} — never a bare string.
 - o11y_search_alerts_or_incidents: omit params.severity unless the user explicitly asked for a severity; if set, use a **list** (e.g. ["critical"]), never a bare string.
 - Prefer eventId from search results when referencing alerts in Observability Cloud.

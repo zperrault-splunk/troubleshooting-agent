@@ -30,7 +30,7 @@ If you want to skim the code before running:
 
 Make sure you completed [Configure Environment]({{< relref "5-configure-agent-environment" >}}) — virtual environment installed, `.env` configured, and both doctor commands passing.
 
-Start with a CLI investigation using the workshop defaults — service **`payment`**, environment **`sre-agent-workshop`**:
+Start with a CLI investigation using the workshop defaults — service **`paymentservice`**, environment **`splunk-hipster`**:
 
 {{< tabs >}}
 {{% tab title="Script" open="true" %}}
@@ -39,14 +39,14 @@ Start with a CLI investigation using the workshop defaults — service **`paymen
 cd ~/troubleshooting-agent
 source .venv/bin/activate
 cd part1_agent
-troubleshooting-agent chat "Why does payment have errors in the sre-agent-workshop environment?"
+troubleshooting-agent chat "Why does paymentservice have errors in the splunk-hipster environment?"
 ```
 
 {{% /tab %}}
 {{% tab title="Example Output" %}}
 
 ```text
-(.venv) splunk@ip-172-31-19-27:~/troubleshooting-agent/part1_agent$ troubleshooting-agent chat "Why does payment have errors in the sre-agent-workshop environment?"
+(.venv) splunk@ip-172-31-19-27:~/troubleshooting-agent/part1_agent$ troubleshooting-agent chat "Why does paymentservice have errors in the splunk-hipster environment?"
 INFO Splunk OTel initialized service=troubleshooting-agent
 INFO HTTP Request: POST https://lite-llm-proxy.splunko11y.com/v1/chat/completions "HTTP/1.1 200 OK"
 INFO [inv=chat:5a4dffc6d704] Log file: /home/splunk/troubleshooting-agent/shared/logs/investigations/chat-5a4dffc6d704.jsonl
@@ -54,7 +54,7 @@ INFO [inv=chat:5a4dffc6d704]
 INFO [inv=chat:5a4dffc6d704] ══════════════════════════════════════════════════════════════
 INFO [inv=chat:5a4dffc6d704]  Investigation  chat:5a4dffc6d704  |  part1_agent  |  cli
 INFO [inv=chat:5a4dffc6d704] ──────────────────────────────────────────────────────────────
-INFO [inv=chat:5a4dffc6d704]  Query: Why does payment have errors in the sre-agent-workshop environment?
+INFO [inv=chat:5a4dffc6d704]  Query: Why does paymentservice have errors in the splunk-hipster environment?
 INFO [inv=chat:5a4dffc6d704]  LLM: openai  |  MCP tools available: 12
 INFO [inv=chat:5a4dffc6d704] ══════════════════════════════════════════════════════════════
 INFO HTTP Request: GET https://api.multitenant.galileocloud.io/healthcheck "HTTP/1.1 200 OK"
@@ -85,14 +85,14 @@ INFO [inv=chat:5a4dffc6d704]
 INFO [inv=chat:5a4dffc6d704] ──────────────────────────────────────────────────────────────
 INFO [inv=chat:5a4dffc6d704]  Agent response
 INFO [inv=chat:5a4dffc6d704] ──────────────────────────────────────────────────────────────
-INFO [inv=chat:5a4dffc6d704] payment in sre-agent-workshop shows elevated errors in the last hour. I found … (summary from MCP tool JSON — your run may differ)
+INFO [inv=chat:5a4dffc6d704] paymentservice in splunk-hipster shows elevated errors in the last hour. I found … (summary from MCP tool JSON — your run may differ)
 INFO [inv=chat:5a4dffc6d704] ══════════════════════════════════════════════════════════════
 ```
 
 {{% /tab %}}
 {{< /tabs >}}
 
-You can also paste alert text from the facilitator's demo. Always include **service** (`payment`) and **environment** (`sre-agent-workshop`) when asking about a specific service.
+You can also paste alert text from the facilitator's demo. Always include **service** (`paymentservice`) and **environment** (`splunk-hipster`) when asking about a specific service.
 
 ## Read the terminal trace
 
@@ -100,7 +100,7 @@ With `AGENT_LOG_TRACE=true` (the default), every run prints a structured trace t
 
 1. **Which MCP tools did the agent call?** — Look for `[n] MCP o11y_...` lines.
 2. **Which tools did it skip?** — A baseline agent often skips traces, logs, or infrastructure correlation.
-3. **Were parameters correct?** — Service should be `payment`, environment `sre-agent-workshop` (exact APM names). Time ranges should use `{"start": "-1h", "stop": "now"}` inside a `params` object.
+3. **Were parameters correct?** — Service should be `paymentservice`, environment `splunk-hipster` (exact APM names). Time ranges should use `{"start": "-1h", "stop": "now"}` inside a `params` object.
 4. **Is the answer grounded?** — Does the final response reflect actual JSON from tool results, or does it sound plausible without evidence?
 
 The same events are written to `shared/logs/investigations/<id>.jsonl` for post-workshop review. Each run prints the path at the end (look for `Log file:` in the output).
@@ -112,12 +112,12 @@ Cleared your terminal before you could review the trace? You have two easy optio
   ```bash
   ls -t ~/troubleshooting-agent/shared/logs/investigations/*.jsonl | head -1
   ```
-- **Re-run the same command** — run `troubleshooting-agent chat "Why does payment have errors in the sre-agent-workshop environment?"` again. You will get a new trace (and a new Agent Observability session), but the investigation flow is the same.
+- **Re-run the same command** — run `troubleshooting-agent chat "Why does paymentservice have errors in the splunk-hipster environment?"` again. You will get a new trace (and a new Agent Observability session), but the investigation flow is the same.
 {{< /notice >}}
 
 ## Review the run in Splunk Agent Observability
 
-After your chat completes, open the **Splunk Agent Observability console** and navigate to:
+After your chat completes, open the [Splunk Agent Observability console](https://console.multitenant.galileocloud.io) and navigate to:
 
 1. **Project** — the name you set (for example, `sre-agent-wkshp-shw-2cb1`)
 2. **Agent Stream** — your log stream from `.env` (for example, `sre-agent-wkshp`)
@@ -147,13 +147,13 @@ Keep the Splunk Agent Observability console open in a browser tab during the wor
 
 ## Baseline exercise
 
-Work through this checklist using the workshop defaults — **`payment`** in environment **`sre-agent-workshop`**:
+Work through this checklist using the workshop defaults — **`paymentservice`** in environment **`splunk-hipster`**:
 
 | Step | Action |
 |------|--------|
-| 1 | Run `troubleshooting-agent chat "Why does payment have errors in the sre-agent-workshop environment?"` |
+| 1 | Run `troubleshooting-agent chat "Why does paymentservice have errors in the splunk-hipster environment?"` |
 | 2 | Read the terminal trace — list tools called vs. tools skipped |
-| 3 | Open Splunk Agent Observability — find your session and expand agent/tool spans |
+| 3 | Open [Splunk Agent Observability](https://console.multitenant.galileocloud.io) — find your session and expand agent/tool spans |
 | 4 | Answer: *Did the agent ground its conclusion in MCP data?* |
 | 5 | Answer: *Where might it have hallucinated if MCP had returned empty results?* |
 | 6 | **Save your notes** — you will re-run the same scenario in Part 2 and Part 3 |

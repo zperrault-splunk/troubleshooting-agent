@@ -10,7 +10,7 @@ from workshop_shared.workshop_targets import (
 
 def test_settings_default_workshop_targets() -> None:
     settings = Settings()
-    assert settings.splunk_o11y_environment == "sre-agent-workshop"
+    assert settings.splunk_o11y_environment == "splunk-hipster"
     assert settings.splunk_search_index == "splunk4rookies-workshop"
 
 
