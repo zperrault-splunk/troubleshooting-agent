@@ -43,6 +43,7 @@ The repository is at `~/troubleshooting-agent` on your instance. Follow the work
 6. [Part 2 — Skill Playbooks]({{< relref "8-part2-skill-playbooks" >}})
 7. [Part 3 — Full Workflow]({{< relref "9-part3-full-workflow" >}})
 8. [Production-Ready Agent]({{< relref "10-production-ready-agent" >}}) *(optional)*
+9. [FAQ]({{< relref "11-faq" >}})
 
 {{< notice title="Tips" style="tip" >}}
 - Run commands from the **part directory** (`part1_agent/`, `part2_agent/`, `part3_agent/`) — the CLI picks up the agent for that part automatically.
