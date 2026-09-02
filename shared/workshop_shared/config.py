@@ -198,7 +198,7 @@ class Settings(BaseSettings):
         description="Only expose MCP tools whose names start with this prefix",
     )
     splunk_o11y_environment: str = Field(
-        default="sre-agent-workshop",
+        default="splunk-hipster",
         description=(
             "Default APM environment for o11y_get_apm_* tools when alert/metadata omit sf_environment"
         ),

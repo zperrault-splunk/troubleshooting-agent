@@ -60,8 +60,8 @@ def test_categorize_unknown_when_empty() -> None:
 
 def test_investigation_has_anchors_payment_workshop() -> None:
     metadata = {
-        "service": "payment",
-        "environment": "sre-agent-workshop",
+        "service": "paymentservice",
+        "environment": "splunk-hipster",
         "detector_id": "HNcv52_AwAA",
         "rule": "SRE Agent - PaymentService High Error Rate",
     }
@@ -71,21 +71,21 @@ def test_investigation_has_anchors_payment_workshop() -> None:
 def test_build_context_alert_from_workshop_metadata() -> None:
     alert = build_context_alert(
         {
-            "service": "payment",
-            "environment": "sre-agent-workshop",
+            "service": "paymentservice",
+            "environment": "splunk-hipster",
             "detector_id": "HNcv52_AwAA",
             "rule": "SRE Agent - PaymentService High Error Rate",
         }
     )
     assert alert is not None
-    assert alert["customProperties"]["sf_service"] == "payment"
+    assert alert["customProperties"]["sf_service"] == "paymentservice"
     assert alert["originatingMetric"] == "request.error"
 
 
 def test_categorize_investigation_without_mcp_payload() -> None:
     metadata = {
-        "service": "payment",
-        "environment": "sre-agent-workshop",
+        "service": "paymentservice",
+        "environment": "splunk-hipster",
         "detector_id": "HNcv52_AwAA",
         "rule": "SRE Agent - PaymentService High Error Rate",
     }

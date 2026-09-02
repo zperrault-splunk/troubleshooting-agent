@@ -47,7 +47,7 @@ Make a note of this, as your instance name is unique to you and will be used lat
 ## Connect Visual Studio Code (Optional)
 
 {{< notice title="Tip" style="tip" >}}
-We'll be editing several files throughout the workshop. The workshop instructions include tips for doing this using a `vi` editor, and workshop participants can use the `nano` editor as well.
+We'll be editing several files throughout the workshop. The workshop instructions include tips for doing this using a `vi` editor.
 {{< /notice >}}
 
 If you prefer a full-fledged IDE, you can connect Visual Studio Code running on your laptop to edit remote files on the EC2 instance.

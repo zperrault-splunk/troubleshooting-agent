@@ -21,7 +21,7 @@ Optional Splunk Cloud step:
 
 6. `splunk_run_query` — searches `index=splunk4rookies-workshop` for `_raw="*payment*"` by default
 
-Defaults: APM service **`payment`**, environment **`sre-agent-workshop`**, exemplar type **`err`** when exemplars are enabled.
+Defaults: APM service **`paymentservice`**, environment **`splunk-hipster`**, exemplar type **`err`** when exemplars are enabled.
 
 Use this to find how many simultaneous participants your MCP backends tolerate before latency spikes, throttling, or failures.
 

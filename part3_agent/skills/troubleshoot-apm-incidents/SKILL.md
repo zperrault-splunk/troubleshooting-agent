@@ -49,7 +49,7 @@ After **o11y_get_apm_exemplar_traces**, **do not skip** full trace detail when `
    - Identify the **deepest failing span** (often downstream of the alerted service).
    - Read **span attributes** on that span — they often contain the exact failure (exception message, HTTP route, RPC method, DB error, `code.function`, stack hints).
 4. **Name the root cause component** — service + operation + short error quote from attributes (not invented text).
-5. **Record call path** — e.g. `frontend → checkoutservice → payment` with failure on `payment`.
+5. **Record call path** — e.g. `frontend → checkoutservice → paymentservice` with failure on `paymentservice`.
 6. Carry **`trace_id`** and error text into **search-logs** (when Splunk MCP is connected) and **troubleshoot-report** RCA.
 
 Attribute field names vary by instrumentation. Prioritize: `exception.message`, `exception.type`, `http.route`, `http.status_code`, `rpc.method`, `db.statement`, `code.function`, `code.namespace`, `error.message`, `service.name`, `operation.name`. More detail: [reference.md](reference.md).

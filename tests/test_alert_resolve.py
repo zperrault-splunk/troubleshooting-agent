@@ -140,8 +140,8 @@ def test_pick_matching_alert_falls_back_to_detector_when_event_id_stale() -> Non
             "detectorId": "HNcv52_AwAA",
             "detectLabel": "SRE Agent - PaymentService High Error Rate",
             "customProperties": {
-                "sf_service": "payment",
-                "sf_environment": "sre-agent-workshop",
+                "sf_service": "paymentservice",
+                "sf_environment": "splunk-hipster",
             },
         },
     ]
@@ -150,8 +150,8 @@ def test_pick_matching_alert_falls_back_to_detector_when_event_id_stale() -> Non
         {
             "event_id": "HOfTd1TA0AE",
             "detector_id": "HNcv52_AwAA",
-            "service": "payment",
-            "environment": "sre-agent-workshop",
+            "service": "paymentservice",
+            "environment": "splunk-hipster",
             "rule": "SRE Agent - PaymentService High Error Rate",
         },
     )
@@ -162,14 +162,14 @@ def test_pick_matching_alert_falls_back_to_detector_when_event_id_stale() -> Non
 
 def test_parse_o11y_alert_context_extracts_workshop_cli_prompt() -> None:
     text = (
-        "Troubleshoot the Splunk Observability alert: payment service in "
-        "sre-agent-workshop environment. DetectorId HNcv52_AwAA. "
+        "Troubleshoot the Splunk Observability alert: paymentservice in "
+        "splunk-hipster environment. DetectorId HNcv52_AwAA. "
         "Rule: SRE Agent - PaymentService High Error Rate. "
         "Find root cause of the high error rate and confirm whether it is resolved."
     )
     context = parse_o11y_alert_context(text)
-    assert context["service"] == "payment"
-    assert context["environment"] == "sre-agent-workshop"
+    assert context["service"] == "paymentservice"
+    assert context["environment"] == "splunk-hipster"
     assert context["detector_id"] == "HNcv52_AwAA"
     assert context["rule"] == "SRE Agent - PaymentService High Error Rate"
 

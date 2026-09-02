@@ -28,7 +28,7 @@ Most out-of-the-box evaluators use an **SLM** (Luna) or **LLM-as-a-judge** to sc
 
 ## Open your log stream
 
-1. Sign in to the Splunk Agent Observability console.
+1. Sign in to the [Splunk Agent Observability console](https://console.multitenant.galileocloud.io).
 2. Open **Projects** and select your project (for example, `sre-agent-wkshp-shw-2cb1`).
 3. Select **Agent Stream** in the sidebar — this is the log stream named in your `.env` (for example, `sre-agent-wkshp`).
 4. Confirm you see at least one session from Part 1 (for example, `chat-9265e3375c8b | part1_agent`).
@@ -61,12 +61,9 @@ Use these to score **how the agent investigates**, not just what it says at the 
 |-----------|-----------|-------------------|----------------|
 | [**Tool selection quality**](https://docs.galileo.ai/concepts/metrics/agentic/tool-selection-quality) | LLM span | Whether the model chose appropriate tools for the task | Did it call `o11y_get_apm_service_errors_and_requests` vs. skipping straight to a vague answer? |
 | [**Tool error**](https://docs.galileo.ai/concepts/metrics/agentic/tool-error) | Tool span | Failures during tool execution | Catches MCP validation errors (for example, missing `environment_name`) |
-| [**Action advancement**](https://docs.galileo.ai/concepts/metrics/agentic/action-advancement) | Trace | Whether each step moves the investigation forward | Useful when comparing shallow Part 1 runs vs. deeper Part 2/3 runs |
-| [**Action completion**](https://docs.galileo.ai/concepts/metrics/agentic/action-completion) | Session | Whether the agent achieved the user's goal | Did it actually investigate errors, or only ask clarifying questions? |
-| [**Agent efficiency**](https://docs.galileo.ai/concepts/metrics/agentic/agent-efficiency) | Session | Whether the path to the answer was reasonably direct | Flags excessive LLM turns or redundant tool calls |
-| [**Reasoning coherence**](https://docs.galileo.ai/concepts/metrics/agentic/reasoning-coherence) | LLM span | Logical consistency across planning steps | More useful in Part 3's multi-node graph |
+| [**Action Completion**](https://docs.galileo.ai/concepts/metrics/agentic/action-completion) | Session | Whether the agent achieved the user's goal | Did it actually investigate errors, or only ask clarifying questions? |
 
-**Minimum set for Part 1:** turn on **Tool selection quality**, **Tool error**, and **Action completion**.
+**Minimum set for Part 1:** turn on **Tool selection quality**, **Tool error**, and **Action Completion**.
 
 ### Response quality — hallucination and grounding
 
@@ -74,16 +71,10 @@ These evaluators judge the **final answer** against the evidence available in th
 
 | Evaluator | Node type | What it tells you | Workshop focus |
 |-----------|-----------|-------------------|----------------|
-| [**Context adherence**](https://docs.galileo.ai/concepts/metrics/rag/generation-quality/context-adherence) | LLM span | Closed-domain hallucination — claims not supported by provided context | Scores low when the model invents service names, error rates, or root causes not present in MCP JSON |
-| [**Correctness**](https://docs.galileo.ai/concepts/metrics/response-quality/correctness) | LLM span | Factual accuracy of the response | Complements context adherence when tool output is sparse |
-| [**Instruction adherence**](https://docs.galileo.ai/concepts/metrics/response-quality/instruction-adherence) | LLM span | Whether the model followed system instructions | Part 1's prompt requires using `o11y_*` tools for live data |
-| [**Completeness**](https://docs.galileo.ai/concepts/metrics/rag/generation-quality/completeness) | LLM span | Whether the answer addresses all parts of the user query | Flags partial answers when the user asked about errors, latency, and dependencies |
+| [**Context Adherence**](https://docs.galileo.ai/concepts/metrics/rag/generation-quality/context-adherence) | LLM span | Closed-domain hallucination — claims not supported by provided context | Scores low when the model invents service names, error rates, or root causes not present in MCP JSON |
+| [**Instruction Adherence**](https://docs.galileo.ai/concepts/metrics/response-quality/instruction-adherence) | LLM span | Whether the model followed system instructions | Part 1's prompt requires using `o11y_*` tools for live data |
 
-**Minimum set for hallucination checks:** turn on **Context adherence** and **Instruction adherence**.
-
-{{< notice title="Context adherence vs. correctness" style="tip" >}}
-**Context adherence** is the primary hallucination signal for this workshop: it checks whether claims appear in the **context Agent Observability sees** (tool outputs attached to the trace). **Correctness** is broader factuality and is most useful when you have a known-good answer or rich tool results to compare against.
-{{< /notice >}}
+**Minimum set for hallucination checks:** turn on **Context Adherence** and **Instruction Adherence**.
 
 After you click **Apply**, reopen **Configure Evaluators** to confirm your selections. It should look similar to this:
 
@@ -97,7 +88,7 @@ After you apply evaluators and click **Not Now** on past logs, re-run the same P
 
 ### Run the investigation
 
-Re-run the same Part 1 investigation. Use the workshop defaults — service **`payment`**, environment **`sre-agent-workshop`**:
+Re-run the same Part 1 investigation. Use the workshop defaults — service **`paymentservice`**, environment **`splunk-hipster`**:
 
 {{< tabs >}}
 {{% tab title="Script" open="true" %}}
@@ -106,18 +97,18 @@ Re-run the same Part 1 investigation. Use the workshop defaults — service **`p
 cd ~/troubleshooting-agent
 source .venv/bin/activate
 cd part1_agent
-troubleshooting-agent chat "Why does payment have errors in the sre-agent-workshop environment?"
+troubleshooting-agent chat "Why does paymentservice have errors in the splunk-hipster environment?"
 ```
 
 {{% /tab %}}
 {{< /tabs >}}
 
-You can also paste alert text from the facilitator's demo. Use **`payment`** and **`sre-agent-workshop`** when asking about the workshop demo service.
+You can also paste alert text from the facilitator's demo. Use **`paymentservice`** and **`splunk-hipster`** when asking about the workshop demo service.
 
 
 ### Review the run in Splunk Agent Observability
 
-After your chat completes, open the **Splunk Agent Observability console** and navigate to:
+After your chat completes, open the [Splunk Agent Observability console](https://console.multitenant.galileocloud.io) and navigate to:
 
 1. **Project** — the name you set (for example, `sre-agent-wkshp-shw-2cb1`)
 2. **Agent Stream** — your log stream from `.env` (for example, `sre-agent-wkshp`)
@@ -143,17 +134,19 @@ If the environment is missing, you may see a **shallower** trace instead — for
 
 The center panel shows the **chat** — your query and the agent's final response. On the right, open the **Evaluators** tab to see scores grouped under headings such as **Agent Quality**. SLM evaluators are labeled with **(SLM)**, for example:
 
-- **Action Advancement (SLM)** — did each step move the investigation forward?
+- **Tool Selection Quality (SLM)** — did the model choose appropriate MCP tools?
+- **Tool Error (SLM)** — did any tool calls fail?
 - **Action Completion (SLM)** — did the agent finish the job, or stop at summaries and "next steps"?
-- **Agent Efficiency** — was the path reasonably direct? (may show **System error** if the platform cannot score that run — ask your facilitator)
+- **Context Adherence (SLM)** — are claims grounded in tool output?
+- **Instruction Adherence (SLM)** — did the agent follow the system prompt (use `o11y_*` tools for live data)?
 
 Click into each **`tools`** span to inspect MCP inputs, outputs, and span-level evaluators. Use the **chat** panel and **Evaluators** tab together — a detailed-sounding answer can still score low if the agent did not complete the investigation.
 
 {{< diagram src="images/part1-galileo-trace-with-env.png" alt="Splunk Agent Observability Agent Stream showing a Part 1 re-run with evaluator scores in the Agent Quality panel" caption="Part 1 re-run with evaluators enabled. Low action scores are common when the agent stops at suggested next steps." width="960" >}}
 
-Work through this checklist using **`payment`** in environment **`sre-agent-workshop`**:
+Work through this checklist using **`paymentservice`** in environment **`splunk-hipster`**:
 
-1. Run `troubleshooting-agent chat "Why does payment have errors in the sre-agent-workshop environment?"` (same as Part 1).
+1. Run `troubleshooting-agent chat "Why does paymentservice have errors in the splunk-hipster environment?"` (same as Part 1).
 2. Open Splunk Agent Observability **Agent Stream** — find **both** sessions using the session picker (for example, **Session 2 of 3** for the scored re-run).
 3. On the **newest** session, expand the trace tree — confirm multiple **`tools`** spans ran (not just a single environment lookup).
 4. Click each MCP span — do the numbers and facts in the **chat** response match the tool JSON?
@@ -168,8 +161,9 @@ A strong Part 1 run (for a data-rich environment) might show:
 
 - **Tool selection quality** — high; tools align with APM errors, traces, or dependencies
 - **Tool error** — high (no failures)
-- **Context adherence** — high; conclusions cite numbers and service names from MCP JSON
-- **Action completion** — moderate to high; a clear root-cause summary, not just suggested next steps
+- **Action Completion** — moderate to high; a clear root-cause summary, not just suggested next steps
+- **Context Adherence** — high; conclusions cite numbers and service names from MCP JSON
+- **Instruction Adherence** — high; the agent used `o11y_*` tools for live data instead of answering from the prompt alone
 
 A shallow run (missing environment) is still useful baseline data:
 
@@ -180,13 +174,13 @@ A deeper run that **still scores low** is common in Part 1 — the screenshot ab
 
 - Prompt includes environment; agent calls `o11y_get_apm_services` and `o11y_get_apm_service_errors_and_requests`
 - Chat cites real numbers (for example, 68 errors in the last hour) — looks productive at first glance
-- **Action Completion (SLM)** and **Action Advancement (SLM)** — still low (for example **2%**) because the agent stops at a summary and offers "next steps" instead of finishing the investigation
-- **Agent Efficiency** — may show **System error**; ask your facilitator if an evaluator fails to score
+- **Action Completion (SLM)** — still low (for example **2%**) because the agent stops at a summary and offers "next steps" instead of finishing the investigation
 
 Other weak patterns to watch for:
 
 - **Tool selection quality** — low; model answered without calling tools
-- **Context adherence** — low; detailed root cause with empty or failed tool output
+- **Context Adherence** — low; detailed root cause with empty or failed tool output
+- **Instruction Adherence** — low; the agent skipped required `o11y_*` tools or ignored the system prompt
 
 {{% /tab %}}
 {{% tab title="When scores are missing" %}}
