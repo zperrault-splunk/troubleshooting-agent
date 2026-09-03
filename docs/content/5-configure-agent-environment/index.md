@@ -71,24 +71,6 @@ Save and exit: press `Esc`, type `:wq`, then press Enter. Your file should look 
 
 {{< diagram src="images/env-example.png" alt="Example .env file with Agent Observability enabled and a personalized agent stream name" >}}
 
-## Splunk Agent Observability
-
-**Splunk Agent Observability** captures each agent investigation as a trace you can review in the browser:
-
-- Each **LLM turn** — what the model decided to do next
-- Each **tool call** — which MCP tools ran, with inputs and outputs
-- **Token usage** — input, output, and total tokens for the session
-
-| Signal | Where | Best for |
-|--------|-------|----------|
-| **Terminal trace** | CLI output during a run | Live narration |
-| **JSONL files** | `shared/logs/investigations/` | Review after a run |
-| **Agent Observability sessions** | Splunk Agent Observability console | Comparing runs across Parts 1–3 |
-
-In **Part 1**, open **Agent Stream** in the [Splunk Agent Observability console](https://console.multitenant.galileocloud.io) to see the ReAct loop — `Agent:agent` (LLM turns), `should_continue` (graph routing), and `tools` (MCP calls). Parts 2 and 3 add skills and named workflow nodes.
-
-Each investigation creates a **session** named like `chat-abc123 | part1_agent` in your Agent Observability project (terminal IDs use `chat:`; session names in the console use `chat-`).
-
 ## Verify setup
 
 With your virtual environment activated and `.env` saved, run:
