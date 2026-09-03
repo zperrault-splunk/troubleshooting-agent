@@ -131,35 +131,23 @@ Cleared your terminal before you could review the trace? You have two easy optio
 
 Each investigation creates a **session** named like `chat-abc123 | part1_agent` in your Agent Observability project (terminal IDs use `chat:`; session names in the console use `chat-`).
 
-### Splunk Observability vs Galileo
+### Metrics, traces, logs, and events vs Agent streams
 
-Both products use **trace** and **span**, but they watch **different systems**:
+**Splunk Observability** records **metrics, traces, logs, and events** about **`paymentservice`**. The agent reads those with `o11y_*` tools.
 
-- **Splunk Observability** — telemetry of **`paymentservice`** (the app the agent is troubleshooting). The agent queries this with `o11y_*` MCP tools.
-- **Splunk Agent Observability (Galileo)** — telemetry of **the agent itself**. Each `troubleshooting-agent chat` run lands here.
+**Splunk Agent Observability** does not store those four signals. It stores an **Agent stream** — a named collection of **sessions** for this workshop instance. Each session is one investigation: **chat**, an agent **trace**, and **spans** (LLM turns, MCP calls).
 
-Galileo organizes that agent telemetry like this:
+| Splunk Observability | What it tells you (the app) | In an Agent stream | Difference |
+|----------------------|-----------------------------|--------------------|------------|
+| **Metrics** | Time series: error rate, latency, request volume | Token counts, later **evaluators** | App RED vs agent quality/cost — not the same numbers |
+| **Traces** | One user request across services (`paymentservice` → dependencies) | One agent interaction (reason → tools → answer) | App request vs investigation workflow |
+| **Logs** | Application log lines | Span input/output and the workshop JSONL file | Syslog/events from the service vs LLM/tool payloads |
+| **Events** | Detector firings, alert/incident activity | A **session** (one `troubleshooting-agent chat`) | An incident on the app vs a recorded agent run |
 
-```text
-Project (sre-agent-wkshp)
- └── Agent Stream / Log stream  (GALILEO_LOG_STREAM)
-      └── Session               (one investigation: chat-… | part1_agent)
-           └── Trace            (one complete agent interaction)
-                └── Spans       (LLM turns, MCP tools, graph nodes)
-```
-
-| Idea | Splunk Observability (the app) | Splunk Agent Observability / Galileo (the agent) |
-|------|--------------------------------|--------------------------------------------------|
-| **What you observe** | `paymentservice` in `splunk-hipster` | The agent's reasoning and tool use |
-| **Bucket** | Environment / realm | **Agent Stream** (Galileo log stream) |
-| **Run** | Correlate by `trace_id` / time | **Session** — one CLI `chat` |
-| **End-to-end** | **Trace** — one user request across services | **Trace** — one agent interaction |
-| **Step** | **Span** — HTTP, RPC, DB | **Span** — LLM (`Agent:agent`), MCP (`o11y_*`), graph node |
-| **Events** | **Logs** | Span I/O + JSONL; **chat** is the reconstructed conversation |
-| **Numbers** | **Metrics** — error rate, latency | **Evaluators** (next section) — quality scores, not RED time series |
+**Chat** is a view of the session (query + final answer), not a fifth Observability signal.
 
 {{< notice title="Same words, two systems" style="tip" >}}
-If the agent calls `o11y_get_apm_exemplar_traces` or similar, those are **Splunk Observability APM traces** of `paymentservice`. The tree in Agent Stream is an **agent trace** of how the LLM investigated — including those MCP calls as **tool spans**. Clicking a tool span is how you audit whether the agent actually queried Observability metrics, traces, or logs.
+If the agent calls `o11y_get_apm_exemplar_traces`, those IDs are **Splunk Observability traces** of `paymentservice`. The tree in **Agent Stream** is the **agent trace**. Nested `o11y_*` **spans** are the audit that the agent queried metrics, traces, logs, or events.
 {{< /notice >}}
 
 ## Review the run in Splunk Agent Observability
@@ -170,7 +158,7 @@ After your chat completes, open the [Splunk Agent Observability console](https:/
 2. **Agent Stream** — your agent stream from `.env` (for example, `sre-agent-wkshp-shw-2cb1`)
 3. **Sessions** — find the most recent session (named `chat-9265e3375c8b | part1_agent`)
 
-Select the session to open the trace view. You should see three areas: the **trace tree** on the left, the **chat** in the center (user query and agent response), and detail tabs on the right. The left tree is Galileo **spans**, the center panel is **chat**, and nested `o11y_*` spans are the agent's queries into Splunk Observability.
+Select the session to open the trace view. You should see three areas: the **trace tree** on the left, the **chat** in the center (user query and agent response), and detail tabs on the right. The left tree is the **agent trace** (spans), the center panel is **chat**, and nested `o11y_*` spans are queries into Splunk Observability metrics, traces, logs, or events.
 
 Expand the trace tree. A typical Part 1 run looks like this:
 
@@ -214,7 +202,7 @@ Part 1 intentionally has **no playbook**. Expect variation between runs — that
 - Part 1 proves the agent **can** call live Observability MCP tools and synthesize an answer.
 - Without skills, **tool selection and investigation depth vary** from run to run.
 - **Terminal traces** give immediate feedback; **Splunk Agent Observability** preserves the full session for review and comparison.
-- Splunk Observability watches the app; Splunk Agent Observability (Galileo) watches the agent — same words, two layers.
+- Splunk Observability's **metrics, traces, logs, and events** describe the app; an **Agent stream** records how the agent investigated.
 - This baseline sets up the core workshop question: *How much do skills and graph structure improve investigation quality?*
 
 ---
