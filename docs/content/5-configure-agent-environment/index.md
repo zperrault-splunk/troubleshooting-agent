@@ -6,7 +6,7 @@ navTitle: "Configure Environment"
 duration: "10 minutes"
 ---
 
-Your workshop instance and credentials are already configured. Before Part 1, you will **install the agent dependencies** and **personalize your Agent Observability log stream** so you can find your traces during the workshop.
+Your workshop instance and credentials are already configured. Before Part 1, you will **install the agent dependencies** and **personalize your Agent Observability agent stream** so you can find your traces during the workshop.
 
 ## Install dependencies
 
@@ -40,7 +40,7 @@ Run `source .venv/bin/activate` whenever you open a new SSH session. Your prompt
 
 ## Personalize your Agent Observability settings
 
-Create your `.env` file and set a **unique Agent Observability log stream** so your agent runs are easy to find:
+Create your `.env` file and set a **unique Agent Observability agent stream** so your agent runs are easy to find:
 
 ```bash
 cd ~/troubleshooting-agent
@@ -64,12 +64,12 @@ GALILEO_LOG_STREAM="sre-agent-wkshp-shw-2cb1"
 ```
 
 {{< notice title="Tip" style="tip" >}}
-Use the same **`GALILEO_PROJECT`** and **`GALILEO_LOG_STREAM`** across Parts 1–3. Do not change the log stream when you switch to `part2_agent` or `part3_agent` — all sessions land in one **Agent Stream** so you can compare Part 1, Part 2, and Part 3 side by side.
+Use the same **`GALILEO_PROJECT`** and **`GALILEO_LOG_STREAM`** across Parts 1–3. Do not change the agent stream when you switch to `part2_agent` or `part3_agent` — all sessions land in one **Agent Stream** so you can compare Part 1, Part 2, and Part 3 side by side.
 {{< /notice >}}
 
 Save and exit: press `Esc`, type `:wq`, then press Enter. Your file should look similar to this:
 
-{{< diagram src="images/env-example.png" alt="Example .env file with Agent Observability enabled and a personalized log stream name" >}}
+{{< diagram src="images/env-example.png" alt="Example .env file with Agent Observability enabled and a personalized agent stream name" >}}
 
 ## Splunk Agent Observability
 

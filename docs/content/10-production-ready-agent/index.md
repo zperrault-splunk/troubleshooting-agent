@@ -44,3 +44,6 @@ A practical next step after the workshop: pick one alert type (e.g. APM error ra
 - [Part 3 — Full Workflow]({{< relref "9-part3-full-workflow" >}}) — graph nodes and Agent Observability trace shape
 - [AI Skills]({{< relref "2-ai-skills" >}}) — authoring and testing playbooks
 - [Configure Evaluators]({{< relref "7-galileo-logstream-evaluators" >}}) — quality gates for agent outputs
+- [FAQ]({{< relref "11-faq" >}}) — setup, Parts 1–3, evaluators, and common lab issues
+
+**Next:** [FAQ]({{< relref "11-faq" >}}) — forty questions covering the overall workshop and each part.

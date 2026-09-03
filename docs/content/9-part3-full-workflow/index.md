@@ -86,7 +86,7 @@ Participants run Part 3 from the CLI with a **mock Observability alert** — no 
 
 From `part3_agent`:
 
-{{< notice title="Same log stream" style="tip" >}}
+{{< notice title="Same agent stream" style="tip" >}}
 Do **not** change `GALILEO_LOG_STREAM` in `.env` when you switch to `part3_agent`. Part 3 sessions appear in the same Agent Stream as Parts 1 and 2 — look for the `part3_agent` suffix in the session name.
 {{< /notice >}}
 

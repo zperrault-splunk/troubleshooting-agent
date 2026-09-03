@@ -1,12 +1,12 @@
 ---
-title: "Configure Log Stream Evaluators"
-description: "Enable Agent Observability evaluators on your log stream to score agent responses, tool selection, hallucination risk, and investigation quality."
+title: "Configure Agent Stream Evaluators"
+description: "Enable Agent Observability evaluators on your agent stream to score agent responses, tool selection, hallucination risk, and investigation quality."
 weight: 7
 navTitle: "Configure Evaluators"
 duration: "15 minutes"
 ---
 
-You already send agent traces to Splunk Agent Observability from Part 1. In this section you turn on **log stream evaluators** so the platform automatically scores each investigation — not just records it.
+You already send agent traces to Splunk Agent Observability from Part 1. In this section you turn on **agent stream evaluators** so the platform automatically scores each investigation — not just records it.
 
 Evaluators answer questions that are hard to judge by eye across dozens of runs:
 
@@ -26,16 +26,16 @@ Evaluators answer questions that are hard to judge by eye across dozens of runs:
 
 Most out-of-the-box evaluators use an **SLM** (Luna) or **LLM-as-a-judge** to score traces. Prefer **SLM** when configuring evaluators. Your workshop instance should already have an LLM integration configured. If evaluator scores stay empty after several minutes, ask your facilitator to verify **Integrations** in the Splunk Agent Observability console.
 
-## Open your log stream
+## Open your agent stream
 
 1. Sign in to the [Splunk Agent Observability console](https://console.multitenant.galileocloud.io).
 2. Open **Projects** and select the shared project `sre-agent-wkshp`.
-3. Select **Agent Stream** in the sidebar — this is the log stream named in your `.env` (for example, `sre-agent-wkshp-shw-2cb1`).
+3. Select **Agent Stream** in the sidebar — this is the agent stream named in your `.env` (for example, `sre-agent-wkshp-shw-2cb1`).
 4. Confirm you see at least one session from Part 1 (for example, `chat-9265e3375c8b | part1_agent`).
 
 ## Configure evaluators
 
-1. From the log stream view, click **Configure Evaluators**.
+1. From the agent stream view, click **Configure Evaluators**.
 2. Search or filter the evaluator list.
 3. Turn on the evaluators in the tables below.
 4. When the console offers a choice between **LLM** and **SLM** (Luna), select **SLM** — same scoring intent, with lower latency and cost during the workshop.
@@ -43,7 +43,7 @@ Most out-of-the-box evaluators use an **SLM** (Luna) or **LLM-as-a-judge** to sc
 6. When Agent Observability asks whether to compute evaluators on **past logs**, click **Not Now**. Your Part 1 session stays as the **without evaluators** baseline; you will run a fresh investigation next so you can compare both traces side by side.
 
 {{< notice title="Why Not Now?" style="tip" >}}
-Keep your first Part 1 session un-scored on purpose. After you re-run the same chat command, you will have two sessions in the same log stream: one **trace only** (Part 1) and one **trace + evaluator scores** (this section). That makes the before/after difference easy to see.
+Keep your first Part 1 session un-scored on purpose. After you re-run the same chat command, you will have two sessions in the same agent stream: one **trace only** (Part 1) and one **trace + evaluator scores** (this section). That makes the before/after difference easy to see.
 {{< /notice >}}
 {{< notice title="Prefer SLM when available" style="tip" >}}
 Many built-in evaluators have an **SLM** variant powered by Luna models. Use SLM for workshop runs unless your facilitator asks you to compare against the full LLM judge. If you do not see an SLM option for an evaluator, the LLM variant is fine.
@@ -84,7 +84,7 @@ After you click **Apply**, reopen **Configure Evaluators** to confirm your selec
 
 ## Exercise — score your baseline run
 
-After you apply evaluators and click **Not Now** on past logs, re-run the same Part 1 investigation. You will end up with two sessions in your log stream: your original Part 1 run (trace only) and this new run (trace + evaluator scores).
+After you apply evaluators and click **Not Now** on past logs, re-run the same Part 1 investigation. You will end up with two sessions in your agent stream: your original Part 1 run (trace only) and this new run (trace + evaluator scores).
 
 ### Run the investigation
 
@@ -111,7 +111,7 @@ You can also paste alert text from the facilitator's demo. Use **`paymentservice
 After your chat completes, open the [Splunk Agent Observability console](https://console.multitenant.galileocloud.io) and navigate to:
 
 1. **Project** — the shared workshop project (`sre-agent-wkshp`)
-2. **Agent Stream** — your log stream from `.env` (for example, `sre-agent-wkshp-shw-2cb1`)
+2. **Agent Stream** — your agent stream from `.env` (for example, `sre-agent-wkshp-shw-2cb1`)
 3. **Sessions** — use the session picker (for example, **Session 2 of 2**) to find your two Part 1 runs: the original (trace only) and the newest (with evaluator scores)
 
 Select the **newest** session. When the environment is in the prompt, the trace tree often shows **multiple tool rounds** — the agent is trying, even if the final answer is still incomplete:
@@ -201,7 +201,7 @@ Part 1 intentionally has **no playbook**, so results can range from weak to stro
 
 ## What you learned
 
-- Log streams **capture** traces; **evaluators** score them automatically on each session after you enable them.
+- Agent streams **capture** traces; **evaluators** score them automatically on each session after you enable them.
 - Clicking **Not Now** on past logs keeps a clean **before/after** pair of sessions to compare.
 - **Agentic evaluators** (tool selection, tool error, action completion) measure investigation behavior.
 - **Response quality evaluators** (context adherence, instruction adherence) surface **hallucination** and prompt-following gaps.
