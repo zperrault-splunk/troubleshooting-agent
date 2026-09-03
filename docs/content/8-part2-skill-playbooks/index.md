@@ -37,7 +37,7 @@ Make sure [Part 1]({{< relref "6-part1-baseline-agent" >}}) and [Configure Evalu
 
 From `part2_agent`, run a **latency** investigation. Use the workshop defaults — service **`paymentservice`**, environment **`splunk-hipster`**:
 
-{{< notice title="Same log stream" style="tip" >}}
+{{< notice title="Same agent stream" style="tip" >}}
 Do **not** change `GALILEO_LOG_STREAM` in `.env` when you switch to `part2_agent`. Part 2 sessions appear in the same Agent Stream as Part 1 — look for the `part2_agent` suffix in the session name.
 {{< /notice >}}
 

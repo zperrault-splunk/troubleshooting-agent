@@ -120,7 +120,7 @@ Cleared your terminal before you could review the trace? You have two easy optio
 After your chat completes, open the [Splunk Agent Observability console](https://console.multitenant.galileocloud.io) and navigate to:
 
 1. **Project** — the shared workshop project (`sre-agent-wkshp`)
-2. **Agent Stream** — your log stream from `.env` (for example, `sre-agent-wkshp-shw-2cb1`)
+2. **Agent Stream** — your agent stream from `.env` (for example, `sre-agent-wkshp-shw-2cb1`)
 3. **Sessions** — find the most recent session (named `chat-9265e3375c8b | part1_agent`)
 
 Select the session to open the trace view. You should see three areas: the **trace tree** on the left, the **chat** in the center (user query and agent response), and detail tabs on the right.
@@ -171,4 +171,4 @@ Part 1 intentionally has **no playbook**. Expect variation between runs — that
 
 ---
 
-**Next:** [Configure Evaluators]({{< relref "7-galileo-logstream-evaluators" >}}) — enable log stream evaluators before comparing Parts 2 and 3.
+**Next:** [Configure Evaluators]({{< relref "7-galileo-logstream-evaluators" >}}) — enable agent stream evaluators before comparing Parts 2 and 3.

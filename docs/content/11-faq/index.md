@@ -5,7 +5,7 @@ weight: 11
 navTitle: "FAQ"
 ---
 
-Quick answers for the hands-on lab. Workshop defaults: service **`paymentservice`**, environment **`splunk-hipster`**. Use the same [Agent Observability](https://console.multitenant.galileocloud.io) project and log stream across Parts 1–3.
+Quick answers for the hands-on lab. Workshop defaults: service **`paymentservice`**, environment **`splunk-hipster`**. Use the same [Agent Observability](https://console.multitenant.galileocloud.io) project and agent stream across Parts 1–3.
 
 {{< notice title="How to use this page" style="tip" >}}
 Start with [General](#general) for setup and CLI issues. Use the Part 1–3 sections while you are in that exercise. For playbook authoring background, see [AI Skills]({{< relref "2-ai-skills" >}}).
@@ -50,7 +50,7 @@ Copy `.env.example` to `.env` and set:
 - `GALILEO_PROJECT="sre-agent-wkshp"`
 - `GALILEO_LOG_STREAM="sre-agent-wkshp-$INSTANCE"` — replace `$INSTANCE` with the value from `echo $INSTANCE` (for example `sre-agent-wkshp-shw-2cb1`)
 
-Use the **same** project and log stream for Parts 1–3. Do not change `GALILEO_LOG_STREAM` when you switch parts. Your instance name comes from [Connect to EC2]({{< relref "3-connect-ec2" >}}).
+Use the **same** project and agent stream for Parts 1–3. Do not change `GALILEO_LOG_STREAM` when you switch parts. Your instance name comes from [Connect to EC2]({{< relref "3-connect-ec2" >}}).
 
 ### 6. `doctor` or `mcp-doctor` Failed. What Next?
 
