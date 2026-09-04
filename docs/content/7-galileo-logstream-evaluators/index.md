@@ -6,7 +6,7 @@ navTitle: "Configure Evaluators"
 duration: "15 minutes"
 ---
 
-Enable agent stream evaluators, then re-run the Part 1 investigation. Splunk Agent Observability will score the new session while preserving the original trace-only session as your baseline.
+Enable agent stream evaluators, then apply them to the Part 1 session already in your stream. Splunk Agent Observability will score that existing investigation. You do not need to re-run Part 1.
 
 Use the scores to verify:
 
@@ -20,12 +20,12 @@ Use the scores to verify:
 
 | Requirement                                                               | Why                                                                        |
 | ------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
-| [Part 1 investigation completed]({{< relref "6-part1-baseline-agent" >}}) | Provides the trace-only session for the before-and-after comparison        |
+| [Part 1 investigation completed]({{< relref "6-part1-baseline-agent" >}}) | Provides the session that evaluators will score                            |
 | `.env` Agent Observability settings saved                                 | Same `GALILEO_PROJECT` and `GALILEO_LOG_STREAM` you used in Part 1         |
 | Splunk Agent Observability console access                                 | Open the shared project `sre-agent-wkshp`, then your instance Agent Stream |
 
 
-Most built-in evaluators score traces with an **SLM** (Luna) or an **LLM-as-a-judge**. Select **SLM** when available. Your workshop instance should already have an LLM integration. If a new session remains unscored after several minutes, ask your facilitator to verify **Integrations** in the Splunk Agent Observability console.
+Most built-in evaluators score traces with an **SLM** (Luna) or an **LLM-as-a-judge**. Select **SLM** when available. Your workshop instance should already have an LLM integration. If a session remains unscored after several minutes, ask your facilitator to verify **Integrations** in the Splunk Agent Observability console.
 
 ## Open your agent stream
 
@@ -43,11 +43,8 @@ Most built-in evaluators score traces with an **SLM** (Luna) or an **LLM-as-a-ju
 3. Turn on the evaluators in the tables below.
 4. When the console offers **LLM** or **SLM** (Luna), select **SLM**. It provides the same scoring intent with lower workshop latency and cost.
 5. Click **Apply** to save your evaluator selections. Toggles alone do not take effect until you apply.
-6. When Agent Observability asks whether to compute evaluators on **past logs**, click **Not Now**. Your Part 1 session stays as the **without evaluators** baseline; you will run a fresh investigation next so you can compare both traces side by side.
+6. When Agent Observability asks whether to compute evaluators on **past logs** or existing chats, apply them to those existing sessions. Your Part 1 investigation receives scores; do not click **Not Now**.
 
-{{< notice title="Why Not Now?" style="tip" >}}
-Keep the first Part 1 session unscored. After you re-run the same command, the agent stream will contain one trace-only session and one session with trace data and evaluator scores.
-{{< /notice >}}
 {{< notice title="Prefer SLM when available" style="tip" >}}
 Many built-in evaluators have an **SLM** variant powered by Luna models. Use SLM unless your facilitator asks you to compare it with the full LLM judge. If no SLM option exists for an evaluator, use the LLM variant.
 {{< /notice >}}
@@ -87,38 +84,19 @@ After you click **Apply**, reopen **Configure Evaluators** to confirm your selec
 
 {{< diagram src="images/applyEvals.png" alt="Splunk Agent Observability Configure Evaluators pane with workshop evaluators enabled" >}}
 
-## Score a baseline run
+## Review scores on your Part 1 session
 
-After you apply the evaluators and click **Not Now** for past logs, re-run the Part 1 investigation. The original session remains trace-only; the new session receives evaluator scores.
-
-### Run the investigation
-
-Use the same scope as Part 1: service `paymentservice` and environment `splunk-hipster`.
-
-{{< tabs >}}
-{{% tab title="Script" open="true" %}}
-
-```bash
-cd ~/troubleshooting-agent
-source .venv/bin/activate
-cd part1_agent
-troubleshooting-agent chat "Why does paymentservice have errors in the splunk-hipster environment?"
-```
-
-{{% /tab %}}
-{{< /tabs >}}
-
-You can instead paste alert text from the facilitator's demo. Include exact values `paymentservice` and `splunk-hipster` to preserve the service and environment scope.
+After you apply the evaluators and confirm scoring of existing chats, wait for scores to appear on the Part 1 session you already ran. Do not re-run the investigation just to get scores.
 
 ### Review the run in Splunk Agent Observability
 
-After the command completes, open the [Splunk Agent Observability console](https://console.multitenant.galileocloud.io) and navigate to:
+When scoring finishes, open the [Splunk Agent Observability console](https://console.multitenant.galileocloud.io) and navigate to:
 
 1. **Project:** the shared workshop project (`sre-agent-wkshp`)
 2. **Agent Stream:** your instance name from `echo $INSTANCE` (for example, `shw-2cb1`)
-3. **Sessions:** use the session picker (for example, **Session 2 of 2**) to locate the original trace-only run and the newest scored run
+3. **Sessions:** open the Part 1 session you already ran (for example, `chat-9265e3375c8b | part1_agent`)
 
-Select the newest session. A prompt with the environment often produces multiple tool rounds, even when the final answer remains incomplete:
+Select that session. A prompt with the environment often produces multiple tool rounds, even when the final answer remains incomplete:
 
 ```text
 Agent (~20s)
@@ -146,17 +124,16 @@ The center panel shows the chat query and final response. Open the **Evaluators*
 
 Open every `tools` span. Inspect MCP inputs, result status, output JSON, and span-level evaluators. Compare those details with the chat response. A detailed answer can still score poorly when the trace shows incomplete investigation or unsupported claims.
 
-{{< diagram src="images/part1-galileo-trace-with-env.png" alt="Splunk Agent Observability Agent Stream showing a Part 1 re-run with evaluator scores in the Agent Quality panel" caption="Part 1 re-run with evaluators enabled. Low action scores are common when the agent stops at suggested next steps." width="960" >}}
+{{< diagram src="images/part1-galileo-trace-with-env.png" alt="Splunk Agent Observability Agent Stream showing a Part 1 session with evaluator scores in the Agent Quality panel" caption="Part 1 session after evaluators are applied to existing chats. Low action scores are common when the agent stops at suggested next steps." width="960" >}}
 
-Verify the scored run for `paymentservice` in environment `splunk-hipster`:
+Verify the scored Part 1 session for `paymentservice` in environment `splunk-hipster`:
 
-1. Run `troubleshooting-agent chat "Why does paymentservice have errors in the splunk-hipster environment?"` (same as Part 1).
-2. Open Splunk Agent Observability **Agent Stream** and find both sessions with the session picker (for example, **Session 2 of 3** for the scored re-run).
-3. Expand the newest session's trace tree and confirm that multiple `tools` spans ran, not only an environment lookup.
+1. Wait for past-log scoring to finish on the Part 1 session you already ran.
+2. Open Splunk Agent Observability **Agent Stream** and select that same session.
+3. Expand the session's trace tree and confirm that multiple `tools` spans ran, not only an environment lookup.
 4. For each MCP span, verify the input service, environment, and time window; then map chat claims to result JSON.
 5. Open the **Evaluators** tab and record scores under **Agent Quality** (and other groups if present).
-6. Compare the Part 1 trace-only baseline with this trace-and-scores run.
-7. Save the tool sequence, failures, evidence, final conclusion, and scores for Parts 2 and 3.
+6. Save the tool sequence, failures, evidence, final conclusion, and scores for Parts 2 and 3.
 
 {{< tabs >}}
 {{% tab title="What good looks like" %}}
@@ -191,10 +168,11 @@ Other weak patterns to watch for:
 
 If evaluator scores do not appear:
 
-1. Confirm you ran a **new** investigation after saving evaluator settings
+1. Confirm you applied evaluators to **existing chats** / **past logs**, not **Not Now**
 2. Check **Configure Evaluators** — the evaluator toggle is still on and you clicked **Apply**
 3. Verify sampling is **100%** under **Evaluator Sampling** in the same pane
-4. Ask your facilitator to confirm the **LLM integration** is configured in Splunk Agent Observability
+4. Wait a few minutes for past-log scoring to finish, then refresh the session
+5. Ask your facilitator to confirm the **LLM integration** is configured in Splunk Agent Observability
 
 {{% /tab %}}
 {{< /tabs >}}
@@ -207,8 +185,7 @@ Part 1 has no playbook, so results vary across runs and participants. A detailed
 
 Before continuing, confirm that:
 
-- The original Part 1 session remains trace-only.
-- The new session shows results for the five configured evaluators where each evaluator applies.
+- The original Part 1 session shows results for the five configured evaluators where each evaluator applies. You do not need a second investigation.
 - Tool spans expose the inputs, outputs, failures, and span-level scores needed to explain each evaluation.
 - Your notes distinguish tool-selection or execution failures from unsupported final-answer claims.
 - You saved the Part 1 scores as the comparison point for Part 2 skills and the Part 3 structured graph.

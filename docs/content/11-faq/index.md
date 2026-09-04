@@ -77,7 +77,7 @@ Terminal IDs use `chat:`; console session names use `chat-`.
 
 ### 9. When Do I Enable Evaluators, and Should I Score My First Part 1 Run?
 
-Enable evaluators **after** the first Part 1 investigation, then click **Not Now** when asked to score past logs. That keeps session 1 as a trace-only baseline. Prefer **SLM (Luna)** over full LLM judges. Toggles do nothing until you click **Apply**. If scores stay empty, ask a facilitator to check Integrations.
+Enable evaluators **after** the first Part 1 investigation, then apply them to **existing chats** / **past logs**. Do not click **Not Now**, and do not re-run Part 1 just to get scores. Prefer **SLM (Luna)** over full LLM judges. Toggles do nothing until you click **Apply**. If scores stay empty, ask a facilitator to check Integrations.
 
 Details: [Configure Evaluators]({{< relref "7-galileo-logstream-evaluators" >}}).
 
