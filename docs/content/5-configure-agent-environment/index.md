@@ -6,11 +6,11 @@ navTitle: "Configure Environment"
 duration: "10 minutes"
 ---
 
-Your workshop instance and credentials are already configured. Before Part 1, you will **install the agent dependencies** and **personalize your Agent Observability agent stream** so you can find your traces during the workshop.
+Your workshop instance and credentials are already configured. Before Part 1, install the agent dependencies and give your Agent Observability agent stream a unique name. That name will let you isolate your traces from other attendees' traces.
 
 ## Install dependencies
 
-From the repo on your instance:
+From the repository on your instance, create and activate a virtual environment, then install the workshop package:
 
 {{< tabs >}}
 {{% tab title="Script" open="true" %}}
@@ -40,7 +40,7 @@ Run `source .venv/bin/activate` whenever you open a new SSH session. Your prompt
 
 ## Personalize your Agent Observability settings
 
-Create your `.env` file and set a **unique Agent Observability agent stream** so your agent runs are easy to find:
+Create `.env`, then set an Agent Observability stream name that is unique to your instance:
 
 ```bash
 cd ~/troubleshooting-agent
@@ -48,7 +48,7 @@ cp .env.example .env
 vi .env
 ```
 
-Add or update these lines. Use your instance name from `echo $INSTANCE` (see [Connect to EC2]({{< relref "3-connect-ec2" >}})) — replace `$INSTANCE` in the template with that printed value. Do not leave the dollar sign in `.env`:
+Add or update these lines. Use the value printed by `echo $INSTANCE` (see [Connect to EC2]({{< relref "3-connect-ec2" >}})). Replace `$INSTANCE` with that value; do not leave the dollar sign in `.env`:
 
 ```bash
 ENABLE_GALILEO=true
@@ -64,16 +64,16 @@ GALILEO_LOG_STREAM="sre-agent-wkshp-shw-2cb1"
 ```
 
 {{< notice title="Tip" style="tip" >}}
-Use the same **`GALILEO_PROJECT`** and **`GALILEO_LOG_STREAM`** across Parts 1–3. Do not change the agent stream when you switch to `part2_agent` or `part3_agent` — all sessions land in one **Agent Stream** so you can compare Part 1, Part 2, and Part 3 side by side.
+Keep **`GALILEO_PROJECT`** and **`GALILEO_LOG_STREAM`** unchanged across Parts 1–3. When you switch to `part2_agent` or `part3_agent`, the same **Agent Stream** will hold every session for side-by-side comparison.
 {{< /notice >}}
 
-Save and exit: press `Esc`, type `:wq`, then press Enter. Your file should look similar to this:
+Save and exit: press `Esc`, type `:wq`, then press Enter. Verify that the file resembles this example and contains your instance name:
 
 {{< diagram src="images/env-example.png" alt="Example .env file with Agent Observability enabled and a personalized agent stream name" >}}
 
 ## Verify setup
 
-With your virtual environment activated and `.env` saved, run:
+With the virtual environment active and `.env` saved, run both readiness checks:
 
 {{< tabs >}}
 {{% tab title="Script" open="true" %}}
@@ -119,7 +119,7 @@ MCP ready.
 {{< /tabs >}}
 
 {{< notice title="Important" style="primary" >}}
-Both commands should report **Ready** before you continue. If either fails, ask your facilitator for help.
+Continue only when both commands report **Ready**. `doctor` verifies the LLM connection; `mcp-doctor` verifies the Splunk Observability MCP endpoint and lists the available tools. If either check fails, copy the failure output and ask your facilitator for help.
 {{< /notice >}}
 
 ---

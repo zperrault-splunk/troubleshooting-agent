@@ -6,31 +6,31 @@ navTitle: "Configure Evaluators"
 duration: "15 minutes"
 ---
 
-You already send agent traces to Splunk Agent Observability from Part 1. In this section you turn on **agent stream evaluators** so the platform automatically scores each investigation — not just records it.
+Enable agent stream evaluators, then re-run the Part 1 investigation. Splunk Agent Observability will score the new session while preserving the original trace-only session as your baseline.
 
-Evaluators answer questions that are hard to judge by eye across dozens of runs:
+Use the scores to verify:
 
-- Did the agent pick the **right MCP tools** for the alert?
-- Did tool calls **fail** because of bad parameters?
-- Is the final answer **grounded in tool output**, or does it sound plausible without evidence?
-- Did the agent **complete** the investigation goal, or stop early?
+- Whether the selected MCP tools match the alert and available signals
+- Whether invalid inputs or execution errors caused tool failures
+- Whether the final answer is grounded in tool output
+- Whether the agent completed the investigation or stopped early
 
 
 ## Before you start
 
 | Requirement | Why |
 |-------------|-----|
-| [Part 1 investigation completed]({{< relref "6-part1-baseline-agent" >}}) | We will use the session/trace from the previous section to compare the before and after enabling evaluators |
+| [Part 1 investigation completed]({{< relref "6-part1-baseline-agent" >}}) | Provides the trace-only session for the before-and-after comparison |
 | `.env` Agent Observability settings saved | Same `GALILEO_PROJECT` and `GALILEO_LOG_STREAM` you used in Part 1 |
 | Splunk Agent Observability console access | Open the shared project `sre-agent-wkshp`, then your instance Agent Stream |
 
-Most out-of-the-box evaluators use an **SLM** (Luna) or **LLM-as-a-judge** to score traces. Prefer **SLM** when configuring evaluators. Your workshop instance should already have an LLM integration configured. If evaluator scores stay empty after several minutes, ask your facilitator to verify **Integrations** in the Splunk Agent Observability console.
+Most built-in evaluators score traces with an **SLM** (Luna) or an **LLM-as-a-judge**. Select **SLM** when available. Your workshop instance should already have an LLM integration. If a new session remains unscored after several minutes, ask your facilitator to verify **Integrations** in the Splunk Agent Observability console.
 
 ## Open your agent stream
 
 1. Sign in to the [Splunk Agent Observability console](https://console.multitenant.galileocloud.io).
 2. Open **Projects** and select the shared project `sre-agent-wkshp`.
-3. Select **Agent Stream** in the sidebar — this is the agent stream named in your `.env` (for example, `sre-agent-wkshp-shw-2cb1`).
+3. Select **Agent Stream** in the sidebar. Open the stream named in your `.env` (for example, `sre-agent-wkshp-shw-2cb1`).
 4. Confirm you see at least one session from Part 1 (for example, `chat-9265e3375c8b | part1_agent`).
 
 ## Configure evaluators
@@ -38,24 +38,24 @@ Most out-of-the-box evaluators use an **SLM** (Luna) or **LLM-as-a-judge** to sc
 1. From the agent stream view, click **Configure Evaluators**.
 2. Search or filter the evaluator list.
 3. Turn on the evaluators in the tables below.
-4. When the console offers a choice between **LLM** and **SLM** (Luna), select **SLM** — same scoring intent, with lower latency and cost during the workshop.
+4. When the console offers **LLM** or **SLM** (Luna), select **SLM**. It provides the same scoring intent with lower workshop latency and cost.
 5. Click **Apply** to save your evaluator selections. Toggles alone do not take effect until you apply.
 6. When Agent Observability asks whether to compute evaluators on **past logs**, click **Not Now**. Your Part 1 session stays as the **without evaluators** baseline; you will run a fresh investigation next so you can compare both traces side by side.
 
 {{< notice title="Why Not Now?" style="tip" >}}
-Keep your first Part 1 session un-scored on purpose. After you re-run the same chat command, you will have two sessions in the same agent stream: one **trace only** (Part 1) and one **trace + evaluator scores** (this section). That makes the before/after difference easy to see.
+Keep the first Part 1 session unscored. After you re-run the same command, the agent stream will contain one trace-only session and one session with trace data and evaluator scores.
 {{< /notice >}}
 {{< notice title="Prefer SLM when available" style="tip" >}}
-Many built-in evaluators have an **SLM** variant powered by Luna models. Use SLM for workshop runs unless your facilitator asks you to compare against the full LLM judge. If you do not see an SLM option for an evaluator, the LLM variant is fine.
+Many built-in evaluators have an **SLM** variant powered by Luna models. Use SLM unless your facilitator asks you to compare it with the full LLM judge. If no SLM option exists for an evaluator, use the LLM variant.
 {{< /notice >}}
 
 ## Recommended evaluators
 
-Enable evaluators from **two categories** that map directly to troubleshooting-agent quality. Not every evaluator applies to every span type — the platform only scores where the node type matches.
+Enable evaluators from two categories that map directly to troubleshooting-agent quality. The platform applies each evaluator only to matching node types.
 
 ### Agent behavior — tools and progress
 
-Use these to score **how the agent investigates**, not just what it says at the end.
+These evaluators score the investigation path, including tool choice, execution, and completion.
 
 | Evaluator | Node type | What it tells you | Workshop focus |
 |-----------|-----------|-------------------|----------------|
@@ -63,18 +63,18 @@ Use these to score **how the agent investigates**, not just what it says at the 
 | [**Tool error**](https://docs.galileo.ai/concepts/metrics/agentic/tool-error) | Tool span | Failures during tool execution | Catches MCP validation errors (for example, missing `environment_name`) |
 | [**Action Completion**](https://docs.galileo.ai/concepts/metrics/agentic/action-completion) | Session | Whether the agent achieved the user's goal | Did it actually investigate errors, or only ask clarifying questions? |
 
-**Minimum set for Part 1:** turn on **Tool selection quality**, **Tool error**, and **Action Completion**.
+For Part 1, enable at least **Tool selection quality**, **Tool error**, and **Action Completion**.
 
 ### Response quality — hallucination and grounding
 
-These evaluators judge the **final answer** against the evidence available in the trace.
+These evaluators compare the final answer and model behavior with the evidence and instructions available in the trace.
 
 | Evaluator | Node type | What it tells you | Workshop focus |
 |-----------|-----------|-------------------|----------------|
 | [**Context Adherence**](https://docs.galileo.ai/concepts/metrics/rag/generation-quality/context-adherence) | LLM span | Closed-domain hallucination — claims not supported by provided context | Scores low when the model invents service names, error rates, or root causes not present in MCP JSON |
 | [**Instruction Adherence**](https://docs.galileo.ai/concepts/metrics/response-quality/instruction-adherence) | LLM span | Whether the model followed system instructions | Part 1's prompt requires using `o11y_*` tools for live data |
 
-**Minimum set for hallucination checks:** turn on **Context Adherence** and **Instruction Adherence**.
+For hallucination and prompt-compliance checks, enable **Context Adherence** and **Instruction Adherence**.
 
 After you click **Apply**, reopen **Configure Evaluators** to confirm your selections. It should look similar to this:
 
@@ -82,13 +82,13 @@ After you click **Apply**, reopen **Configure Evaluators** to confirm your selec
 
 
 
-## Exercise — score your baseline run
+## Score a baseline run
 
-After you apply evaluators and click **Not Now** on past logs, re-run the same Part 1 investigation. You will end up with two sessions in your agent stream: your original Part 1 run (trace only) and this new run (trace + evaluator scores).
+After you apply the evaluators and click **Not Now** for past logs, re-run the Part 1 investigation. The original session remains trace-only; the new session receives evaluator scores.
 
 ### Run the investigation
 
-Re-run the same Part 1 investigation. Use the workshop defaults — service **`paymentservice`**, environment **`splunk-hipster`**:
+Use the same scope as Part 1: service **`paymentservice`** and environment **`splunk-hipster`**.
 
 {{< tabs >}}
 {{% tab title="Script" open="true" %}}
@@ -103,18 +103,18 @@ troubleshooting-agent chat "Why does paymentservice have errors in the splunk-hi
 {{% /tab %}}
 {{< /tabs >}}
 
-You can also paste alert text from the facilitator's demo. Use **`paymentservice`** and **`splunk-hipster`** when asking about the workshop demo service.
+You can instead paste alert text from the facilitator's demo. Include exact values **`paymentservice`** and **`splunk-hipster`** to preserve the service and environment scope.
 
 
 ### Review the run in Splunk Agent Observability
 
-After your chat completes, open the [Splunk Agent Observability console](https://console.multitenant.galileocloud.io) and navigate to:
+After the command completes, open the [Splunk Agent Observability console](https://console.multitenant.galileocloud.io) and navigate to:
 
-1. **Project** — the shared workshop project (`sre-agent-wkshp`)
-2. **Agent Stream** — your agent stream from `.env` (for example, `sre-agent-wkshp-shw-2cb1`)
-3. **Sessions** — use the session picker (for example, **Session 2 of 2**) to find your two Part 1 runs: the original (trace only) and the newest (with evaluator scores)
+1. **Project:** the shared workshop project (`sre-agent-wkshp`)
+2. **Agent Stream:** your stream from `.env` (for example, `sre-agent-wkshp-shw-2cb1`)
+3. **Sessions:** use the session picker (for example, **Session 2 of 2**) to locate the original trace-only run and the newest scored run
 
-Select the **newest** session. When the environment is in the prompt, the trace tree often shows **multiple tool rounds** — the agent is trying, even if the final answer is still incomplete:
+Select the newest session. A prompt with the environment often produces multiple tool rounds, even when the final answer remains incomplete:
 
 ```text
 Agent (~20s)
@@ -130,57 +130,57 @@ Agent (~20s)
 │   └── should_continue
 ```
 
-If the environment is missing, you may see a **shallower** trace instead — for example a single call to `o11y_get_apm_environments` and a response asking you to specify the environment.
+If the environment is missing, expect a shallower trace, such as one `o11y_get_apm_environments` call followed by a request for the environment.
 
-The center panel shows the **chat** — your query and the agent's final response. On the right, open the **Evaluators** tab to see scores grouped under headings such as **Agent Quality**. SLM evaluators are labeled with **(SLM)**, for example:
+The center panel shows the chat query and final response. Open the **Evaluators** tab on the right to inspect groups such as **Agent Quality**. SLM evaluator names include **(SLM)**:
 
-- **Tool Selection Quality (SLM)** — did the model choose appropriate MCP tools?
-- **Tool Error (SLM)** — did any tool calls fail?
-- **Action Completion (SLM)** — did the agent finish the job, or stop at summaries and "next steps"?
-- **Context Adherence (SLM)** — are claims grounded in tool output?
-- **Instruction Adherence (SLM)** — did the agent follow the system prompt (use `o11y_*` tools for live data)?
+- **Tool Selection Quality (SLM):** whether the model chose appropriate MCP tools
+- **Tool Error (SLM):** whether tool calls failed
+- **Action Completion (SLM):** whether the agent completed the investigation instead of stopping at a summary or proposed next steps
+- **Context Adherence (SLM):** whether claims are grounded in tool output
+- **Instruction Adherence (SLM):** whether the agent followed the requirement to use `o11y_*` tools for live data
 
-Click into each **`tools`** span to inspect MCP inputs, outputs, and span-level evaluators. Use the **chat** panel and **Evaluators** tab together — a detailed-sounding answer can still score low if the agent did not complete the investigation.
+Open every **`tools`** span. Inspect MCP inputs, result status, output JSON, and span-level evaluators. Compare those details with the chat response. A detailed answer can still score poorly when the trace shows incomplete investigation or unsupported claims.
 
 {{< diagram src="images/part1-galileo-trace-with-env.png" alt="Splunk Agent Observability Agent Stream showing a Part 1 re-run with evaluator scores in the Agent Quality panel" caption="Part 1 re-run with evaluators enabled. Low action scores are common when the agent stops at suggested next steps." width="960" >}}
 
-Work through this checklist using **`paymentservice`** in environment **`splunk-hipster`**:
+Verify the scored run for **`paymentservice`** in environment **`splunk-hipster`**:
 
 1. Run `troubleshooting-agent chat "Why does paymentservice have errors in the splunk-hipster environment?"` (same as Part 1).
-2. Open Splunk Agent Observability **Agent Stream** — find **both** sessions using the session picker (for example, **Session 2 of 3** for the scored re-run).
-3. On the **newest** session, expand the trace tree — confirm multiple **`tools`** spans ran (not just a single environment lookup).
-4. Click each MCP span — do the numbers and facts in the **chat** response match the tool JSON?
+2. Open Splunk Agent Observability **Agent Stream** and find both sessions with the session picker (for example, **Session 2 of 3** for the scored re-run).
+3. Expand the newest session's trace tree and confirm that multiple **`tools`** spans ran, not only an environment lookup.
+4. For each MCP span, verify the input service, environment, and time window; then map chat claims to result JSON.
 5. Open the **Evaluators** tab and record scores under **Agent Quality** (and other groups if present).
-6. **Compare** your sessions — the Part 1 baseline (trace only) vs. this run (trace + evaluator scores).
-7. **Save your notes and scores** — you will re-run the same scenario in Part 2 and Part 3.
+6. Compare the Part 1 trace-only baseline with this trace-and-scores run.
+7. Save the tool sequence, failures, evidence, final conclusion, and scores for Parts 2 and 3.
 
 {{< tabs >}}
 {{% tab title="What good looks like" %}}
 
-A strong Part 1 run (for a data-rich environment) might show:
+A strong Part 1 run in a data-rich environment might show:
 
-- **Tool selection quality** — high; tools align with APM errors, traces, or dependencies
-- **Tool error** — high (no failures)
-- **Action Completion** — moderate to high; a clear root-cause summary, not just suggested next steps
-- **Context Adherence** — high; conclusions cite numbers and service names from MCP JSON
-- **Instruction Adherence** — high; the agent used `o11y_*` tools for live data instead of answering from the prompt alone
+- **Tool selection quality:** high because tools align with APM errors, traces, or dependencies
+- **Tool error:** high because no calls failed
+- **Action Completion:** moderate to high because the response reaches a supported root-cause summary
+- **Context Adherence:** high because conclusions cite values and service names from MCP JSON
+- **Instruction Adherence:** high because the agent used `o11y_*` tools for live data
 
 A shallow run (missing environment) is still useful baseline data:
 
-- Single tool call such as `o11y_get_apm_environments`, then the agent **asks for environment**
-- **Action Completion (SLM)** — **0%**; the investigation never started
+- One tool call such as `o11y_get_apm_environments`, followed by a request for the environment
+- **Action Completion (SLM): 0%** because the scoped investigation never started
 
-A deeper run that **still scores low** is common in Part 1 — the screenshot above is a real example:
+A deeper run can still score poorly. The screenshot above shows this pattern:
 
-- Prompt includes environment; agent calls `o11y_get_apm_services` and `o11y_get_apm_service_errors_and_requests`
-- Chat cites real numbers (for example, 68 errors in the last hour) — looks productive at first glance
-- **Action Completion (SLM)** — still low (for example **2%**) because the agent stops at a summary and offers "next steps" instead of finishing the investigation
+- The prompt includes the environment, and the agent calls `o11y_get_apm_services` and `o11y_get_apm_service_errors_and_requests`.
+- The chat cites real values, such as 68 errors in the last hour.
+- **Action Completion (SLM)** remains low, for example **2%**, because the agent stops at a summary and proposes next steps instead of completing the investigation.
 
 Other weak patterns to watch for:
 
-- **Tool selection quality** — low; model answered without calling tools
-- **Context Adherence** — low; detailed root cause with empty or failed tool output
-- **Instruction Adherence** — low; the agent skipped required `o11y_*` tools or ignored the system prompt
+- **Tool selection quality:** low when the model answers without calling appropriate tools
+- **Context Adherence:** low when a detailed root cause follows empty or failed tool output
+- **Instruction Adherence:** low when the agent skips required `o11y_*` tools or ignores the system prompt
 
 {{% /tab %}}
 {{% tab title="When scores are missing" %}}
@@ -196,16 +196,18 @@ If evaluator scores do not appear:
 {{< /tabs >}}
 
 {{< notice title="Tip" style="tip" >}}
-Part 1 intentionally has **no playbook**, so results can range from weak to strong across runs and even between participants. A response can **sound detailed** in the chat panel but still score poorly on **Action Completion** — evaluators help you see that gap without reading every tool JSON by hand.
+Part 1 has no playbook, so results vary across runs and participants. A detailed response can still score poorly on **Action Completion** when the trace ends before the investigation reaches a supported conclusion.
 {{< /notice >}}
 
-## What you learned
+## Exit checks
 
-- Agent streams **capture** traces; **evaluators** score them automatically on each session after you enable them.
-- Clicking **Not Now** on past logs keeps a clean **before/after** pair of sessions to compare.
-- **Agentic evaluators** (tool selection, tool error, action completion) measure investigation behavior.
-- **Response quality evaluators** (context adherence, instruction adherence) surface **hallucination** and prompt-following gaps.
-- Baseline **Part 1 scores** become your ruler when you add skills (Part 2) and graph structure (Part 3) on the same alert.
+Before continuing, confirm that:
+
+- The original Part 1 session remains trace-only.
+- The new session shows results for the five configured evaluators where each evaluator applies.
+- Tool spans expose the inputs, outputs, failures, and span-level scores needed to explain each evaluation.
+- Your notes distinguish tool-selection or execution failures from unsupported final-answer claims.
+- You saved the Part 1 scores as the comparison point for Part 2 skills and the Part 3 structured graph.
 
 ---
 

@@ -6,13 +6,13 @@ navTitle: "Part 3 — Full Workflow"
 duration: "30 minutes"
 ---
 
-Part 3 replaces the single ReAct loop with a **four-node LangGraph workflow**: **identify → categorize → investigate → report**. The same `SKILL.md` playbook format from Part 2 applies — but **when and where** skills load in Splunk Agent Observability looks different on purpose.
+Run the alert through a four-node LangGraph workflow: **identify → categorize → investigate → report**. Part 3 keeps the `SKILL.md` format from Part 2 but loads each playbook only in the node that needs it.
 
-Complete [Part 2 — Skill Playbooks]({{< relref "8-part2-skill-playbooks" >}}) first so you have a baseline for keyword injection and the upfront **`skill_router`** trace.
+Complete [Part 2 — Skill Playbooks]({{< relref "8-part2-skill-playbooks" >}}) first. Its keyword injection and **`skill_router`** trace provide the comparison baseline.
 
 ## Part 2 vs Part 3 — how skills load in Splunk Agent Observability
 
-Both parts inject playbooks into the **system prompt** — skills are not MCP tools. The difference is **timing and orchestration**.
+Both parts inject playbooks into the system prompt; neither exposes skills as MCP tools. Compare their timing and orchestration:
 
 | | Part 2 | Part 3 |
 |---|--------|--------|
@@ -23,7 +23,7 @@ Both parts inject playbooks into the **system prompt** — skills are not MCP to
 | **Skills per run** | One domain skill + always-on `investigation-report` | Different skills per phase — see table below |
 
 {{< notice title="Don't expect skill_router in Part 3" style="primary" >}}
-If you just finished Part 2, you may look for a top-level **`skill_router`** block with every playbook listed upfront. **Part 3 does not use that pattern.** Skills appear under the node that needs them — that is the production-style workflow the workshop is teaching.
+Part 3 has no top-level **`skill_router`** block. Each skill appears under the node that loads it. If `skill_router` appears, verify that you ran the command from `part3_agent`.
 {{< /notice >}}
 
 ### Part 2 trace (what you saw in Part 2)
@@ -64,10 +64,10 @@ Session: chat-… | part3_agent
         └── report_llm
 ```
 
-Same skill files (`SKILL.md`), different **orchestration layer**:
+The files remain `SKILL.md`; the orchestration changes:
 
-- **Part 2** teaches *authoring* playbooks with a simple keyword router.
-- **Part 3** teaches *orchestrating* playbooks — load the right runbook at the right workflow step.
+- Part 2 selects a domain playbook with a keyword router and injects the report format up front.
+- Part 3 loads the alert, product, log-search, and report playbooks at their respective workflow nodes.
 
 ## Skills loaded at each node
 
@@ -78,11 +78,11 @@ Same skill files (`SKILL.md`), different **orchestration layer**:
 | **investigate** | Product skill (e.g. `troubleshoot-apm-incidents`) + **`search-logs`** | Product-specific MCP steps + mandatory Splunk log search |
 | **report** | `troubleshoot-report` | Structured handoff — only after evidence is gathered |
 
-The investigate node also injects **`search-logs/indexes.md`** — a catalog of Splunk indexes for the workshop tenant so the agent searches the right index instead of defaulting to `main`.
+The investigate node also injects **`search-logs/indexes.md`**, the workshop tenant's Splunk index catalog. Confirm that log queries use a listed index rather than defaulting to `main`.
 
 ## Run Part 3
 
-Participants run Part 3 from the CLI with a **mock Observability alert** — no Slack integration required. The prompt includes service, environment, **`detectorId`**, and rule name so the **identify** node can anchor the investigation like a real alert thread.
+Run Part 3 from the CLI with the supplied mock Observability alert; Slack is not required. The prompt provides the service, environment, **`detectorId`**, and rule name. The **identify** node uses those fields to resolve the alert before investigation.
 
 From `part3_agent`:
 
@@ -104,28 +104,35 @@ troubleshooting-agent chat "Troubleshoot the Splunk Observability alert: payment
 {{< /tabs >}}
 
 {{< notice title="Mock alert fields" style="tip" >}}
-The workshop prompt mirrors a Slack alert: **service** (`paymentservice`), **environment** (`splunk-hipster`), **detector ID**, and **rule name**. Part 3 uses these to fetch the alert payload, categorize as APM, run **`troubleshoot-apm-incidents`** + **`search-logs`**, then format **`troubleshoot-report`**.
+The prompt carries the fields expected from an alert integration: **service** (`paymentservice`), **environment** (`splunk-hipster`), **detector ID**, and **rule name**. Part 3 uses them to fetch the alert payload, categorize it as APM, run **`troubleshoot-apm-incidents`** plus **`search-logs`**, and then apply **`troubleshoot-report`**.
 {{< /notice >}}
 
-Agent Observability sessions are named `chat-… | part3_agent`. Expect **`part3_investigation`** with nodes **`identify` → `categorize` → `investigate` → `report`** — not a single ReAct **`Agent`** trace.
+Agent Observability sessions are named `chat-… | part3_agent`. Expect **`part3_investigation`** with **`identify` → `categorize` → `investigate` → `report`**, not a single ReAct **`Agent`** trace.
 
 ## Review Part 3 in Splunk Agent Observability
 
-1. Open **Agent Stream** in the [Splunk Agent Observability console](https://console.multitenant.galileocloud.io) and find a session ending in **`part3_agent`**.
-2. Expand **`part3_investigation`** — confirm **named nodes** (`identify`, `categorize`, `investigate`, `report`), not repeated generic `Agent:Agent` spans.
-3. Under **`identify`**, **`investigate`**, and **`report`**, expand **`load_skill:*`** spans — note **when** each playbook enters the prompt relative to MCP tool calls.
-4. Compare to your Part 2 session on a similar alert — same tools may run, but the trace **shape** and **skill timing** should differ.
+1. Open **Agent Stream** in the [Splunk Agent Observability console](https://console.multitenant.galileocloud.io) and select a session ending in **`part3_agent`**.
+2. Expand **`part3_investigation`**. Confirm the named nodes `identify`, `categorize`, `investigate`, and `report`; repeated generic `Agent:Agent` spans indicate the wrong agent.
+3. Expand **`load_skill:*`** under **`identify`**, **`investigate`**, and **`report`**. Record which skill entered the prompt before each node's MCP calls.
+4. Inspect `identify_tools` for alert resolution. Inspect `investigate_tools` for APM evidence and at least one `splunk_*` log search. Treat an empty result as an observation, not proof that no events exist. First confirm that the query succeeded and used the intended service, environment, index, and alert time window; also consider authorization, ingestion delay, and result limits.
+5. In the final report, trace every metric and root-cause statement back to a tool result. Treat unsupported causality or a resolution claim without post-alert evidence as a failure.
+6. Compare with the Part 2 session for the same alert. Tool names may overlap; node ownership and skill timing must differ.
 
 {{< notice title="Tip" style="tip" >}}
 Side-by-side comparison: Part 2 loads **`investigation-report`** at the start with the domain skill. Part 3 loads **`troubleshoot-report`** only in the **report** node — after investigate has gathered evidence.
 {{< /notice >}}
 
-## What you learned
+## Exit checks
 
-- Part 3 uses the same **`SKILL.md`** format as Part 2 — orchestration changed, not the playbook file shape.
-- **Part 2** = keyword router, all skills upfront, visible in **`skill_router`**.
-- **Part 3** = graph nodes, skills per step, visible as **`load_skill:*`** under each node.
-- Production agents often look more like Part 3: workflow engine decides *when* to attach each runbook.
+Before leaving Part 3, confirm:
+
+- Part 2 and Part 3 use the same `SKILL.md` format.
+- Part 2 loads selected skills up front in **`skill_router`**.
+- Part 3 shows **`load_skill:*`** under the node that consumes each playbook.
+- Alert identity, APM metrics or traces, and Splunk logs are separated in the trace and reconciled in the report.
+- Any claim that the incident is resolved uses evidence after the alert window, not only a current empty-alert response.
+
+This graph is a workshop implementation, not a production architecture guarantee. The production controls still required are covered in the next chapter.
 
 For skill authoring details and the full Part 3 skill library, see [AI Skills]({{< relref "2-ai-skills" >}}).
 

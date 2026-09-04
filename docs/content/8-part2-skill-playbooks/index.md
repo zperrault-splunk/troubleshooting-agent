@@ -6,9 +6,9 @@ navTitle: "Part 2 — Skill Playbooks"
 duration: "30 minutes"
 ---
 
-Part 2 uses the **same ReAct loop as Part 1**, but adds **playbooks** — markdown skills that tell the agent which MCP tools to call, in what order, and how to format the answer. You will run the Part 2 agent, see what changes in **Splunk Agent Observability**, then complete your own **`error-rate`** skill and run the agent again.
+Run the same ReAct loop from Part 1 with markdown playbooks injected into its system prompt. Each playbook specifies the MCP tools, call order, interpretation rules, and response format. First trace the supplied latency playbook in Splunk Agent Observability. Then complete the **`error-rate`** skill and verify its routing and tool sequence.
 
-For background on why skills matter, see [AI Skills]({{< relref "2-ai-skills" >}}). This section focuses on **doing** Part 2.
+For playbook concepts and design rationale, see [AI Skills]({{< relref "2-ai-skills" >}}).
 
 ## Part 1 vs Part 2 — agent differences
 
@@ -33,7 +33,7 @@ Your message → keyword router → SKILL.md → system prompt → ReAct loop (L
 
 ## Run Part 2 agent
 
-Make sure [Part 1]({{< relref "6-part1-baseline-agent" >}}) and [Configure Evaluators]({{< relref "7-galileo-logstream-evaluators" >}}) are done — you will compare against those sessions.
+Complete [Part 1]({{< relref "6-part1-baseline-agent" >}}) and [Configure Evaluators]({{< relref "7-galileo-logstream-evaluators" >}}) before continuing. You need those sessions as the comparison baseline.
 
 From `part2_agent`, run a **latency** investigation. Use the workshop defaults — service **`paymentservice`**, environment **`splunk-hipster`**:
 
@@ -54,7 +54,7 @@ troubleshooting-agent chat "Investigate latency on paymentservice in the splunk-
 {{% /tab %}}
 {{< /tabs >}}
 
-The keyword router should select **`latency-spike`** because the message contains signals like `latency`. The agent should also load **`investigation-report`** on every Part 2 run (report formatting — not matched by keywords).
+Verify that the keyword router selects **`latency-spike`** from the `latency` signal. Every Part 2 run must also load **`investigation-report`**; that skill defines report formatting and is not keyword-matched.
 
 {{< notice title="Workshop defaults" style="tip" >}}
 Use **`paymentservice`** and **`splunk-hipster`** for all Part 2 chat commands unless your facilitator says otherwise — same service and environment as Part 1.
@@ -62,7 +62,7 @@ Use **`paymentservice`** and **`splunk-hipster`** for all Part 2 chat commands u
 
 ## Review Part 2 in Splunk Agent Observability
 
-Open **Agent Stream** in the [Splunk Agent Observability console](https://console.multitenant.galileocloud.io) and find the newest session named `chat-… | part2_agent`.
+Open **Agent Stream** in the [Splunk Agent Observability console](https://console.multitenant.galileocloud.io). Select the newest session named `chat-… | part2_agent`.
 
 {{< notice title="Skills are prompt injection, not MCP tools" style="primary" >}}
 Playbooks are appended to the **system prompt** before the ReAct loop runs. You will **not** see `load_skill:investigation-report` or `load_skill:latency-spike` under **`Agent` → `tools`** — those spans only show MCP calls like `o11y_search_alerts_or_incidents`.
@@ -75,25 +75,25 @@ To confirm skills loaded, check:
 
 ### skill_router trace
 
-Part 2 logs a **`skill_router`** trace **before** the main **`Agent`** trace in the same session. Compare your Part 1 session (left) to a Part 2 latency demo (right):
+Part 2 records **`skill_router`** before the main **`Agent`** trace in the same session. Compare your Part 1 session (left) with the Part 2 latency run (right):
 
 {{< diagram src="images/part1-vs-part2-galileo-compare.png" alt="Side-by-side Splunk Agent Observability Agent Stream: Part 1 Agent-only trace vs Part 2 with skill_router and load_skill spans" caption="Part 1 (left): Agent trace only. Part 2 (right): skill_router injects playbooks before the Agent loop." width="1200" >}}
 
 On the Part 2 session (right):
 
-- Select **`skill_router`** first — it is a **sibling** of **`Agent`**, not nested inside it
-- Expand **`load_skill:latency-spike`** and **`load_skill:investigation-report`** to see characters injected into the system prompt
-- Expand **`Agent`** → **`tools`** for MCP calls (`o11y_search_alerts_or_incidents`, `o11y_get_apm_service_latency`)
-- Open the **Evaluators** tab — compare scores to your Part 1 baseline on a similar alert
+- Select **`skill_router`**. It is a sibling of **`Agent`**, not a child.
+- Expand **`load_skill:latency-spike`** and **`load_skill:investigation-report`**. Confirm that each span reports the characters injected into the system prompt.
+- Expand **`Agent`** → **`tools`**. Confirm calls to `o11y_search_alerts_or_incidents` and `o11y_get_apm_service_latency`.
+- Open **Evaluators** and compare this run with the Part 1 session for the same signal.
 
 ### Main investigation trace
 
-The ReAct trace looks like Part 1 (`Agent:agent`, `tools`, `should_continue`), but tool order should follow the active playbook — for **`latency-spike`**, expect:
+The ReAct trace still contains `Agent:agent`, `tools`, and `should_continue`. For **`latency-spike`**, verify this tool order:
 
 1. `o11y_search_alerts_or_incidents`
 2. `o11y_get_apm_service_latency`
 
-Even when alert search returns an empty list, the agent **must** still call step 2 (`o11y_get_apm_service_latency` or error metrics) and format the final reply using **`investigation-report`** headings — not stop after one tool or ask "would you like me to pull metrics?"
+An empty alert list is not a stopping condition. The agent must still call step 2 (`o11y_get_apm_service_latency` or error metrics) and format the final reply with **`investigation-report`** headings. Stopping after alert search or asking whether to pull metrics is a failed run.
 
 The **`latency-spike`** playbook and system prompt tell the agent to omit `severity` unless you asked for it (wrong type causes MCP validation errors) and to treat empty alerts as normal for CLI runs.
 
@@ -108,7 +108,7 @@ On the **Evaluators** tab, compare this session to your Part 1 baseline on a sim
 | **Context adherence** | Are cited metrics present in MCP tool output? |
 | **Instruction adherence** | Did it follow the report skill (no raw JSON dumps)? |
 
-Scores may still be low in Part 2 — that is useful data. The goal is to see **whether skills change behavior and scores**, not to hit 100% yet.
+Do not optimize for a perfect score. Use score changes to determine whether the playbook improved tool selection, completion, and evidence use relative to Part 1.
 
 {{< notice title="Tip" style="tip" >}}
 Filter Agent Stream by session name suffix **`part2_agent`**, or use the session picker to compare **`part1_agent`** vs **`part2_agent`** runs side by side.
@@ -164,9 +164,9 @@ For a blank starting point, copy `skills/_template/SKILL.md`. More examples live
 
 ## Lab — complete the error-rate skill
 
-Your task: finish the starter stub at **`part2_agent/skills/error-rate/SKILL.md`** so the router picks **`error-rate`** when the user mentions errors or 5xx.
+Complete **`part2_agent/skills/error-rate/SKILL.md`** so the router selects **`error-rate`** for errors or 5xx signals.
 
-Work from **`latency-spike/SKILL.md`** — same structure, different tools and signals.
+Use **`latency-spike/SKILL.md`** as the structural reference, but specify error-rate signals, tools, and interpretation.
 
 Before you pick tools, review what the MCP servers expose. Your instance should match **`troubleshooting-agent mcp-doctor`** (see [Configure Environment]({{< relref "5-configure-agent-environment" >}})). **Bold** tools are the ones the error-rate lab expects; the rest are available if you extend your playbook.
 
@@ -239,7 +239,7 @@ troubleshooting-agent chat "Investigate elevated 5xx errors on paymentservice in
 
 {{< diagram src="images/part2-error-rate-galileo.png" alt="Splunk Agent Observability Agent Stream showing Part 2 error-rate skill_router, MCP tool calls, and evaluator scores" caption="Part 2 after completing the error-rate skill — skill_router, playbook tools, and evaluator scores." width="1200" >}}
 
-Work through this checklist:
+Verify the run:
 
 1. **`skill_router`** shows **`error-rate`** as the domain skill.
 2. The trace includes **two or more** MCP tool calls aligned with your playbook.
@@ -251,17 +251,19 @@ Work through this checklist:
 If the wrong skill loads, check **`alert_signals`** spelling and re-run with clearer keywords (`5xx`, `errors`, `error rate`) in the prompt.
 {{< /notice >}}
 
-## What you learned
+## Exit checks
 
-- Part 2 is still a **single ReAct loop** — skills change the **system prompt**, not the graph shape.
-- **`alert_signals`** drive keyword routing; **`investigation-report`** always loads for consistent handoffs.
-- Splunk Agent Observability **`skill_router`** makes injection visible — you can audit which playbook ran.
-- Authoring a skill means defining **signals, tool order, interpretation, and guardrails** — not new Python code.
-- Evaluators help quantify whether skills improved **tool selection** and **completion** vs the Part 1 baseline.
+Before moving to Part 3, confirm:
+
+- The graph remains a single ReAct loop; only the system prompt changes.
+- **`alert_signals`** selects the domain skill and **`investigation-report`** loads on every run.
+- **`skill_router`** identifies the exact playbooks injected for the session.
+- The error-rate playbook defines signals, tool order, interpretation, and guardrails without Python changes.
+- Evaluator results and trace evidence show whether tool selection and completion changed from Part 1.
 
 ## Intentional gaps (Part 3 preview)
 
-Part 2 deliberately stops short of a full production workflow:
+Part 2 intentionally omits capabilities introduced in Part 3:
 
 | Capability | Part 2 | Part 3 |
 |------------|--------|--------|
