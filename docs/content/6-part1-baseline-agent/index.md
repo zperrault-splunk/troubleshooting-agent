@@ -12,25 +12,31 @@ Record what the agent does without a playbook. You will compare its tool selecti
 
 ## Baseline Agent
 
-| Component | Description |
-|-----------|-------------|
-| **Agent loop** | LangGraph ReAct: `agent` (LLM) → `tools` (MCP) → repeat |
-| **Tools** | Splunk Observability MCP only (`o11y_*` prefix) |
-| **Skills** | None; the model decides the investigation path |
+
+| Component         | Description                                             |
+| ----------------- | ------------------------------------------------------- |
+| **Agent loop**    | LangGraph ReAct: `agent` (LLM) → `tools` (MCP) → repeat |
+| **Tools**         | Splunk Observability MCP only (`o11y_`* prefix)         |
+| **Skills**        | None; the model decides the investigation path          |
 | **Observability** | Terminal trace, JSONL logs, Agent Observability session |
+
 
 If you want to skim the code before running:
 
-| File | Purpose |
-|------|---------|
-| `part1_agent/agent.py` | ReAct graph, MCP wiring, observability callbacks |
+
+| File                    | Purpose                                              |
+| ----------------------- | ---------------------------------------------------- |
+| `part1_agent/agent.py`  | ReAct graph, MCP wiring, observability callbacks     |
 | `part1_agent/prompt.py` | System prompt requiring `o11y_*` calls for live data |
+
+
+
 
 ## Run your first investigation
 
 Confirm that you completed [Configure Environment]({{< relref "5-configure-agent-environment" >}}): the virtual environment is active, `.env` identifies your agent stream, and both doctor commands report `Ready`.
 
-Investigate service **`paymentservice`** in environment **`splunk-hipster`**:
+Investigate service `paymentservice` in environment `splunk-hipster`:
 
 {{< tabs >}}
 {{% tab title="Script" open="true" %}}
@@ -89,10 +95,8 @@ INFO [inv=chat:5a4dffc6d704] paymentservice in splunk-hipster shows elevated err
 INFO [inv=chat:5a4dffc6d704] ══════════════════════════════════════════════════════════════
 ```
 
-{{% /tab %}}
+{{% /tab %}}  
 {{< /tabs >}}
-
-You can instead paste alert text from the facilitator's demo. Include the exact APM service (`paymentservice`) and environment (`splunk-hipster`) so the agent scopes every query correctly.
 
 ## Read the terminal trace
 
@@ -116,6 +120,8 @@ If the terminal trace is no longer visible, recover the evidence in either of th
 - Re-run `troubleshooting-agent chat "Why does paymentservice have errors in the splunk-hipster environment?"`. This creates a new terminal trace and Agent Observability session; do not mistake it for the original run.
 {{< /notice >}}
 
+
+
 ## Splunk Agent Observability
 
 **Splunk Agent Observability** captures each investigation as a browser-accessible agent trace:
@@ -124,31 +130,35 @@ If the terminal trace is no longer visible, recover the evidence in either of th
 - Each MCP tool call, including inputs and outputs
 - Input, output, and total token usage for the session
 
-| Signal | Where | Best for |
-|--------|-------|----------|
-| **Terminal trace** | CLI output during a run | Live narration |
-| **JSONL files** | `shared/logs/investigations/` | Review after a run |
+
+| Signal                           | Where                              | Best for                        |
+| -------------------------------- | ---------------------------------- | ------------------------------- |
+| **Terminal trace**               | CLI output during a run            | Live narration                  |
+| **JSONL files**                  | `shared/logs/investigations/`      | Review after a run              |
 | **Agent Observability sessions** | Splunk Agent Observability console | Comparing runs across Parts 1–3 |
+
 
 Each investigation creates a **session** named like `chat-abc123 | part1_agent` in your Agent Observability project (terminal IDs use `chat:`; session names in the console use `chat-`).
 
 ### Metrics, traces, logs, and events vs Agent streams
 
-**Splunk Observability** records metrics, traces, logs, and events for **`paymentservice`**. The agent queries those signals through `o11y_*` tools.
+**Splunk Observability** records metrics, traces, logs, and events for `paymentservice`. The agent queries those signals through `o11y_`* tools.
 
 **Splunk Agent Observability** does not store those application signals. It stores an **Agent stream**, a named collection of sessions for this workshop instance. Each session contains one investigation: the chat, an agent trace, and spans for LLM turns and MCP calls.
 
-| Splunk Observability | What it tells you (the app) | In an Agent stream | Difference |
-|----------------------|-----------------------------|--------------------|------------|
-| **Metrics** | Time series: error rate, latency, request volume | Token counts, later **evaluators** | App RED vs agent quality/cost — not the same numbers |
-| **Traces** | One user request across services (`paymentservice` → dependencies) | One agent interaction (reason → tools → answer) | App request vs investigation workflow |
-| **Logs** | Application log lines | Span input/output and the workshop JSONL file | Syslog/events from the service vs LLM/tool payloads |
-| **Events** | Detector firings, alert/incident activity | A **session** (one `troubleshooting-agent chat`) | An incident on the app vs a recorded agent run |
+
+| Splunk Observability | What it tells you (the app)                                        | In an Agent stream                               | Difference                                           |
+| -------------------- | ------------------------------------------------------------------ | ------------------------------------------------ | ---------------------------------------------------- |
+| **Metrics**          | Time series: error rate, latency, request volume                   | Token counts, later **evaluators**               | App RED vs agent quality/cost — not the same numbers |
+| **Traces**           | One user request across services (`paymentservice` → dependencies) | One agent interaction (reason → tools → answer)  | App request vs investigation workflow                |
+| **Logs**             | Application log lines                                              | Span input/output and the workshop JSONL file    | Syslog/events from the service vs LLM/tool payloads  |
+| **Events**           | Detector firings, alert/incident activity                          | A **session** (one `troubleshooting-agent chat`) | An incident on the app vs a recorded agent run       |
+
 
 **Chat** is the session's query-and-answer view, not a fifth Observability signal.
 
 {{< notice title="Same words, two systems" style="tip" >}}
-If the agent calls `o11y_get_apm_exemplar_traces`, the returned IDs identify **Splunk Observability traces** for `paymentservice`. The tree in **Agent Stream** is the separate **agent trace**. Nested `o11y_*` spans show which application signals the agent queried.
+If the agent calls `o11y_get_apm_exemplar_traces`, the returned IDs identify **Splunk Observability traces** for `paymentservice`. The tree in **Agent Stream** is the separate **agent trace**. Nested `o11y_`* spans show which application signals the agent queried.
 {{< /notice >}}
 
 ## Review the run in Splunk Agent Observability
@@ -173,7 +183,7 @@ Agent
 └── should_continue
 ```
 
-Open **`tools`** and each nested MCP span. Check its arguments, result status, and JSON response against the terminal trace. The tool sequence, inputs, results, and final answer should agree across both views.
+Open `tools` and each nested MCP span. Check its arguments, result status, and JSON response against the terminal trace. The tool sequence, inputs, results, and final answer should agree across both views.
 
 {{< diagram src="images/part1-galileo-trace.png" alt="Splunk Agent Observability Agent Stream showing a Part 1 session with trace tree, chat, and empty Evaluators tab" caption="Part 1 in Agent Stream. Evaluators are empty until the next section." width="960" >}}
 
@@ -183,16 +193,18 @@ Keep the Splunk Agent Observability console open. After each investigation, refr
 
 ## Baseline exercise
 
-Complete this baseline using **`paymentservice`** in environment **`splunk-hipster`**:
+Complete this baseline using `paymentservice` in environment `splunk-hipster`:
 
-| Step | Action |
-|------|--------|
-| 1 | Run `troubleshooting-agent chat "Why does paymentservice have errors in the splunk-hipster environment?"` |
-| 2 | Record the tools called, relevant tools skipped, and each tool's input scope and time window |
-| 3 | Open [Splunk Agent Observability](https://console.multitenant.galileocloud.io), find the session, and expand every agent and tool span |
-| 4 | Map each conclusion to the MCP result that supports it; mark unsupported claims |
-| 5 | Identify claims that would become hallucinations if the corresponding MCP result were empty |
-| 6 | Save the tool sequence, evidence, failure modes, and final conclusion for comparison with Parts 2 and 3 |
+
+| Step | Action                                                                                                                                 |
+| ---- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| 1    | Run `troubleshooting-agent chat "Why does paymentservice have errors in the splunk-hipster environment?"`                              |
+| 2    | Record the tools called, relevant tools skipped, and each tool's input scope and time window                                           |
+| 3    | Open [Splunk Agent Observability](https://console.multitenant.galileocloud.io), find the session, and expand every agent and tool span |
+| 4    | Map each conclusion to the MCP result that supports it; mark unsupported claims                                                        |
+| 5    | Identify claims that would become hallucinations if the corresponding MCP result were empty                                            |
+| 6    | Save the tool sequence, evidence, failure modes, and final conclusion for comparison with Parts 2 and 3                                |
+
 
 {{< notice title="Important" style="primary" >}}
 Part 1 intentionally has no playbook. Tool choice and investigation depth can vary between runs. Capture that variation; Parts 2 and 3 add controls intended to make the same investigation more repeatable.
