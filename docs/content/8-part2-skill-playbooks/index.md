@@ -6,36 +6,42 @@ navTitle: "Part 2 — Skill Playbooks"
 duration: "30 minutes"
 ---
 
-Run the same ReAct loop from Part 1 with markdown playbooks injected into its system prompt. Each playbook specifies the MCP tools, call order, interpretation rules, and response format. First trace the supplied latency playbook in Splunk Agent Observability. Then complete the **`error-rate`** skill and verify its routing and tool sequence.
+Run the same ReAct loop from Part 1 with markdown playbooks injected into its system prompt. Each playbook specifies the MCP tools, call order, interpretation rules, and response format. First trace the supplied latency playbook in Splunk Agent Observability. Then complete the `error-rate` skill and verify its routing and tool sequence.
 
 For playbook concepts and design rationale, see [AI Skills]({{< relref "2-ai-skills" >}}).
 
 ## Part 1 vs Part 2 — agent differences
 
-| Component | Part 1 | Part 2 |
-|-----------|--------|--------|
-| **Agent loop** | LangGraph ReAct | Same ReAct loop |
-| **Playbooks** | None | One **domain** skill + always-on **`investigation-report`** |
-| **Routing** | — | Keyword match on your chat/alert text (`alert_signals` in SKILL.md YAML) |
-| **Agent Observability session** | `chat-… \| part1_agent` | `chat-… \| part2_agent` |
-| **Extra Agent Observability trace** | — | **`skill_router`** — all skills injected **before** the ReAct loop |
+
+| Component                           | Part 1                 | Part 2                                                                   |
+| ----------------------------------- | ---------------------- | ------------------------------------------------------------------------ |
+| **Agent loop**                      | LangGraph ReAct        | Same ReAct loop                                                          |
+| **Playbooks**                       | None                   | One **domain** skill + always-on `investigation-report`                  |
+| **Routing**                         | —                      | Keyword match on your chat/alert text (`alert_signals` in SKILL.md YAML) |
+| **Agent Observability session**     | `chat-… | part1_agent` | `chat-… | part2_agent`                                                   |
+| **Extra Agent Observability trace** | —                      | `skill_router` — all skills injected **before** the ReAct loop           |
+
 
 ```text
 Your message → keyword router → SKILL.md → system prompt → ReAct loop (LLM + MCP tools)
 ```
 
-| File | Purpose |
-|------|---------|
-| `part2_agent/agent.py` | Builds prompt with injected skills; logs routing metadata |
-| `part2_agent/skill_inject.py` | Keyword router and prompt assembly |
-| `part2_agent/skills/` | Playbook library — you edit skills here |
-| `part2_agent/skills/_template/SKILL.md` | Blank template for new playbooks |
+
+| File                                    | Purpose                                                   |
+| --------------------------------------- | --------------------------------------------------------- |
+| `part2_agent/agent.py`                  | Builds prompt with injected skills; logs routing metadata |
+| `part2_agent/skill_inject.py`           | Keyword router and prompt assembly                        |
+| `part2_agent/skills/`                   | Playbook library — you edit skills here                   |
+| `part2_agent/skills/_template/SKILL.md` | Blank template for new playbooks                          |
+
+
+
 
 ## Run Part 2 agent
 
 Complete [Part 1]({{< relref "6-part1-baseline-agent" >}}) and [Configure Evaluators]({{< relref "7-galileo-logstream-evaluators" >}}) before continuing. You need those sessions as the comparison baseline.
 
-From `part2_agent`, run a **latency** investigation. Use the workshop defaults — service **`paymentservice`**, environment **`splunk-hipster`**:
+From `part2_agent`, run a **latency** investigation. Use the workshop defaults — service `paymentservice`, environment `splunk-hipster`:
 
 {{< notice title="Same agent stream" style="tip" >}}
 Do **not** change `GALILEO_LOG_STREAM` in `.env` when you switch to `part2_agent`. Part 2 sessions appear in the same Agent Stream as Part 1 — look for the `part2_agent` suffix in the session name.
@@ -54,10 +60,10 @@ troubleshooting-agent chat "Investigate latency on paymentservice in the splunk-
 {{% /tab %}}
 {{< /tabs >}}
 
-Verify that the keyword router selects **`latency-spike`** from the `latency` signal. Every Part 2 run must also load **`investigation-report`**; that skill defines report formatting and is not keyword-matched.
+Verify that the keyword router selects `latency-spike` from the `latency` signal. Every Part 2 run must also load `investigation-report`; that skill defines report formatting and is not keyword-matched.
 
 {{< notice title="Workshop defaults" style="tip" >}}
-Use **`paymentservice`** and **`splunk-hipster`** for all Part 2 chat commands unless your facilitator says otherwise — same service and environment as Part 1.
+Use `paymentservice` and `splunk-hipster` for all Part 2 chat commands unless your facilitator says otherwise — same service and environment as Part 1.
 {{< /notice >}}
 
 ## Review Part 2 in Splunk Agent Observability
@@ -65,70 +71,78 @@ Use **`paymentservice`** and **`splunk-hipster`** for all Part 2 chat commands u
 Open **Agent Stream** in the [Splunk Agent Observability console](https://console.multitenant.galileocloud.io). Select the newest session named `chat-… | part2_agent`.
 
 {{< notice title="Skills are prompt injection, not MCP tools" style="primary" >}}
-Playbooks are appended to the **system prompt** before the ReAct loop runs. You will **not** see `load_skill:investigation-report` or `load_skill:latency-spike` under **`Agent` → `tools`** — those spans only show MCP calls like `o11y_search_alerts_or_incidents`.
+Playbooks are appended to the **system prompt** before the ReAct loop runs. You will **not** see `load_skill:investigation-report` or `load_skill:latency-spike` under `Agent` **→** `tools` — those spans only show MCP calls like `o11y_search_alerts_or_incidents`.
 
 To confirm skills loaded, check:
+
 1. **Terminal** — lines like `[N] Skill loaded: latency-spike` and `[N] Skill loaded: investigation-report`
-2. **Splunk Agent Observability** — a separate **`skill_router`** trace in the same session (sibling to **`Agent`**, not nested inside it)
+2. **Splunk Agent Observability** — a separate `skill_router` trace in the same session (sibling to `Agent`, not nested inside it)
 3. **Chat JSON** — the system message includes `## Active playbook` and `## Reporting requirements`
+
 {{< /notice >}}
 
 ### skill_router trace
 
-Part 2 records **`skill_router`** before the main **`Agent`** trace in the same session. Compare your Part 1 session (left) with the Part 2 latency run (right):
+Part 2 records `skill_router` before the main `Agent` trace in the same session. Compare your Part 1 session (left) with the Part 2 latency run (right):
 
 {{< diagram src="images/part1-vs-part2-galileo-compare.png" alt="Side-by-side Splunk Agent Observability Agent Stream: Part 1 Agent-only trace vs Part 2 with skill_router and load_skill spans" caption="Part 1 (left): Agent trace only. Part 2 (right): skill_router injects playbooks before the Agent loop." width="1200" >}}
 
 On the Part 2 session (right):
 
-- Select **`skill_router`**. It is a sibling of **`Agent`**, not a child.
-- Expand **`load_skill:latency-spike`** and **`load_skill:investigation-report`**. Confirm that each span reports the characters injected into the system prompt.
-- Expand **`Agent`** → **`tools`**. Confirm calls to `o11y_search_alerts_or_incidents` and `o11y_get_apm_service_latency`.
+- Select `skill_router`. It is a sibling of `Agent`, not a child.
+- Expand `load_skill:latency-spike` and `load_skill:investigation-report`. Confirm that each span reports the characters injected into the system prompt.
+- Expand `Agent` → `tools`. Confirm calls to `o11y_search_alerts_or_incidents` and `o11y_get_apm_service_latency`.
 - Open **Evaluators** and compare this run with the Part 1 session for the same signal.
+
+
 
 ### Main investigation trace
 
-The ReAct trace still contains `Agent:agent`, `tools`, and `should_continue`. For **`latency-spike`**, verify this tool order:
+The ReAct trace still contains `Agent:agent`, `tools`, and `should_continue`. For `latency-spike`, verify this tool order:
 
 1. `o11y_search_alerts_or_incidents`
 2. `o11y_get_apm_service_latency`
 
-An empty alert list is not a stopping condition. The agent must still call step 2 (`o11y_get_apm_service_latency` or error metrics) and format the final reply with **`investigation-report`** headings. Stopping after alert search or asking whether to pull metrics is a failed run.
+An empty alert list is not a stopping condition. The agent must still call step 2 (`o11y_get_apm_service_latency` or error metrics) and format the final reply with `investigation-report` headings. Stopping after alert search or asking whether to pull metrics is a failed run.
 
-The **`latency-spike`** playbook and system prompt tell the agent to omit `severity` unless you asked for it (wrong type causes MCP validation errors) and to treat empty alerts as normal for CLI runs.
+The `latency-spike` playbook and system prompt tell the agent to omit `severity` unless you asked for it (wrong type causes MCP validation errors) and to treat empty alerts as normal for CLI runs.
 
 ### Compare evaluators to Part 1
 
 On the **Evaluators** tab, compare this session to your Part 1 baseline on a similar alert:
 
-| Evaluator | What to look for |
-|-----------|------------------|
-| **Tool selection quality** | Did the agent call the tools the playbook names? |
-| **Action Completion** | Did it get further than Part 1’s “please provide environment” or “here are next steps” stops? |
-| **Context adherence** | Are cited metrics present in MCP tool output? |
-| **Instruction adherence** | Did it follow the report skill (no raw JSON dumps)? |
+
+| Evaluator                  | What to look for                                                                              |
+| -------------------------- | --------------------------------------------------------------------------------------------- |
+| **Tool selection quality** | Did the agent call the tools the playbook names?                                              |
+| **Action Completion**      | Did it get further than Part 1’s “please provide environment” or “here are next steps” stops? |
+| **Context adherence**      | Are cited metrics present in MCP tool output?                                                 |
+| **Instruction adherence**  | Did it follow the report skill (no raw JSON dumps)?                                           |
+
 
 Do not optimize for a perfect score. Use score changes to determine whether the playbook improved tool selection, completion, and evidence use relative to Part 1.
 
 {{< notice title="Tip" style="tip" >}}
-Filter Agent Stream by session name suffix **`part2_agent`**, or use the session picker to compare **`part1_agent`** vs **`part2_agent`** runs side by side.
+Filter Agent Stream by session name suffix `part2_agent`, or use the session picker to compare `part1_agent` vs `part2_agent` runs side by side.
 {{< /notice >}}
 
-## Anatomy of a SKILL.md
+## Anatomy of a [SKILL.md](http://SKILL.md)
 
-Every playbook lives in `part2_agent/skills/<skill-name>/SKILL.md`. Open **`skills/latency-spike/SKILL.md`** as the reference while you work.
+Every playbook lives in `part2_agent/skills/<skill-name>/SKILL.md`. Open `skills/latency-spike/SKILL.md` as the reference while you work.
 
 The file starts with YAML between `---` lines:
 
-| Field | Purpose |
-|-------|---------|
-| **`name`** | Skill identifier (usually matches the folder name) |
-| **`description`** | One line — when to use this playbook |
-| **`alert_signals`** | Keywords matched against your chat/alert text (lowercase) |
-| **`mcp_tools`** | Tools the playbook expects — guides the model and facilitators |
-| **`rule_patterns`** | Optional — document detector name patterns (reference only in Part 2) |
 
-Example from **`latency-spike`**:
+| Field           | Purpose                                                               |
+| --------------- | --------------------------------------------------------------------- |
+| `name`          | Skill identifier (usually matches the folder name)                    |
+| `description`   | One line — when to use this playbook                                  |
+| `alert_signals` | Keywords matched against your chat/alert text (lowercase)             |
+| `mcp_tools`     | Tools the playbook expects — guides the model and facilitators        |
+| `rule_patterns` | Optional — document detector name patterns (reference only in Part 2) |
+
+
+Example from `latency-spike`:
 
 ```yaml
 ---
@@ -147,77 +161,85 @@ mcp_tools:
 
 Below the YAML block, the markdown body defines the playbook:
 
-| Section | Purpose |
-|---------|---------|
-| **When to use** | Symptoms or alert types that match |
-| **Tool sequence** | Ordered MCP steps with parameter hints (`service_name`, `environment_name`, `time_range`) |
-| **Interpretation** | How to read the metrics — not just what to call |
-| **Do not** | Guardrails (wrong params, skipping steps, inventing data) |
 
-Part 2 also loads **`investigation-report`** automatically — it is not selected by keywords. It defines the **final answer format** for every run.
+| Section            | Purpose                                                                                   |
+| ------------------ | ----------------------------------------------------------------------------------------- |
+| **When to use**    | Symptoms or alert types that match                                                        |
+| **Tool sequence**  | Ordered MCP steps with parameter hints (`service_name`, `environment_name`, `time_range`) |
+| **Interpretation** | How to read the metrics — not just what to call                                           |
+| **Do not**         | Guardrails (wrong params, skipping steps, inventing data)                                 |
+
+
+Part 2 also loads `investigation-report` automatically — it is not selected by keywords. It defines the **final answer format** for every run.
 
 {{< notice title="Important" style="primary" >}}
-Tool names must match **`mcp-doctor`** exactly (`o11y_*` prefix). Time ranges belong inside a **`params`** object: `{"start": "-1h", "stop": "now"}`.
+Tool names must match `mcp-doctor` exactly (`o11y_*` prefix). Time ranges belong inside a `params` object: `{"start": "-1h", "stop": "now"}`.
 {{< /notice >}}
 
 For a blank starting point, copy `skills/_template/SKILL.md`. More examples live in [AI Skills]({{< relref "2-ai-skills" >}}).
 
 ## Lab — complete the error-rate skill
 
-Complete **`part2_agent/skills/error-rate/SKILL.md`** so the router selects **`error-rate`** for errors or 5xx signals.
+Complete `part2_agent/skills/error-rate/SKILL.md` so the router selects `error-rate` for errors or 5xx signals.
 
-Use **`latency-spike/SKILL.md`** as the structural reference, but specify error-rate signals, tools, and interpretation.
+Use `latency-spike/SKILL.md` as the structural reference, but specify error-rate signals, tools, and interpretation.
 
-Before you pick tools, review what the MCP servers expose. Your instance should match **`troubleshooting-agent mcp-doctor`** (see [Configure Environment]({{< relref "5-configure-agent-environment" >}})). **Bold** tools are the ones the error-rate lab expects; the rest are available if you extend your playbook.
+Before you pick tools, review what the MCP servers expose. Your instance should match `troubleshooting-agent mcp-doctor` (see [Configure Environment]({{< relref "5-configure-agent-environment" >}})). **Bold** tools are the ones the error-rate lab expects; the rest are available if you extend your playbook.
 
 {{< collapse title="Splunk Observability MCP tools (o11y_*) — click to expand" >}}
-| Tool | What it's for |
-|------|----------------|
-| **`o11y_search_alerts_or_incidents`** | Find active or recent alerts and incidents by service, environment, detector, or keywords — capture `eventId` when present |
-| **`o11y_get_apm_service_errors_and_requests`** | Error count and request volume time series for one service — primary metric tool for error-rate investigations |
-| `o11y_get_apm_service_latency` | Latency percentiles (p50/p90/p99) for a service — used by the latency-spike playbook |
-| `o11y_get_apm_services` | Aggregate request, error, and latency metrics across services — useful for traffic or health comparisons |
-| `o11y_get_apm_service_dependencies` | Upstream and downstream APM dependencies for a service |
-| `o11y_get_apm_exemplar_traces` | Sample trace IDs linked to latency buckets or errors — deeper drill-down (Part 3) |
-| `o11y_get_apm_trace_tool` | Full trace detail for a specific `trace_id` |
-| `o11y_get_apm_environments` | List APM environment names when the user did not specify one |
-| `o11y_get_metric_names` | Discover metric names available for SignalFlow queries |
-| `o11y_get_metric_metadata` | Units and dimensions for a named metric |
-| `o11y_generate_signalflow_program` | Build a SignalFlow program from a natural-language description |
-| `o11y_execute_signalflow_program` | Run SignalFlow and return metric time series |
-{{< /collapse >}}
+
+
+| Tool                                       | What it's for                                                                                                              |
+| ------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------- |
+| `o11y_search_alerts_or_incidents`          | Find active or recent alerts and incidents by service, environment, detector, or keywords — capture `eventId` when present |
+| `o11y_get_apm_service_errors_and_requests` | Error count and request volume time series for one service — primary metric tool for error-rate investigations             |
+| `o11y_get_apm_service_latency`             | Latency percentiles (p50/p90/p99) for a service — used by the latency-spike playbook                                       |
+| `o11y_get_apm_services`                    | Aggregate request, error, and latency metrics across services — useful for traffic or health comparisons                   |
+| `o11y_get_apm_service_dependencies`        | Upstream and downstream APM dependencies for a service                                                                     |
+| `o11y_get_apm_exemplar_traces`             | Sample trace IDs linked to latency buckets or errors — deeper drill-down (Part 3)                                          |
+| `o11y_get_apm_trace_tool`                  | Full trace detail for a specific `trace_id`                                                                                |
+| `o11y_get_apm_environments`                | List APM environment names when the user did not specify one                                                               |
+| `o11y_get_metric_names`                    | Discover metric names available for SignalFlow queries                                                                     |
+| `o11y_get_metric_metadata`                 | Units and dimensions for a named metric                                                                                    |
+| `o11y_generate_signalflow_program`         | Build a SignalFlow program from a natural-language description                                                             |
+| `o11y_execute_signalflow_program`          | Run SignalFlow and return metric time series                                                                               |
+| {{< /collapse >}}                          |                                                                                                                            |
+
 
 {{< collapse title="Splunk Cloud MCP tools (splunk_*) — Part 3 preview" >}}
-| Tool | What it's for |
-|------|----------------|
-| `splunk_run_query` | Run read-only SPL against Splunk Cloud — primary log search (required in Part 3 before concluding) |
-| `splunk_get_indexes` | List indexes and storage tiers — use when the log index is unknown |
-| `splunk_get_metadata` | Field names, event types, and sources for an index — narrows SPL before searching |
-| `splunk_get_info` | Splunk instance version and identity — connectivity checks |
 
-Part 2 playbooks focus on **`o11y_*`** tools. Log search skills use **`splunk_*`** in Part 3.
+
+| Tool                  | What it's for                                                                                      |
+| --------------------- | -------------------------------------------------------------------------------------------------- |
+| `splunk_run_query`    | Run read-only SPL against Splunk Cloud — primary log search (required in Part 3 before concluding) |
+| `splunk_get_indexes`  | List indexes and storage tiers — use when the log index is unknown                                 |
+| `splunk_get_metadata` | Field names, event types, and sources for an index — narrows SPL before searching                  |
+| `splunk_get_info`     | Splunk instance version and identity — connectivity checks                                         |
+
+
+Part 2 playbooks focus on `o11y_*` tools. Log search skills use `splunk_*` in Part 3.
 {{< /collapse >}}
 
-1. Open **`skills/error-rate/SKILL.md`** in your editor.
+1. Open `skills/error-rate/SKILL.md` in your editor.
 2. **SKILL.md YAML** — replace the `TODO` entries:
-   - **`description`** — one line: investigate error-rate / 5xx alerts using APM error metrics
-   - **`alert_signals`** — include `error`, `errors`, and `5xx` (add others if useful)
-   - **`mcp_tools`** — list `o11y_search_alerts_or_incidents` and `o11y_get_apm_service_errors_and_requests`
+  - `description` — one line: investigate error-rate / 5xx alerts using APM error metrics
+  - `alert_signals` — include `error`, `errors`, and `5xx` (add others if useful)
+  - `mcp_tools` — list `o11y_search_alerts_or_incidents` and `o11y_get_apm_service_errors_and_requests`
 3. **When to use** — when the alert or user message mentions elevated errors or error rate.
 4. **Tool sequence** — two steps:
-   - Search alerts / incidents — capture `eventId` when present; **if empty, continue to step 2**
-   - Get APM service errors and requests — **required**; `service_name`, `environment_name`, `time_range` in `params`
+  - Search alerts / incidents — capture `eventId` when present; **if empty, continue to step 2**
+  - Get APM service errors and requests — **required**; `service_name`, `environment_name`, `time_range` in `params`
 5. **Interpretation** — at least two bullets (for example: error count vs request volume; errors spiking with traffic vs independently).
 6. **Do not** — at least one rule (for example: do not state root cause without metric evidence from tools).
 7. Save the file.
 
 {{< notice title="Check your routing" style="tip" >}}
-The router counts how many **`alert_signals`** appear in your message. A prompt with **`5xx`** or **`errors`** should score **`error-rate`** higher than **`latency-spike`**.
+The router counts how many `alert_signals` appear in your message. A prompt with `5xx` or `errors` should score `error-rate` higher than `latency-spike`.
 {{< /notice >}}
 
 ## Run Part 2 with your skill
 
-After saving **`error-rate/SKILL.md`**, run an error-focused investigation:
+After saving `error-rate/SKILL.md`, run an error-focused investigation:
 
 {{< tabs >}}
 {{% tab title="Script" open="true" %}}
@@ -232,23 +254,21 @@ troubleshooting-agent chat "Investigate elevated 5xx errors on paymentservice in
 
 ### Confirm in Splunk Agent Observability
 
-1. Open the new **`part2_agent`** session in Agent Stream.
-2. Expand **`skill_router`** — expect **`load_skill:error-rate`** and **`load_skill:investigation-report`**.
-3. Expand the main trace — expect at least **`o11y_search_alerts_or_incidents`** and **`o11y_get_apm_service_errors_and_requests`** under **`tools`** spans.
+1. Open the new `part2_agent` session in Agent Stream.
+2. Expand `skill_router` — expect `load_skill:error-rate` and `load_skill:investigation-report`.
+3. Expand the main trace — expect at least `o11y_search_alerts_or_incidents` and `o11y_get_apm_service_errors_and_requests` under `tools` spans.
 4. Open **Evaluators** — compare scores to your Part 1 and latency-demo Part 2 sessions.
-
-{{< diagram src="images/part2-error-rate-galileo.png" alt="Splunk Agent Observability Agent Stream showing Part 2 error-rate skill_router, MCP tool calls, and evaluator scores" caption="Part 2 after completing the error-rate skill — skill_router, playbook tools, and evaluator scores." width="1200" >}}
 
 Verify the run:
 
-1. **`skill_router`** shows **`error-rate`** as the domain skill.
+1. `skill_router` shows `error-rate` as the domain skill.
 2. The trace includes **two or more** MCP tool calls aligned with your playbook.
 3. The **chat** response cites **interpreted** numbers from tool output (not generic advice).
-4. The reply uses **`investigation-report`** headings — no raw JSON blocks.
+4. The reply uses `investigation-report` headings — no raw JSON blocks.
 5. **Evaluator scores** are recorded — note which improved vs Part 1.
 
 {{< notice title="Tip" style="tip" >}}
-If the wrong skill loads, check **`alert_signals`** spelling and re-run with clearer keywords (`5xx`, `errors`, `error rate`) in the prompt.
+If the wrong skill loads, check `alert_signals` spelling and re-run with clearer keywords (`5xx`, `errors`, `error rate`) in the prompt.
 {{< /notice >}}
 
 ## Exit checks
@@ -256,22 +276,26 @@ If the wrong skill loads, check **`alert_signals`** spelling and re-run with cle
 Before moving to Part 3, confirm:
 
 - The graph remains a single ReAct loop; only the system prompt changes.
-- **`alert_signals`** selects the domain skill and **`investigation-report`** loads on every run.
-- **`skill_router`** identifies the exact playbooks injected for the session.
+- `alert_signals` selects the domain skill and `investigation-report` loads on every run.
+- `skill_router` identifies the exact playbooks injected for the session.
 - The error-rate playbook defines signals, tool order, interpretation, and guardrails without Python changes.
 - Evaluator results and trace evidence show whether tool selection and completion changed from Part 1.
+
+
 
 ## Intentional gaps (Part 3 preview)
 
 Part 2 intentionally omits capabilities introduced in Part 3:
 
-| Capability | Part 2 | Part 3 |
-|------------|--------|--------|
-| Graph | Single ReAct | Four nodes: identify → categorize → investigate → report |
-| Skills per run | One domain + report | Product skill + log search + full report |
-| Exemplar traces | Not in playbooks | Yes |
-| Alert anchoring | Keyword routing | Strict detector / incident matching |
-| Skill timing in Agent Observability | **`skill_router`** trace, then **`Agent`** | **`load_skill:*`** under each graph node — see [Part 3]({{< relref "9-part3-full-workflow" >}}) |
+
+| Capability                          | Part 2                             | Part 3                                                                                      |
+| ----------------------------------- | ---------------------------------- | ------------------------------------------------------------------------------------------- |
+| Graph                               | Single ReAct                       | Four nodes: identify → categorize → investigate → report                                    |
+| Skills per run                      | One domain + report                | Product skill + log search + full report                                                    |
+| Exemplar traces                     | Not in playbooks                   | Yes                                                                                         |
+| Alert anchoring                     | Keyword routing                    | Strict detector / incident matching                                                         |
+| Skill timing in Agent Observability | `skill_router` trace, then `Agent` | `load_skill:*` under each graph node — see [Part 3]({{< relref "9-part3-full-workflow" >}}) |
+
 
 ---
 
