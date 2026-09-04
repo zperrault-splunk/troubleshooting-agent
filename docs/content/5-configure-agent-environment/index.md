@@ -64,7 +64,7 @@ GALILEO_LOG_STREAM="sre-agent-wkshp-shw-2cb1"
 ```
 
 {{< notice title="Tip" style="tip" >}}
-Keep **`GALILEO_PROJECT`** and **`GALILEO_LOG_STREAM`** unchanged across Parts 1–3. When you switch to `part2_agent` or `part3_agent`, the same **Agent Stream** will hold every session for side-by-side comparison.
+Keep `GALILEO_PROJECT` and `GALILEO_LOG_STREAM` unchanged across Parts 1–3. When you switch to `part2_agent` or `part3_agent`, the same **Agent Stream** will hold every session for side-by-side comparison.
 {{< /notice >}}
 
 Save and exit: press `Esc`, type `:wq`, then press Enter. Verify that the file resembles this example and contains your instance name:
@@ -90,28 +90,40 @@ troubleshooting-agent mcp-doctor
 {{% tab title="Example Output" %}}
 
 ```text
-(.venv) splunk@ip-172-31-19-27:~/troubleshooting-agent/part1_agent$ troubleshooting-agent doctor
 Part 1 — minimal MCP-only agent
 LLM provider: openai
 Base URL: https://lite-llm-proxy.splunko11y.com/v1
 Model: gpt-4.1-mini
 OpenAI-compatible LLM: OK
 Ready.
-(.venv) splunk@ip-172-31-19-27:~/troubleshooting-agent/part1_agent$ troubleshooting-agent mcp-doctor
 Part 1 — minimal MCP-only agent
+MCP integrations enabled: o11y, cloud
+Feature flags: ENABLE_SPLUNK_O11Y=True, ENABLE_SPLUNK_CLOUD_MCP=True, ENABLE_SPLUNK_MCP=False
+MCP transport: /usr/bin/npx (mcp-remote)
+(Use `node --trace-warnings ...` to show where the warning was created)
 splunk_o11y: OK (12 tools)
-  - o11y_get_metric_names
-  - o11y_get_apm_trace_tool
-  - o11y_get_apm_exemplar_traces
-  - o11y_generate_signalflow_program
+  - o11y_execute_signalflow_program
+  - o11y_get_apm_environments
   - o11y_get_apm_service_errors_and_requests
-  - o11y_get_apm_service_latency
   - o11y_get_apm_services
   - o11y_search_alerts_or_incidents
-  - o11y_execute_signalflow_program
+  - o11y_get_apm_exemplar_traces
+  - o11y_get_apm_service_latency
+  - o11y_generate_signalflow_program
+  - o11y_get_apm_trace_tool
   - o11y_get_apm_service_dependencies
-  - o11y_get_apm_environments
+  - o11y_get_metric_names
   - o11y_get_metric_metadata
+splunk_cloud_mcp: OK (9 tools)
+  - splunk_get_info
+  - splunk_get_indexes
+  - splunk_get_index_info
+  - splunk_get_user_list
+  - splunk_get_user_info
+  - splunk_run_query
+  - splunk_get_metadata
+  - splunk_get_kv_store_collections
+  - splunk_get_knowledge_objects
 MCP ready.
 ```
 
