@@ -46,9 +46,8 @@ Copy `.env.example` to `.env` and set:
 
 - `ENABLE_GALILEO=true`
 - `GALILEO_PROJECT="sre-agent-wkshp"`
-- `GALILEO_LOG_STREAM="sre-agent-wkshp-$INSTANCE"` — replace `$INSTANCE` with the value from `echo $INSTANCE` (for example `sre-agent-wkshp-shw-2cb1`)
 
-Use the **same** project and agent stream for Parts 1–3. Do not change `GALILEO_LOG_STREAM` when you switch parts. Your instance name comes from [Connect to EC2]({{< relref "3-connect-ec2" >}}).
+The agent sets `GALILEO_LOG_STREAM` to `$INSTANCE` (for example, `shw-2cb1`). You do not need to add that line. Use the **same** project for Parts 1–3, and do not override the stream unless your facilitator asks. Your instance name comes from [Connect to EC2]({{< relref "3-connect-ec2" >}}).
 
 ### 6. `doctor` or `mcp-doctor` Failed. What Next?
 
@@ -135,7 +134,7 @@ Or re-run the same chat command. You get a new investigation ID and Agent Observ
 
 ### 18. I Cannot Find My Session in Agent Observability. Where Should I Look?
 
-Confirm `GALILEO_LOG_STREAM` matches the Agent Stream name (includes your instance id). Filter sessions by suffix `part1_agent`. Refresh after the run finishes — traces upload at the end. Keep the console tab open for later parts.
+Confirm the Agent Stream name is your instance id (`echo $INSTANCE`, for example `shw-2cb1`). Filter sessions by suffix `part1_agent`. Refresh after the run finishes — traces upload at the end. Keep the console tab open for later parts.
 
 ### 19. What Does a Typical Part 1 Agent Observability Tree Look Like?
 
@@ -212,7 +211,7 @@ The router counts overlapping `alert_signals`. Add clearer keywords (`5xx`, `err
 
 ### 28. Why Must I Keep the Same `GALILEO_LOG_STREAM` in Part 2?
 
-So Part 1 and Part 2 sessions sit in one Agent Stream. Filter by suffix `part2_agent` vs `part1_agent`. Changing the stream splits the comparison the lab is built around.
+The agent derives the stream from `$INSTANCE`. Leave it unset (or unchanged) so Part 1 and Part 2 sessions sit in one Agent Stream. Filter by suffix `part2_agent` vs `part1_agent`. Setting a different stream splits the comparison the lab is built around.
 
 ### 29. Should Evaluator Scores Be Perfect in Part 2?
 

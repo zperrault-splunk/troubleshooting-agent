@@ -31,7 +31,7 @@ Most built-in evaluators score traces with an **SLM** (Luna) or an **LLM-as-a-ju
 
 1. Sign in to the [Splunk Agent Observability console](https://console.multitenant.galileocloud.io).
 2. Open **Projects** and select the shared project `sre-agent-wkshp`.
-3. Select **Agent Stream** in the sidebar. Open the stream named in your `.env` (for example, `sre-agent-wkshp-shw-2cb1`).
+3. Select **Agent Stream** in the sidebar. Open the stream named after your instance (for example, `shw-2cb1` from `echo $INSTANCE`).
 4. Confirm you see at least one session from Part 1 (for example, `chat-9265e3375c8b | part1_agent`).
 
 
@@ -115,7 +115,7 @@ You can instead paste alert text from the facilitator's demo. Include exact valu
 After the command completes, open the [Splunk Agent Observability console](https://console.multitenant.galileocloud.io) and navigate to:
 
 1. **Project:** the shared workshop project (`sre-agent-wkshp`)
-2. **Agent Stream:** your stream from `.env` (for example, `sre-agent-wkshp-shw-2cb1`)
+2. **Agent Stream:** your instance name from `echo $INSTANCE` (for example, `shw-2cb1`)
 3. **Sessions:** use the session picker (for example, **Session 2 of 2**) to locate the original trace-only run and the newest scored run
 
 Select the newest session. A prompt with the environment often produces multiple tool rounds, even when the final answer remains incomplete:

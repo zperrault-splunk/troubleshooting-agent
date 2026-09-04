@@ -90,7 +90,7 @@ Agent telemetry goes to the **local collector** only. The collector (see worksho
 | `GALILEO_API_KEY` | Galileo API key |
 | `GALILEO_CONSOLE_URL` | Your Galileo console URL (required) |
 | `GALILEO_PROJECT` | Project name |
-| `GALILEO_LOG_STREAM` | Log stream name |
+| `GALILEO_LOG_STREAM` | Agent Stream name. On workshop EC2, defaults to `$INSTANCE` when unset or still a placeholder |
 
 Galileo sessions are named from Observability **`eventId`** plus the active workshop part (e.g. `slack-alert-HNNiTkcA0AA | part2_agent`).
 
