@@ -18,9 +18,23 @@ This workshop uses two orchestration patterns:
 - **ReAct:** the model alternates between reasoning and tool calls. Parts 1 and 2 use this loop.
 - **Graph workflow:** explicit nodes own stages and state. Part 3 uses LangGraph nodes for identify, categorize, investigate, and report.
 
-[LangChain](https://www.langchain.com/) supplies the model and tool integrations used here. [LangGraph](https://www.langchain.com/langgraph) supplies explicit workflow state, branching, and node transitions for Part 3.
+[LangChain](https://www.langchain.com/) supplies the model and tool integrations used here. 
 
-Other frameworks package the same concerns differently: [CrewAI](https://www.crewai.com/) emphasizes role-based multi-agent teams; [Microsoft Agent Framework](https://learn.microsoft.com/en-us/agent-framework/) targets Python and .NET with Azure and Entra integration; [OpenAI Agents SDK](https://openai.github.io/openai-agents-python/) provides a smaller OpenAI-native tool and handoff model; [Google ADK](https://google.github.io/adk-docs/) integrates with Vertex AI; and [LlamaIndex Workflows](https://docs.llamaindex.ai/en/stable/module_guides/workflow/) focuses on event-driven retrieval and document workflows. Framework choice affects state control, provider coupling, deployment options, and operational complexity. It does not remove the need for clear tool schemas, controlled workflows, and end-to-end traces.
+[LangGraph](https://www.langchain.com/langgraph) supplies explicit workflow state, branching, and node transitions for Part 3.
+
+Other frameworks package the agent differently:
+
+ [CrewAI](https://www.crewai.com/) emphasizes role-based multi-agent teams;
+
+ [Microsoft Agent Framework](https://learn.microsoft.com/en-us/agent-framework/) targets Python and .NET with Azure and Entra integration;
+
+ [OpenAI Agents SDK](https://openai.github.io/openai-agents-python/) provides a smaller OpenAI-native tool and handoff model;
+
+ [Google ADK](https://google.github.io/adk-docs/) integrates with Vertex AI
+
+ [LlamaIndex Workflows](https://docs.llamaindex.ai/en/stable/module_guides/workflow/) focuses on event-driven retrieval and document workflows. 
+
+Framework choice affects state control, provider coupling, deployment options, and operational complexity. It does not remove the need for clear tool schemas, controlled workflows, and end-to-end traces.
 
 {{< notice title="Concepts transfer" style="tip" >}}
 Regardless of framework, verify tool schemas, workflow decisions, and LLM conclusions in the trace.
@@ -59,13 +73,15 @@ The final answer does not show whether the agent used the right service, time ra
 
 Inspect:
 
-| Signal | Why it matters |
-|--------|----------------|
-| **Traces / spans** | LLM calls, tool invocations, and graph node transitions |
-| **Tool calls** | APIs called, arguments sent, results returned, and errors |
-| **Decisions** | Product route, skills loaded, retries, and stop conditions |
-| **Quality** | Claims supported by tool output, missing checks, and incomplete work |
-| **Latency & cost** | Time per step, token use, and tool round trips |
+
+| Signal             | Why it matters                                                       |
+| ------------------ | -------------------------------------------------------------------- |
+| **Traces / spans** | LLM calls, tool invocations, and graph node transitions              |
+| **Tool calls**     | APIs called, arguments sent, results returned, and errors            |
+| **Decisions**      | Product route, skills loaded, retries, and stop conditions           |
+| **Quality**        | Claims supported by tool output, missing checks, and incomplete work |
+| **Latency & cost** | Time per step, token use, and tool round trips                       |
+
 
 Compare Part 1 and Part 3 on the same alert. A useful trace should show whether the agent selected the relevant observability APIs, supplied valid arguments, followed the intended workflow, and based its conclusion on returned data. A polished answer without those properties is not a successful investigation.
 
