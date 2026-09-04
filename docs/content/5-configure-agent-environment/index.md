@@ -17,6 +17,7 @@ From the repository on your instance, create and activate a virtual environment,
 
 ```bash
 cd ~/troubleshooting-agent
+cp .env.example .env
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements-workshop.txt
