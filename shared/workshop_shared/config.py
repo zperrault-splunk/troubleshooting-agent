@@ -82,6 +82,38 @@ def _without_placeholders(value: str | None) -> str | None:
     return value
 
 
+# ---------------------------------------------------------------------------
+# Workshop Agent Stream name
+# Use the EC2 INSTANCE value as GALILEO_LOG_STREAM so attendees do not edit
+# .env. An explicit custom stream name is left unchanged.
+# ---------------------------------------------------------------------------
+_GALILEO_LOG_STREAM_PLACEHOLDERS = frozenset(
+    {
+        "slack-investigations",
+        "sre-agent-wkshp-<your-instance>",
+        "sre-agent-wkshp-$INSTANCE",
+        "sre-agent-wkshp-${INSTANCE}",
+    }
+)
+
+
+def _workshop_instance_name() -> str | None:
+    value = os.environ.get("INSTANCE", "").strip()
+    return value or None
+
+
+def resolve_galileo_log_stream(value: str | None) -> str:
+    """Use INSTANCE for workshop placeholders; keep custom stream names."""
+    current = (value or "").strip()
+    instance = _workshop_instance_name()
+    if instance:
+        if "${INSTANCE}" in current or "$INSTANCE" in current:
+            return instance
+        if not current or current in _GALILEO_LOG_STREAM_PLACEHOLDERS:
+            return instance
+    return current or "slack-investigations"
+
+
 def default_agent_log_dir() -> str:
     """Shared investigation log directory (cwd-independent)."""
     shared_root = Path(__file__).resolve().parents[1]
@@ -368,6 +400,7 @@ class Settings(BaseSettings):
         self.splunk_o11y_gateway_url = normalize_splunk_o11y_gateway_url(self.splunk_o11y_gateway_url)
         self.splunk_cloud_mcp_url = normalize_splunk_cloud_mcp_url(self.splunk_cloud_mcp_url)
         self.splunk_mcp_url = normalize_splunk_enterprise_mcp_url(self.splunk_mcp_url)
+        self.galileo_log_stream = resolve_galileo_log_stream(self.galileo_log_stream)
 
         if self.llm_provider is None:
             if self.openai_api_key and self.openai_base_url:

@@ -220,6 +220,53 @@ def test_enable_galileo_requires_console_url() -> None:
         Settings(enable_galileo=True, galileo_api_key="key")
 
 
+def test_galileo_log_stream_default_without_instance() -> None:
+    settings = Settings()
+    assert settings.galileo_log_stream == "slack-investigations"
+
+
+def test_galileo_log_stream_from_instance(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("INSTANCE", "shw-2cb1")
+    settings = Settings()
+    assert settings.galileo_log_stream == "shw-2cb1"
+
+
+def test_galileo_log_stream_expands_dollar_instance(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("INSTANCE", "shw-2cb1")
+    settings = Settings(galileo_log_stream="sre-agent-wkshp-$INSTANCE")
+    assert settings.galileo_log_stream == "shw-2cb1"
+
+
+def test_galileo_log_stream_replaces_example_placeholder(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("INSTANCE", "shw-2cb1")
+    settings = Settings(galileo_log_stream="sre-agent-wkshp-<your-instance>")
+    assert settings.galileo_log_stream == "shw-2cb1"
+
+
+def test_galileo_log_stream_keeps_explicit_custom_name(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("INSTANCE", "shw-2cb1")
+    settings = Settings(galileo_log_stream="my-custom-stream")
+    assert settings.galileo_log_stream == "my-custom-stream"
+
+
+def test_galileo_log_stream_expands_unexpanded_dotenv_value(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    env_file = tmp_path / ".env"
+    env_file.write_text(
+        'GALILEO_LOG_STREAM="sre-agent-wkshp-$INSTANCE"\n',
+        encoding="utf-8",
+    )
+    monkeypatch.setenv("INSTANCE", "shw-2cb1")
+    settings = Settings(_env_file=env_file)
+    assert settings.galileo_log_stream == "shw-2cb1"
+
+
 def test_azure_openai_settings_valid() -> None:
     settings = Settings(
         llm_provider="azure_openai",

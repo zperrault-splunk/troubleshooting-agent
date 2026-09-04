@@ -9,5 +9,6 @@ import pytest
 
 @pytest.fixture(autouse=True)
 def isolate_from_dotenv(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    """Run tests without loading the project .env file."""
+    """Run tests without loading the project .env file or host INSTANCE."""
     monkeypatch.chdir(tmp_path)
+    monkeypatch.delenv("INSTANCE", raising=False)
