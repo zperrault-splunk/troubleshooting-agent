@@ -1,12 +1,11 @@
 """Tests for Part 1 ReAct subgraph routing."""
 
-from langchain_core.messages import AIMessage
-
-from part1_agent.agent import _make_should_continue, build_react_subgraph
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
+from langchain_core.messages import AIMessage
 from langchain_core.tools import tool
+from part1_agent.agent import _make_should_continue, build_react_subgraph
 
 
 @tool
@@ -58,7 +57,17 @@ async def test_react_subgraph_custom_node_names_route_to_tools() -> None:
         tools_node_name="investigate_tools",
     )
     app = graph.compile()
-    result = await app.ainvoke({"messages": []})
+    result = await app.ainvoke(
+        {"messages": []},
+        config={
+            "metadata": {"trace_id": "galileo-test"},
+            "tags": ["galileo"],
+        },
+    )
 
     assert result["messages"][-1].content == "finished"
     assert llm.ainvoke.await_count == 2
+    for llm_call in llm.ainvoke.await_args_list:
+        forwarded_config = llm_call.kwargs["config"]
+        assert forwarded_config["metadata"]["trace_id"] == "galileo-test"
+        assert "galileo" in forwarded_config["tags"]

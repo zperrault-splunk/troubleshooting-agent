@@ -167,14 +167,17 @@ def build_react_subgraph(
     else:
         tool_node = ToolNode(tools) if tools else None
 
-    async def call_model(state: AgentState) -> dict[str, list[BaseMessage]]:
+    async def call_model(
+        state: AgentState,
+        config: RunnableConfig,
+    ) -> dict[str, list[BaseMessage]]:
         messages = list(state["messages"])
         if not messages or not isinstance(messages[0], SystemMessage):
             messages = [SystemMessage(content=system_prompt), *messages]
         has_tool_results = any(isinstance(m, ToolMessage) for m in messages)
         invoke_model = model_force_tools if model_force_tools and not has_tool_results else model
         with otel_span("agent.llm.turn", {"agent.subgraph_node": llm_node_name}):
-            response = await invoke_model.ainvoke(messages)
+            response = await invoke_model.ainvoke(messages, config=config)
         if isinstance(response, AIMessage):
             response = ensure_ai_tool_calls(response, tools_by_name=tools_by_name)
             if response.tool_calls:
