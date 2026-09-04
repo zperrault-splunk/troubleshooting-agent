@@ -5,7 +5,7 @@ weight: 11
 navTitle: "FAQ"
 ---
 
-Quick answers for the hands-on lab. Workshop defaults: service **`paymentservice`**, environment **`splunk-hipster`**. Use the same [Agent Observability](https://console.multitenant.galileocloud.io) project and agent stream across Parts 1–3.
+Use these answers to diagnose lab runs. The workshop defaults are service **`paymentservice`** and environment **`splunk-hipster`**. Keep the same [Agent Observability](https://console.multitenant.galileocloud.io) project and agent stream across Parts 1–3.
 
 {{< notice title="How to use this page" style="tip" >}}
 Start with [General](#general) for setup and CLI issues. Use the Part 1–3 sections while you are in that exercise. For playbook authoring background, see [AI Skills]({{< relref "2-ai-skills" >}}).
@@ -15,9 +15,7 @@ Start with [General](#general) for setup and CLI issues. Use the Part 1–3 sect
 
 ### 1. What Will I Build in This Workshop?
 
-A troubleshooting agent that investigates observability alerts using an LLM plus structured MCP tools. You progress through three implementations that share the same CLI (`troubleshooting-agent`) and integrations in `shared/workshop_shared/`: a baseline ReAct agent, the same loop with skill playbooks, and a four-node LangGraph workflow.
-
-The three parts share one CLI and the same Observability demo service so you can compare traces side by side.
+You will build and compare three troubleshooting-agent implementations: a baseline ReAct agent, the same loop with `SKILL.md` playbooks, and a four-node LangGraph workflow. All three use the `troubleshooting-agent` CLI, integrations in `shared/workshop_shared/`, and the same Observability demo service. That keeps the alert context stable while you compare tool calls, evidence, traces, and evaluator results.
 
 ### 2. How Are Parts 1, 2, and 3 Different?
 
@@ -29,7 +27,7 @@ The three parts share one CLI and the same Observability demo service so you can
 
 ### 3. Where Do I Run Commands, and Why Does the Directory Matter?
 
-Always `cd` into the part directory (`part1_agent/`, `part2_agent/`, or `part3_agent/`) before running `troubleshooting-agent`. The CLI loads the agent for **that directory**. Running from the repo root (or the wrong part folder) uses the wrong graph and skills.
+Run `troubleshooting-agent` from `part1_agent/`, `part2_agent/`, or `part3_agent/`. The current directory selects the agent implementation. If the trace shape or loaded skills do not match the exercise, check `pwd` first.
 
 ### 4. I Opened a New SSH Session and `troubleshooting-agent` Is Not Found. What Should I Do?
 
@@ -62,15 +60,15 @@ troubleshooting-agent doctor
 troubleshooting-agent mcp-doctor
 ```
 
-`doctor` checks the LLM (workshop proxy / model). `mcp-doctor` checks Observability MCP (expect about 12 `o11y_*` tools). If either fails, ask a facilitator — most issues are credentials, `.env`, or the MCP gateway.
+`doctor` checks the workshop LLM proxy and model. `mcp-doctor` checks Observability MCP; expect about 12 `o11y_*` tools. Do not continue on a partial result. Check `.env`, confirm the current part directory, and re-run once. If either command still fails, give the facilitator the failing check and exact error; common causes are credentials or MCP gateway access.
 
 ### 7. Why Do My Prompts Need `paymentservice` and `splunk-hipster`?
 
-Those are the workshop APM names. If you omit the environment, the agent may call `o11y_get_apm_environments` and stop to ask you for it. If you misspell the service, MCP returns empty or unrelated data and the answer looks like a hallucination even when the model is trying.
+Those are the exact workshop APM entity names. Omitting the environment may cause a discovery call followed by a clarification stop. A misspelled service can return an empty or unrelated series. Treat empty data as an input or scope problem until the tool arguments, environment, and time window are verified.
 
 ### 8. Where Do I Review a Run After It Finishes?
 
-Three places, same story:
+Correlate the run in three places:
 
 1. **Terminal** — live `[n] MCP o11y_...` lines (`AGENT_LOG_TRACE=true` is the default)
 2. **JSONL** — `shared/logs/investigations/<id>.jsonl` (path printed as `Log file:`)
@@ -86,7 +84,7 @@ Details: [Configure Evaluators]({{< relref "7-galileo-logstream-evaluators" >}})
 
 ### 10. Can I Use This Agent on Live Incidents After the Workshop?
 
-Part 3 is a teaching workflow: real graph, skills, and MCP, but workshop shortcuts remain (CLI mock alerts, per-run MCP sessions, `.env` on a shared host). Harden intake, timeouts, secrets, report completeness evaluators, and human-in-the-loop before production. The agent is **read-only** (investigate + report) — do not add remediations without a confirm step.
+No. Part 3 demonstrates a real graph, skills, and MCP calls, but it uses CLI mock alerts, per-run MCP sessions, and `.env` credentials on a shared host. It has not established production availability, security, tenancy, or safety. Keep it read-only. Before live use, implement authenticated intake, typed alert payloads, exact time-window handling, bounded retries and timeouts, secret management, evidence checks, tenant isolation, and human authorization for actions.
 
 See [Production-Ready Agent]({{< relref "10-production-ready-agent" >}}).
 
@@ -111,11 +109,11 @@ You can paste facilitator alert text instead, but always include service and env
 
 ### 13. Why Do Two People Get Different Part 1 Answers on the Same Prompt?
 
-That is expected. With no playbook, tool order, depth, and whether the agent stops at “next steps” all vary. Part 1 is a **baseline**, not a gold-standard investigation.
+Part 1 has no playbook, so model sampling can change tool order, depth, and stopping behavior. Compare the actual tool inputs and results; do not assume either answer is better because it is longer. Part 1 is a baseline, not a reference investigation.
 
 ### 14. How Do I Tell If the Answer Is Grounded vs. Hallucinated?
 
-In the terminal or Agent Observability, open each MCP span and compare JSON to the chat reply. Claims about error rates, services, or root cause should appear in tool output. **Context Adherence** (after evaluators are on) is the primary hallucination signal for this lab.
+Open each MCP span and map the reply's service, time window, metric values, trace IDs, and causal claims to tool results. If a value or cause has no supporting result, mark it unsupported. **Context Adherence** helps identify this after evaluators are enabled, but it does not replace trace inspection.
 
 ### 15. Which Tools Should I Expect in Part 1?
 
@@ -123,7 +121,7 @@ Anything from the Observability MCP list (`mcp-doctor`). Common calls include `o
 
 ### 16. Time Range or Environment Errors on MCP Calls — What Is Wrong?
 
-Use exact APM names (`paymentservice`, `splunk-hipster`). Time ranges belong in a `params` object, for example `{"start": "-1h", "stop": "now"}`. Missing `environment_name` is a typical validation error; **Tool error** evaluators catch this after you enable them.
+Inspect the failed tool input. Use exact APM names (`paymentservice`, `splunk-hipster`). Time ranges belong in a `params` object, for example `{"start": "-1h", "stop": "now"}`. A missing `environment_name` or a top-level `start`/`stop` causes validation failure. Correct the input and re-run; **Tool error** evaluators can flag the failure after they are enabled.
 
 ### 17. I Cleared the Terminal. How Do I Recover the Trace?
 
@@ -156,7 +154,7 @@ Click `tools` to inspect arguments and JSON. Evaluators are empty until [Configu
 
 ### 20. What Notes Should I Save Before Leaving Part 1?
 
-Tools called vs skipped; whether the conclusion matched MCP JSON; where the agent might have invented a cause if tools were empty. You will re-run the **same alert** in Parts 2 and 3 and compare traces and evaluator scores.
+Record the prompt, session name, tool sequence, each tool's service/environment/time window, empty or failed results, and whether the conclusion is supported by MCP output. Reuse the same alert in Parts 2 and 3 so the comparison is meaningful.
 
 ## Part 2 — Skill Playbooks
 
@@ -187,7 +185,7 @@ cd ~/troubleshooting-agent/part2_agent
 troubleshooting-agent chat "Investigate latency on paymentservice in the splunk-hipster environment"
 ```
 
-Expect tools in playbook order: `o11y_search_alerts_or_incidents`, then `o11y_get_apm_service_latency`. Empty alert search is normal for CLI runs — the agent must still call step 2 and format the reply with `investigation-report` headings.
+Expect `o11y_search_alerts_or_incidents` followed by `o11y_get_apm_service_latency`. An empty alert search is valid for a CLI run and must not stop the investigation. The latency call still needs the intended service, environment, and time range, and the reply must use `investigation-report` headings.
 
 ### 25. What Is Inside a `SKILL.md`?
 
@@ -218,7 +216,7 @@ So Part 1 and Part 2 sessions sit in one Agent Stream. Filter by suffix `part2_a
 
 ### 29. Should Evaluator Scores Be Perfect in Part 2?
 
-No. Watch **direction**: Tool selection quality (playbook tools called), Action Completion (fewer “please specify environment” / “next steps” stops), Context Adherence (metrics from MCP JSON), Instruction Adherence (report headings, no raw JSON dumps). Scores can still be low; that is useful data.
+No. Compare the scores with Part 1 for the same alert. Check Tool selection quality for the required calls, Action Completion for premature stops, Context Adherence for claims supported by MCP results, and Instruction Adherence for the required report format. Inspect the trace behind any score change; a higher aggregate score does not prove a correct investigation.
 
 ### 30. What Does Part 2 Deliberately Leave for Part 3?
 
@@ -268,7 +266,7 @@ Named nodes, not a repeating generic `Agent:agent` loop.
 
 ### 35. Why Is `troubleshoot-report` Not Loaded at the Start Like Part 2’s `investigation-report`?
 
-Part 3 loads the report skill only in the **report** node, after investigate has MCP evidence. That is the production-style pattern: do not format the handoff until the work is done.
+Part 3 loads the report skill only after the investigate node returns MCP evidence. This separates evidence collection from presentation. It is a useful workflow property, not by itself a production control.
 
 ### 36. How Does Part 3 Choose the Product Playbook If Not by Keywords?
 
@@ -276,7 +274,7 @@ A **Python categorizer** inspects the alert payload (APM / IM / RUM / Synthetics
 
 ### 37. I Still Do Not See Splunk Log Tools. Is That a Failure?
 
-Investigate should call `splunk_*` tools (typically `splunk_run_query`, sometimes `splunk_get_indexes` / `splunk_get_metadata`). If they are missing, confirm you ran from `part3_agent` (Parts 1 and 2 expose Observability MCP only) and check `mcp-doctor` from that directory. Stale names in `search-logs/indexes.md` can also yield “no logs found.”
+In Part 3, yes. Investigate should call `splunk_*` tools, typically `splunk_run_query` and sometimes `splunk_get_indexes` or `splunk_get_metadata`. Confirm that you ran from `part3_agent`, then run `mcp-doctor` there; Parts 1 and 2 expose only Observability MCP. If the tool ran but returned no events, verify the index, service fields, and alert-aligned time window. Stale entries in `search-logs/indexes.md` can create false negatives.
 
 ### 38. Same Tools as Part 2 — Why Does the Trace Look so Different?
 
@@ -284,10 +282,10 @@ MCP calls can overlap (`o11y_search_alerts_or_incidents`, error metrics). The te
 
 ### 39. How Should I Compare Evaluator Scores Across Parts?
 
-Same alert, same Agent Stream, three suffixes: `part1_agent`, `part2_agent`, `part3_agent`. Look at Tool selection quality, Action Completion, Context Adherence, and Instruction Adherence. Part 3 should show log search and a structured report; Part 1 often stops early; Part 2 sits in between.
+Use the same alert and Agent Stream, then select sessions ending in `part1_agent`, `part2_agent`, and `part3_agent`. Compare tool inputs, time windows, result status, evidence used in the answer, and failure handling before comparing scores. Part 3 should include a log search and structured report. Do not infer quality from the agent version or score alone.
 
-### 40. What Is the One-Line Takeaway of Part 3?
+### 40. What Must I Verify Before Leaving Part 3?
 
-**Author** playbooks in Part 2 (keywords + `SKILL.md`). **Orchestrate** them in Part 3 (workflow engine decides *when* each runbook attaches). Production troubleshooting agents usually look more like Part 3 than a single ReAct loop.
+Confirm that the alert was anchored by detector ID and rule, the categorizer selected the expected product playbook, investigate called both O11y and Splunk tools with the intended scope and time window, and every report claim maps to a tool result. Part 2 demonstrates playbook authoring; Part 3 demonstrates when the workflow attaches each playbook. Neither exercise establishes production readiness.
 
 For hardening after the lab, see [Production-Ready Agent]({{< relref "10-production-ready-agent" >}}).

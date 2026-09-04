@@ -5,27 +5,28 @@ weight: 1
 duration: "90 minutes"
 ---
 
-In this hands-on workshop you will build a **troubleshooting agent** that investigates real observability alerts — the same kind of workflow SRE and platform teams run every day, now powered by an LLM with structured tool access.
+Build a **troubleshooting agent** that investigates observability alerts with an LLM and structured tool access. You will run three implementations against the same service, inspect the resulting traces and tool output, and determine whether each conclusion is supported by telemetry.
 
-**Learning Objectives:**
+**By the end of the workshop, you will be able to:**
 
-- Give the agent **playbooks** (skills) that guide investigation steps instead of leaving every decision to the model
-- Progress from a minimal ReAct loop to a **multi-node LangGraph workflow** with identify → categorize → investigate → report stages
-- Use **Splunk Agent Observability** to monitor what the agent does during an investigation — trace tool calls, follow reasoning steps, and see how it moves through each workflow node
-- Evaluate agent outputs for **hallucinations**, **factual accuracy**, and whether conclusions are grounded in data returned by tools
-- Assess **tool selection** and decision quality — did the agent choose the right observability queries and investigation path for the alert at hand?
+- Run a minimal ReAct agent and identify which observability checks it performs, skips, or executes incorrectly
+- Add **skill playbooks** that specify investigation order, required parameters, interpretation rules, and stop conditions
+- Run and inspect a **multi-node LangGraph workflow** with identify → categorize → investigate → report stages
+- Use **Splunk Agent Observability** to verify LLM calls, tool arguments and results, retries, skill loading, and graph transitions
+- Compare final claims with returned metrics, logs, and alert data to detect unsupported conclusions
+- Evaluate whether the agent selected the right tools, completed the investigation, and produced a report that the evidence supports
 
 ## What you'll build
 
-The repo contains **three progressive agent implementations** that share the same CLI and integrations. Each part adds capability on top of the last:
+The repository contains **three agent implementations** with the same CLI and integrations. Reusing the service, environment, and alert scenario reduces input variance when you compare orchestration and playbook behavior. Live telemetry and model output can still change between runs.
 
 | Part | Focus | Agent shape |
 |------|-------|-------------|
 | **Part 1** | Baseline MCP-only agent | Single ReAct loop — tools only, no playbooks |
 | **Part 2** | Skill playbooks | Same ReAct loop + keyword-injected `SKILL.md` playbooks |
-| **Part 3** | Production-style workflow | Four-node LangGraph graph + full skill library |
+| **Part 3** | Structured workflow | Four-node LangGraph graph + full skill library |
 
-All three parts use the same command — `troubleshooting-agent` — from their respective directories. Shared integrations (LLM, MCP, observability) live in `shared/workshop_shared/` and are pre-built for you.
+Run `troubleshooting-agent` from the directory for the part you are testing. Shared LLM, MCP, and observability integrations live in `shared/workshop_shared/` and are pre-built for you.
 
 ## Prerequisites
 
