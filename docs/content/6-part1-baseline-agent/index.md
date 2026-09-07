@@ -45,14 +45,14 @@ Investigate service `paymentservice` in environment `splunk-hipster`:
 cd ~/troubleshooting-agent
 source .venv/bin/activate
 cd part1_agent
-troubleshooting-agent chat "Why does paymentservice have errors in the splunk-hipster environment?"
+troubleshooting-agent chat "Troubleshoot the Splunk Observability alert: paymentservice in splunk-hipster environment. Rule: sre agent - High Error rate. Find root cause of the high error rate and confirm whether it is resolved."
 ```
 
 {{% /tab %}}
 {{% tab title="Example Output" %}}
 
 ```text
-(.venv) splunk@ip-172-31-19-27:~/troubleshooting-agent/part1_agent$ troubleshooting-agent chat "Why does paymentservice have errors in the splunk-hipster environment?"
+(.venv) splunk@ip-172-31-19-27:~/troubleshooting-agent/part1_agent$ troubleshooting-agent chat "Troubleshoot the Splunk Observability alert: paymentservice in splunk-hipster environment. Rule: sre agent - High Error rate. Find root cause of the high error rate and confirm whether it is resolved."
 INFO Splunk OTel initialized service=troubleshooting-agent
 INFO HTTP Request: POST https://lite-llm-proxy.splunko11y.com/v1/chat/completions "HTTP/1.1 200 OK"
 INFO [inv=chat:5a4dffc6d704] Log file: /home/splunk/troubleshooting-agent/shared/logs/investigations/chat-5a4dffc6d704.jsonl
@@ -60,7 +60,7 @@ INFO [inv=chat:5a4dffc6d704]
 INFO [inv=chat:5a4dffc6d704] ══════════════════════════════════════════════════════════════
 INFO [inv=chat:5a4dffc6d704]  Investigation  chat:5a4dffc6d704  |  part1_agent  |  cli
 INFO [inv=chat:5a4dffc6d704] ──────────────────────────────────────────────────────────────
-INFO [inv=chat:5a4dffc6d704]  Query: Why does paymentservice have errors in the splunk-hipster environment?
+INFO [inv=chat:5a4dffc6d704]  Query: Troubleshoot the Splunk Observability alert: paymentservice in splunk-hipster environment. Rule: sre agent - High Error rate. Find root cause of the high error rate and confirm whether it is resolved.
 INFO [inv=chat:5a4dffc6d704]  LLM: openai  |  MCP tools available: 12
 INFO [inv=chat:5a4dffc6d704] ══════════════════════════════════════════════════════════════
 INFO HTTP Request: GET https://api.multitenant.galileocloud.io/healthcheck "HTTP/1.1 200 OK"
@@ -149,7 +149,7 @@ Each investigation creates a **session** named like `chat-abc123 | part1_agent` 
 
 | Splunk Observability | What it tells you (the app)                                        | In an Agent stream                               | Difference                                           |
 | -------------------- | ------------------------------------------------------------------ | ------------------------------------------------ | ---------------------------------------------------- |
-| **Metrics**          | Time series: error rate, latency, request volume                   | Token counts, later **evaluators**               | App RED vs agent quality/cost — not the same numbers |
+| **Metrics**          | Time series: error rate, latency, request volume                   | Token counts, later **Action Completion**        | App RED vs agent quality/cost — not the same numbers |
 | **Traces**           | One user request across services (`paymentservice` → dependencies) | One agent interaction (reason → tools → answer)  | App request vs investigation workflow                |
 | **Logs**             | Application log lines                                              | Span input/output and the workshop JSONL file    | Syslog/events from the service vs LLM/tool payloads  |
 | **Events**           | Detector firings, alert/incident activity                          | A **session** (one `troubleshooting-agent chat`) | An incident on the app vs a recorded agent run       |
@@ -198,7 +198,7 @@ Complete this baseline using `paymentservice` in environment `splunk-hipster`:
 
 | Step | Action                                                                                                                                 |
 | ---- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| 1    | Run `troubleshooting-agent chat "Why does paymentservice have errors in the splunk-hipster environment?"`                              |
+| 1    | Run the high-error alert prompt shown above                                                                                         |
 | 2    | Record the tools called, relevant tools skipped, and each tool's input scope and time window                                           |
 | 3    | Open [Splunk Agent Observability](https://console.multitenant.galileocloud.io), find the session, and expand every agent and tool span |
 | 4    | Map each conclusion to the MCP result that supports it; mark unsupported claims                                                        |
@@ -223,4 +223,4 @@ Before continuing, confirm that you have:
 
 ---
 
-**Next:** [Configure Evaluators]({{< relref "7-galileo-logstream-evaluators" >}}) — enable agent stream evaluators before comparing Parts 2 and 3.
+**Next:** [Configure Evaluators]({{< relref "7-galileo-logstream-evaluators" >}}) — enable Action Completion before comparing Parts 2 and 3.

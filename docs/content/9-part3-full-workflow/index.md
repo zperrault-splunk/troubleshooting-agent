@@ -82,7 +82,7 @@ The investigate node also injects **`search-logs/indexes.md`**, the workshop ten
 
 ## Run Part 3
 
-Run Part 3 from the CLI with the supplied mock Observability alert; Slack is not required. The prompt provides the service, environment, **`detectorId`**, and rule name. The **identify** node uses those fields to resolve the alert before investigation.
+Run Part 3 from the CLI with the same mock Observability alert used in Parts 1 and 2; Slack is not required. The prompt provides the service, environment, and rule name. The **identify** node uses those fields to resolve alert context before investigation.
 
 From `part3_agent`:
 
@@ -97,14 +97,14 @@ Do **not** change `GALILEO_LOG_STREAM` in `.env` when you switch to `part3_agent
 cd ~/troubleshooting-agent
 source .venv/bin/activate
 cd part3_agent
-troubleshooting-agent chat "Troubleshoot the Splunk Observability alert: paymentservice in splunk-hipster environment. DetectorId HNcv52_AwAA. Rule: SRE Agent - PaymentService High Error Rate. Find root cause of the high error rate and confirm whether it is resolved."
+troubleshooting-agent chat "Troubleshoot the Splunk Observability alert: paymentservice in splunk-hipster environment. Rule: sre agent - High Error rate. Find root cause of the high error rate and confirm whether it is resolved."
 ```
 
 {{% /tab %}}
 {{< /tabs >}}
 
 {{< notice title="Mock alert fields" style="tip" >}}
-The prompt carries the fields expected from an alert integration: **service** (`paymentservice`), **environment** (`splunk-hipster`), **detector ID**, and **rule name**. Part 3 uses them to fetch the alert payload, categorize it as APM, run **`troubleshoot-apm-incidents`** plus **`search-logs`**, and then apply **`troubleshoot-report`**.
+The prompt carries fields expected from an alert integration: **service** (`paymentservice`), **environment** (`splunk-hipster`), and **rule name**. Part 3 uses them to resolve alert context, categorize it as APM, run **`troubleshoot-apm-incidents`** plus **`search-logs`**, and then apply **`troubleshoot-report`**.
 {{< /notice >}}
 
 Agent Observability sessions are named `chat-… | part3_agent`. Expect **`part3_investigation`** with **`identify` → `categorize` → `investigate` → `report`**, not a single ReAct **`Agent`** trace.
@@ -117,6 +117,7 @@ Agent Observability sessions are named `chat-… | part3_agent`. Expect **`part3
 4. Inspect `identify_tools` for alert resolution. Inspect `investigate_tools` for APM evidence and at least one `splunk_*` log search. Treat an empty result as an observation, not proof that no events exist. First confirm that the query succeeded and used the intended service, environment, index, and alert time window; also consider authorization, ingestion delay, and result limits.
 5. In the final report, trace every metric and root-cause statement back to a tool result. Treat unsupported causality or a resolution claim without post-alert evidence as a failure.
 6. Compare with the Part 2 session for the same alert. Tool names may overlap; node ownership and skill timing must differ.
+7. Compare **Action Completion (SLM)** and its explanation across the Part 1, Part 2, and Part 3 sessions. All three use the same alert prompt.
 
 {{< notice title="Tip" style="tip" >}}
 Side-by-side comparison: Part 2 loads **`investigation-report`** at the start with the domain skill. Part 3 loads **`troubleshoot-report`** only in the **report** node — after investigate has gathered evidence.
