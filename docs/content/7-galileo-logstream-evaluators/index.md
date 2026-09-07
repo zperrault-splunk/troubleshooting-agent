@@ -10,6 +10,14 @@ Enable Action Completion, then apply it to the Part 1 session already in your st
 
 Use **Action Completion** to compare whether Parts 1, 2, and 3 completed the same investigation goal or stopped at partial findings and suggested next steps.
 
+## What are evaluators?
+
+Evaluators are automated checks that score recorded agent sessions against a specific quality criterion. They review the session's prompt, tool-assisted investigation, and final response so you can assess agent behavior consistently instead of relying only on whether an answer sounds convincing.
+
+Evaluators are important because agent responses can vary between runs. A repeatable score makes it easier to compare designs, identify incomplete behavior, and measure whether a playbook or structured workflow improved the result. A score is a diagnostic signal, not proof that an answer is correct. Always read its explanation and compare it with the trace, tool results, and final response.
+
+Splunk Agent Observability offers evaluators for different aspects of agent quality. To keep this workshop focused, you will use only **Action Completion (SLM)**. It measures whether the session achieved the user's full goal, making it well suited to comparing the same high-error alert across Parts 1, 2, and 3.
+
 ## Before you start
 
 
