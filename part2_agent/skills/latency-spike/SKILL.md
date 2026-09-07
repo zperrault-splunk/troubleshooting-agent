@@ -3,15 +3,13 @@ name: latency-spike
 description: Investigate APM latency alerts using o11y_get_apm_service_latency.
 alert_signals:
   - latency
-  - duration
-  - p99
-  - slow
+  - TODO
 rule_patterns:
   - "*latency*"
-  - "*duration*"
+  - TODO
 mcp_tools:
   - o11y_search_alerts_or_incidents
-  - o11y_get_apm_service_latency
+  - TODO
 ---
 
 # Latency spike investigation

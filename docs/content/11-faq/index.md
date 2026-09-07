@@ -77,7 +77,7 @@ Terminal IDs use `chat:`; console session names use `chat-`.
 
 ### 9. When Do I Enable Evaluators, and Should I Score My First Part 1 Run?
 
-Enable evaluators **after** the first Part 1 investigation, then apply them to **existing chats** / **past logs**. Do not click **Not Now**, and do not re-run Part 1 just to get scores. Prefer **SLM (Luna)** over full LLM judges. Toggles do nothing until you click **Apply**. If scores stay empty, ask a facilitator to check Integrations.
+After the first Part 1 investigation, enable only **Action Completion (SLM)** and apply it to **existing chats** / **past logs**. Do not click **Not Now**, and do not re-run Part 1 just to get a score. The toggle does nothing until you click **Apply**. If the result stays empty, ask a facilitator to check Integrations.
 
 Details: [Configure Evaluators]({{< relref "7-galileo-logstream-evaluators" >}}).
 
@@ -101,10 +101,10 @@ Full exercise: [Part 1 — Baseline Agent]({{< relref "6-part1-baseline-agent" >
 cd ~/troubleshooting-agent
 source .venv/bin/activate
 cd part1_agent
-troubleshooting-agent chat "Why does paymentservice have errors in the splunk-hipster environment?"
+troubleshooting-agent chat "Troubleshoot the Splunk Observability alert: paymentservice in splunk-hipster environment. Rule: sre agent - High Error rate. Find root cause of the high error rate and confirm whether it is resolved."
 ```
 
-You can paste facilitator alert text instead, but always include service and environment.
+Use the full high-error alert prompt shown in Part 1. Reuse it verbatim in Parts 2 and 3 so Action Completion compares the agent designs against the same goal.
 
 ### 13. Why Do Two People Get Different Part 1 Answers on the Same Prompt?
 
@@ -112,7 +112,7 @@ Part 1 has no playbook, so model sampling can change tool order, depth, and stop
 
 ### 14. How Do I Tell If the Answer Is Grounded vs. Hallucinated?
 
-Open each MCP span and map the reply's service, time window, metric values, trace IDs, and causal claims to tool results. If a value or cause has no supporting result, mark it unsupported. **Context Adherence** helps identify this after evaluators are enabled, but it does not replace trace inspection.
+Open each MCP span and map the reply's service, time window, metric values, trace IDs, and causal claims to tool results. If a value or cause has no supporting result, mark it unsupported. Action Completion does not replace manual evidence inspection.
 
 ### 15. Which Tools Should I Expect in Part 1?
 
@@ -120,7 +120,7 @@ Anything from the Observability MCP list (`mcp-doctor`). Common calls include `o
 
 ### 16. Time Range or Environment Errors on MCP Calls — What Is Wrong?
 
-Inspect the failed tool input. Use exact APM names (`paymentservice`, `splunk-hipster`). Time ranges belong in a `params` object, for example `{"start": "-1h", "stop": "now"}`. A missing `environment_name` or a top-level `start`/`stop` causes validation failure. Correct the input and re-run; **Tool error** evaluators can flag the failure after they are enabled.
+Inspect the failed tool input. Use exact APM names (`paymentservice`, `splunk-hipster`). Time ranges belong in a `params` object, for example `{"start": "-1h", "stop": "now"}`. A missing `environment_name` or a top-level `start`/`stop` causes validation failure. Correct the input and re-run.
 
 ### 17. I Cleared the Terminal. How Do I Recover the Trace?
 
@@ -167,47 +167,49 @@ Full exercise: [Part 2 — Skill Playbooks]({{< relref "8-part2-skill-playbooks"
 
 A keyword router scores `alert_signals` in each skill’s YAML against your chat/alert text. The winning **domain** skill is injected. `investigation-report` always loads (report format) and is not keyword-matched.
 
-Example: “Investigate **latency** on paymentservice…” → `latency-spike` + `investigation-report`.
+Examples: the shared high-error alert → supplied `error-rate` + `investigation-report`; the separate latency lab prompt → attendee-built `latency-spike` + `investigation-report`.
 
 ### 23. Where Do I Confirm Skills Actually Loaded?
 
-1. **Terminal** — `[N] Skill loaded: latency-spike` (and `investigation-report`)
+1. **Terminal** — `[N] Skill loaded: error-rate` for the shared comparison, or `latency-spike` for the separate lab (plus `investigation-report`)
 2. **Agent Observability** — a **`skill_router`** trace that is a **sibling** of `Agent`, not nested inside it; expand `load_skill:…`
 3. **Chat JSON** — system message includes `## Active playbook` and `## Reporting requirements`
 
 Do not look for `load_skill` under MCP `tools` spans.
 
-### 24. What Latency Investigation Should I Run First?
+### 24. What Investigation Should I Run First in Part 2?
 
 ```bash
 cd ~/troubleshooting-agent/part2_agent
-troubleshooting-agent chat "Investigate latency on paymentservice in the splunk-hipster environment"
+troubleshooting-agent chat "Troubleshoot the Splunk Observability alert: paymentservice in splunk-hipster environment. Rule: sre agent - High Error rate. Find root cause of the high error rate and confirm whether it is resolved."
 ```
 
-Expect `o11y_search_alerts_or_incidents` followed by `o11y_get_apm_service_latency`. An empty alert search is valid for a CLI run and must not stop the investigation. The latency call still needs the intended service, environment, and time range, and the reply must use `investigation-report` headings.
+This is the same alert prompt used in Parts 1 and 3. Expect the supplied `error-rate` skill, `o11y_search_alerts_or_incidents`, and `o11y_get_apm_service_errors_and_requests`. Compare its Action Completion result with Part 1.
 
 ### 25. What Is Inside a `SKILL.md`?
 
-YAML front matter: `name`, `description`, `alert_signals`, `mcp_tools` (and optional `rule_patterns`). Body: **When to use**, **Tool sequence**, **Interpretation**, **Do not**. Copy `part2_agent/skills/_template/SKILL.md` or follow `skills/latency-spike/SKILL.md`. Tool names must match `mcp-doctor` exactly (`o11y_*`).
+YAML front matter: `name`, `description`, `alert_signals`, `mcp_tools` (and optional `rule_patterns`). Body: **When to use**, **Tool sequence**, **Interpretation**, **Do not**. Copy `part2_agent/skills/_template/SKILL.md` or follow the supplied `skills/error-rate/SKILL.md`. Tool names must match `mcp-doctor` exactly (`o11y_*`).
 
-### 26. What Do I Need to Finish for the Error-Rate Lab?
+### 26. What Do I Need to Finish for the Latency Lab?
 
-Edit `part2_agent/skills/error-rate/SKILL.md`:
+Edit `part2_agent/skills/latency-spike/SKILL.md`:
 
-- Signals: at least `error`, `errors`, `5xx`
-- Tools: `o11y_search_alerts_or_incidents` and `o11y_get_apm_service_errors_and_requests`
-- Sequence: search alerts (continue if empty) → **required** error/request metrics with `service_name`, `environment_name`, and `time_range` in `params`
-- At least two interpretation bullets and one **Do not** (for example: no root cause without tool evidence)
+- Signals: `latency`, `duration`, `p99`, and `slow`
+- Tools: `o11y_search_alerts_or_incidents` and `o11y_get_apm_service_latency`
+- Sequence: search alerts (continue if empty) → **required** latency metrics with `service_name`, `environment_name`, and `time_range` in `params`
+- At least two interpretation bullets and one **Do not** rule
 
 Then run:
 
 ```bash
-troubleshooting-agent chat "Investigate elevated 5xx errors on paymentservice in the splunk-hipster environment"
+troubleshooting-agent chat "Investigate high p99 latency on paymentservice in the splunk-hipster environment"
 ```
+
+This separate run validates your authored skill; it is not the Parts 1–3 Action Completion comparison.
 
 ### 27. The Wrong Skill Loaded. How Do I Fix Routing?
 
-The router counts overlapping `alert_signals`. Add clearer keywords (`5xx`, `errors`, `error rate`) to the prompt and check spelling in YAML (lowercase). After saving `SKILL.md`, re-run — skills are read at the start of each investigation.
+The router counts overlapping `alert_signals`. For the latency lab, add clearer keywords (`latency`, `p99`, `slow`) and check spelling in YAML (lowercase). After saving `SKILL.md`, re-run — skills are read at the start of each investigation.
 
 ### 28. Why Must I Keep the Same `GALILEO_LOG_STREAM` in Part 2?
 
@@ -215,7 +217,7 @@ The agent derives the stream from `$INSTANCE`. Leave it unset (or unchanged) so 
 
 ### 29. Should Evaluator Scores Be Perfect in Part 2?
 
-No. Compare the scores with Part 1 for the same alert. Check Tool selection quality for the required calls, Action Completion for premature stops, Context Adherence for claims supported by MCP results, and Instruction Adherence for the required report format. Inspect the trace behind any score change; a higher aggregate score does not prove a correct investigation.
+No. Compare **Action Completion (SLM)** and its explanation with Part 1 for the same high-error alert. Inspect the trace behind any change; a higher score does not prove that the investigation or conclusion is correct.
 
 ### 30. What Does Part 2 Deliberately Leave for Part 3?
 
@@ -244,10 +246,10 @@ Investigate also injects `search-logs/indexes.md` so the agent does not default 
 
 ```bash
 cd ~/troubleshooting-agent/part3_agent
-troubleshooting-agent chat "Troubleshoot the Splunk Observability alert: paymentservice in splunk-hipster environment. DetectorId HNcv52_AwAA. Rule: SRE Agent - PaymentService High Error Rate. Find root cause of the high error rate and confirm whether it is resolved."
+troubleshooting-agent chat "Troubleshoot the Splunk Observability alert: paymentservice in splunk-hipster environment. Rule: sre agent - High Error rate. Find root cause of the high error rate and confirm whether it is resolved."
 ```
 
-No Slack app is required. The mock prompt mirrors a real alert thread so **identify** can anchor on detector ID and rule name.
+No Slack app is required. The mock prompt mirrors a real alert thread and gives **identify** the service, environment, and rule name.
 
 ### 34. What Should the Agent Observability Tree Look Like?
 
@@ -281,10 +283,10 @@ MCP calls can overlap (`o11y_search_alerts_or_incidents`, error metrics). The te
 
 ### 39. How Should I Compare Evaluator Scores Across Parts?
 
-Use the same alert and Agent Stream, then select sessions ending in `part1_agent`, `part2_agent`, and `part3_agent`. Compare tool inputs, time windows, result status, evidence used in the answer, and failure handling before comparing scores. Part 3 should include a log search and structured report. Do not infer quality from the agent version or score alone.
+Use the exact same high-error alert prompt and Agent Stream, then select sessions ending in `part1_agent`, `part2_agent`, and `part3_agent`. Compare **Action Completion (SLM)** and its explanation, then inspect tool inputs, results, evidence, and failure handling. Part 3 should include a log search and structured report. Do not infer quality from the agent version or score alone.
 
 ### 40. What Must I Verify Before Leaving Part 3?
 
-Confirm that the alert was anchored by detector ID and rule, the categorizer selected the expected product playbook, investigate called both O11y and Splunk tools with the intended scope and time window, and every report claim maps to a tool result. Part 2 demonstrates playbook authoring; Part 3 demonstrates when the workflow attaches each playbook. Neither exercise establishes production readiness.
+Confirm that the alert was anchored by service, environment, and rule, the categorizer selected the expected product playbook, investigate called both O11y and Splunk tools with the intended scope and time window, and every report claim maps to a tool result. Part 2 demonstrates playbook authoring; Part 3 demonstrates when the workflow attaches each playbook. Neither exercise establishes production readiness.
 
 For hardening after the lab, see [Production-Ready Agent]({{< relref "10-production-ready-agent" >}}).

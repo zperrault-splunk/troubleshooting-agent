@@ -21,15 +21,22 @@ def test_part2_investigation_report_forbids_raw_json() -> None:
     assert "raw" in text.lower()
 
 
-def test_part2_error_rate_lab_stub_has_todos() -> None:
-    text = (SKILLS_DIR / "error-rate" / "SKILL.md").read_text(encoding="utf-8")
+def test_part2_latency_lab_stub_has_todos() -> None:
+    text = (SKILLS_DIR / "latency-spike" / "SKILL.md").read_text(encoding="utf-8")
     assert "TODO" in text
 
 
-def test_part2_error_rate_answer_key_exists() -> None:
-    path = SKILLS_DIR / "error-rate" / "SKILL.md.answer"
+def test_part2_latency_answer_key_exists() -> None:
+    path = SKILLS_DIR / "latency-spike" / "SKILL.md.answer"
     assert path.is_file()
     text = path.read_text(encoding="utf-8")
+    assert "o11y_get_apm_service_latency" in text
+    assert "p99" in text
+
+
+def test_part2_error_rate_reference_is_complete() -> None:
+    text = (SKILLS_DIR / "error-rate" / "SKILL.md").read_text(encoding="utf-8")
+    assert "TODO" not in text
     assert "o11y_get_apm_service_errors_and_requests" in text
     assert "5xx" in text
 

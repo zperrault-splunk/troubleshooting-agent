@@ -12,7 +12,7 @@ from part2_agent.skill_inject import (
     select_skill,
 )
 
-ANSWER_SKILL_DIR = SKILLS_DIR / "error-rate"
+ANSWER_SKILL_DIR = SKILLS_DIR / "latency-spike"
 
 
 def test_select_latency_spike() -> None:
@@ -20,21 +20,21 @@ def test_select_latency_spike() -> None:
     assert name == "latency-spike"
 
 
-def test_select_latency_slow_keyword() -> None:
+def test_unfinished_latency_stub_does_not_route_slow_keyword() -> None:
     name = select_skill(user_message="Why is Verification slow?")
-    assert name == "latency-spike"
+    assert name == FALLBACK_SKILL
 
 
-def test_select_error_rate_from_answer_key(tmp_path: Path) -> None:
-    """Use facilitator answer file so routing works before participants finish the lab."""
+def test_select_latency_from_answer_key(tmp_path: Path) -> None:
+    """Use the facilitator answer file to validate the completed latency skill."""
     skills_root = tmp_path / "skills"
-    error_dir = skills_root / "error-rate"
-    error_dir.mkdir(parents=True)
-    (error_dir / "SKILL.md").write_text(
+    latency_dir = skills_root / "latency-spike"
+    latency_dir.mkdir(parents=True)
+    (latency_dir / "SKILL.md").write_text(
         (ANSWER_SKILL_DIR / "SKILL.md.answer").read_text(encoding="utf-8"),
         encoding="utf-8",
     )
-    for name in ("alert-triage", "latency-spike"):
+    for name in ("alert-triage", "error-rate"):
         src = SKILLS_DIR / name
         dest = skills_root / name
         dest.mkdir(parents=True)
@@ -44,9 +44,14 @@ def test_select_error_rate_from_answer_key(tmp_path: Path) -> None:
         )
 
     name = select_skill(
-        user_message="Investigate elevated 5xx errors on Verification",
+        user_message="Investigate high p99 latency on Verification",
         skills_dir=skills_root,
     )
+    assert name == "latency-spike"
+
+
+def test_select_supplied_error_rate() -> None:
+    name = select_skill(user_message="Investigate elevated 5xx errors on Verification")
     assert name == "error-rate"
 
 
