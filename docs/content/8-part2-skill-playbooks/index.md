@@ -257,16 +257,21 @@ Verify the run:
 If the wrong skill loads, check `alert_signals` spelling and re-run with clearer keywords (`latency`, `p99`, `slow`) in the prompt.
 {{< /notice >}}
 
-## Exit checks
+## Workshop recap
 
-Before moving to Part 3, confirm:
+### What you did
 
-- The graph remains a single ReAct loop; only the system prompt changes.
-- `alert_signals` selects the domain skill and `investigation-report` loads on every run.
-- `skill_router` identifies the exact playbooks injected for the session.
-- The supplied error-rate playbook supports the same high-error alert used in Part 1.
-- Your latency-spike playbook defines signals, tool order, interpretation, and guardrails without Python changes.
-- Action Completion and trace evidence show whether the high-error Part 2 run completed more of the same goal than Part 1.
+- Ran the same high-error alert from Part 1 with the supplied `error-rate` playbook and compared Action Completion.
+- Inspected `skill_router` to see the domain and reporting playbooks injected before the ReAct loop.
+- Completed the `latency-spike` playbook with routing signals, required tools, interpretation guidance, and guardrails.
+- Ran a separate latency investigation to verify that your playbook routed correctly and guided the expected MCP calls.
+
+### What you learned
+
+- Part 2 keeps the Part 1 ReAct graph; skills change the system prompt rather than the Python workflow.
+- `alert_signals` selects one domain skill, while `investigation-report` supplies a consistent response format for every run.
+- A playbook makes investigation steps more explicit and repeatable without becoming an MCP tool itself.
+- Action Completion and trace evidence together show whether added guidance helped the agent finish more of the same high-error investigation.
 
 
 

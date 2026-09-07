@@ -123,15 +123,21 @@ Agent Observability sessions are named `chat-… | part3_agent`. Expect **`part3
 Side-by-side comparison: Part 2 loads **`investigation-report`** at the start with the domain skill. Part 3 loads **`troubleshoot-report`** only in the **report** node — after investigate has gathered evidence.
 {{< /notice >}}
 
-## Exit checks
+## Workshop recap
 
-Before leaving Part 3, confirm:
+### What you did
 
-- Part 2 and Part 3 use the same `SKILL.md` format.
-- Part 2 loads selected skills up front in **`skill_router`**.
-- Part 3 shows **`load_skill:*`** under the node that consumes each playbook.
-- Alert identity, APM metrics or traces, and Splunk logs are separated in the trace and reconciled in the report.
-- Any claim that the incident is resolved uses evidence after the alert window, not only a current empty-alert response.
+- Ran the same high-error alert through the four-node **identify → categorize → investigate → report** workflow.
+- Inspected `load_skill:*` spans to see each playbook enter the prompt only when its graph node needed it.
+- Followed alert context, APM evidence, and Splunk log evidence from separate tool calls into one structured report.
+- Compared Action Completion and trace evidence across the Part 1 baseline, Part 2 playbook injection, and Part 3 structured workflow.
+
+### What you learned
+
+- Part 2 and Part 3 share the `SKILL.md` format but differ in orchestration and skill-loading time.
+- Named graph nodes make routing, evidence collection, and reporting responsibilities visible in the trace.
+- Combining Observability and Splunk evidence produces a stronger investigation than relying on one signal source.
+- A resolution claim requires supporting evidence after the alert window; an empty current-alert result is not enough.
 
 This graph is a workshop implementation, not a production architecture guarantee. The production controls still required are covered in the next chapter.
 

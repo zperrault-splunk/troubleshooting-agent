@@ -12,11 +12,37 @@ Use **Action Completion** to compare whether Parts 1, 2, and 3 completed the sam
 
 ## What are evaluators?
 
-Evaluators are automated checks that score recorded agent sessions against a specific quality criterion. They review the session's prompt, tool-assisted investigation, and final response so you can assess agent behavior consistently instead of relying only on whether an answer sounds convincing.
+Evaluators turn agent traces into measurable quality signals. Each evaluator applies a defined criterion—such as completing the requested action—to recorded evidence from an agent run. This helps you assess behavior consistently instead of relying only on whether a final answer sounds convincing.
 
-Evaluators are important because agent responses can vary between runs. A repeatable score makes it easier to compare designs, identify incomplete behavior, and measure whether a playbook or structured workflow improved the result. A score is a diagnostic signal, not proof that an answer is correct. Always read its explanation and compare it with the trace, tool results, and final response.
+### How evaluation works
 
-Splunk Agent Observability offers evaluators for different aspects of agent quality. To keep this workshop focused, you will use only **Action Completion (SLM)**. It measures whether the session achieved the user's full goal, making it well suited to comparing the same high-error alert across Parts 1, 2, and 3.
+1. **The agent runs.** Splunk Agent Observability records the user's request, model turns, tool calls and results, and final response in a session.
+2. **An evaluator reads eligible evidence.** Some evaluators score an individual LLM or tool span. Others evaluate the whole session. **Action Completion is session-level**, so it can consider the original goal and the investigation's final outcome together.
+3. **A judge applies one criterion.** The judge compares the recorded behavior with that evaluator's rubric.
+4. **The evaluator returns a result.** Review both the score and its explanation. The explanation identifies the behavior that influenced the result and helps you locate supporting or conflicting evidence in the trace.
+
+Evaluator sampling controls how many eligible sessions are scored after an evaluator is enabled. This workshop uses **100%** so every comparison run receives a result. Applying the evaluator to **past logs** backfills the Part 1 session that already exists; it does not require another agent run.
+
+### SLM and LLM judges
+
+Splunk Agent Observability can offer evaluator variants backed by a small language model (SLM) or a larger LLM-as-a-judge. Both apply an evaluator-specific rubric, but they differ in model size, latency, and cost.
+
+**Luna** is Galileo's family of purpose-built SLMs for evaluation. Rather than using a larger general-purpose model for every score, Luna models are optimized to evaluate specific quality criteria. This provides practical benefits:
+
+- **Faster feedback:** Lower inference latency helps scores appear sooner while you iterate on an agent.
+- **Lower evaluation cost:** Efficient models make it practical to score more sessions, including past-log backfills and 100% workshop sampling.
+- **Higher throughput:** More traces can be evaluated in the same period, which is useful for production-scale monitoring and repeated experiments.
+- **Focused evaluation:** A model designed for a defined quality signal avoids using a larger general-purpose judge when the task does not require one.
+
+This workshop uses **Action Completion (SLM)** so attendees can receive fast, economical feedback after each lab. Luna is still model-based evaluation: use the same evaluator variant for each comparison, read its explanation, and validate the result against the trace.
+
+### Why evaluators matter
+
+Agent responses can vary even when the prompt is unchanged. Evaluators provide a repeatable lens for comparing designs, finding incomplete behavior, and measuring whether a playbook or structured workflow changed the result. By using the same alert prompt in Parts 1, 2, and 3, you reduce task variation and make the comparison more meaningful.
+
+A score is a diagnostic signal, not ground truth. A high score does not prove that every claim is correct, and a low score does not explain the root cause by itself. Always read the explanation, inspect the trace and tool results, and verify that the final response is supported by evidence.
+
+Splunk Agent Observability offers evaluators for different aspects of agent quality. To keep this workshop focused, you will configure only **Action Completion (SLM)**. It measures whether the session achieved the user's full goal, making it well suited to comparing the same high-error alert across all three parts.
 
 ## Before you start
 
@@ -131,13 +157,21 @@ If the Action Completion result does not appear:
 Part 1 has no playbook, so results vary across runs and participants. A detailed response can still score poorly on **Action Completion** when the trace ends before the investigation reaches a supported conclusion.
 {{< /notice >}}
 
-## Exit checks
+## Workshop recap
 
-Before continuing, confirm that:
+### What you did
 
-- The original Part 1 session shows an **Action Completion (SLM)** result. You do not need a second investigation.
-- The result includes an explanation you can compare with the trace and final response.
-- You saved the Part 1 result as the comparison point for Part 2 skills and the Part 3 structured graph.
+- Configured **Action Completion (SLM)** as the workshop's single evaluator.
+- Applied it to the existing Part 1 session instead of running the investigation again.
+- Reviewed the score and explanation alongside the session trace, tool results, and final response.
+- Saved the Part 1 result as the baseline for the same alert in Parts 2 and 3.
+
+### What you learned
+
+- Evaluators apply defined quality criteria to recorded agent evidence and can operate at span or session scope.
+- SLM judges provide lower-latency, lower-cost feedback for repeated workshop runs.
+- Action Completion measures whether the entire session achieved the user's goal, not whether the response merely sounded plausible.
+- Evaluator results are diagnostic signals that require trace and evidence review rather than standalone proof of quality.
 
 ---
 
