@@ -10,7 +10,7 @@ Enable Action Completion, then apply it to the Part 1 session already in your st
 
 Use **Action Completion** to compare whether Parts 1, 2, and 3 completed the same investigation goal or stopped at partial findings and suggested next steps.
 
-## What are evaluators?
+## What are Evaluators?
 
 Evaluators turn agent traces into measurable quality signals. Each evaluator applies a defined criterion—such as completing the requested action—to recorded evidence from an agent run. This helps you assess behavior consistently instead of relying only on whether a final answer sounds convincing.
 
@@ -44,18 +44,6 @@ A score is a diagnostic signal, not ground truth. A high score does not prove th
 
 Splunk Agent Observability offers evaluators for different aspects of agent quality. To keep this workshop focused, you will configure only **Action Completion (SLM)**. It measures whether the session achieved the user's full goal, making it well suited to comparing the same high-error alert across all three parts.
 
-## Before you start
-
-
-| Requirement                                                               | Why                                                                        |
-| ------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
-| [Part 1 investigation completed]({{< relref "6-part1-baseline-agent" >}}) | Provides the session that Action Completion will score                     |
-| `.env` Agent Observability settings saved                                 | Same `GALILEO_PROJECT` and `GALILEO_LOG_STREAM` you used in Part 1         |
-| Splunk Agent Observability console access                                 | Open the shared project `sre-agent-wkshp`, then your instance Agent Stream |
-
-
-Action Completion is available with an **SLM** (Luna) or an **LLM-as-a-judge**. This workshop uses **Action Completion (SLM)** for lower latency and cost. Your workshop instance should already have the required integration. If a session remains unscored after several minutes, ask your facilitator to verify **Integrations** in the Splunk Agent Observability console.
-
 ## Open your agent stream
 
 1. Sign in to the [Splunk Agent Observability console](https://console.multitenant.galileocloud.io).
@@ -63,21 +51,21 @@ Action Completion is available with an **SLM** (Luna) or an **LLM-as-a-judge**. 
 3. Select **Agent Stream** in the sidebar. Open the stream named after your instance (for example, `shw-2cb1` from `echo $INSTANCE`).
 4. Confirm you see at least one session from Part 1 (for example, `chat-9265e3375c8b | part1_agent`).
 
-
-
 ## Configure Action Completion
 
 1. From the agent stream view, click **Configure Evaluators**.
 2. Search for **Action Completion**.
 3. Turn on **Action Completion (SLM)**. Leave the other evaluators off for this workshop.
 4. Click **Apply** to save your evaluator selection. The toggle does not take effect until you apply.
-5. When Agent Observability asks whether to compute the evaluator on **past logs** or existing chats, apply it to those existing sessions. Your Part 1 investigation receives a score; do not click **Not Now**.
+5. When Agent Observability asks whether to compute the evaluator on **past logs** or existing chats, apply it to those existing sessions.
 
 ## Workshop evaluator
+
 
 | Evaluator                                                                                   | Node type | What it tells you                                                                 |
 | ------------------------------------------------------------------------------------------- | --------- | --------------------------------------------------------------------------------- |
 | **[Action Completion](https://docs.galileo.ai/concepts/metrics/agentic/action-completion)** | Session   | Whether the agent fully achieved the investigation goal across the entire session |
+
 
 Action Completion considers the user's goal, the tool-supported investigation, and the final response. A low score can indicate that the agent stopped after describing symptoms, asked the user to approve obvious next steps, contradicted tool output, or failed to address part of the request.
 
