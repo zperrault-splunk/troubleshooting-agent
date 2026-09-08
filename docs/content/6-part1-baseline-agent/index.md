@@ -177,25 +177,15 @@ Open `tools` and each nested MCP span. Check its arguments, result status, and J
 Keep the Splunk Agent Observability console open. After each investigation, refresh the session list and select the latest run. Use the same service, environment, and alert scenario across all three parts, then account for changes in live telemetry when you compare them.
 {{< /notice >}}
 
-## Baseline Exercise Recap
+## Part 1 Recap
 
-Complete this baseline using `paymentservice` in environment `splunk-hipster`:
-
-
-| Step | Action                                                                                                                                 |
-| ---- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| 1    | Run the high-error alert prompt shown above                                                                                            |
-| 2    | Record the tools called, relevant tools skipped, and each tool's input scope and time window                                           |
-| 3    | Open [Splunk Agent Observability](https://console.multitenant.galileocloud.io), find the session, and expand every agent and tool span |
-| 4    | Map each conclusion to the MCP result that supports it; mark unsupported claims                                                        |
-| 5    | Identify claims that would become hallucinations if the corresponding MCP result were empty                                            |
-| 6    | Save the tool sequence, evidence, failure modes, and final conclusion for comparison with Parts 2 and 3                                |
-
-
-{{< notice title="Important" style="primary" >}}
-Part 1 intentionally has no playbook. Tool choice and investigation depth can vary between runs. Capture that variation; Parts 2 and 3 add controls intended to make the same investigation more repeatable.
-{{< /notice >}}
+- Ran the shared high-error alert prompt through the baseline LangGraph ReAct agent without a playbook.
+- Reviewed the investigation in the terminal trace, JSONL log, and Splunk Agent Observability session.
+- Recorded the MCP tools called, relevant signals skipped, and each tool's service, environment, and time-window scope.
+- Mapped final-response conclusions to MCP results and identified unsupported claims, empty results, and tool failures.
+- Observed that the model chooses its own tool sequence and stopping point, so investigation depth can vary between runs.
+- Established the no-playbook baseline for comparing Action Completion, trace evidence, and repeatability with Parts 2 and 3.
 
 ---
 
-**Next:** [Configure Evaluators]({{< relref "7-galileo-logstream-evaluators" >}}) — enable Action Completion before comparing Parts 2 and 3.
+**Next:** [Configure Agent Stream Evaluators]({{< relref "7-galileo-logstream-evaluators" >}}) — enable Action Completion before comparing Parts 2 and 3.

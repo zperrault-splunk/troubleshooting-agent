@@ -6,22 +6,20 @@ navTitle: "Configure Evaluators"
 duration: "15 minutes"
 ---
 
-Enable Action Completion, then apply it to the Part 1 session already in your stream. Splunk Agent Observability will score that existing investigation. **You do not need to re-run Part 1**.
-
 Use **Action Completion** to compare whether Parts 1, 2, and 3 completed the same investigation goal or stopped at partial findings and suggested next steps.
 
 ## What are Evaluators?
 
-Evaluators turn agent traces into measurable quality signals. Each evaluator applies a defined criterion—such as completing the requested action—to recorded evidence from an agent run. This helps you assess behavior consistently instead of relying only on whether a final answer sounds convincing.
+Evaluators turn agent traces into measurable quality signals. Each evaluator applies a defined criterion, such as completing the requested action, to recorded evidence from an agent run. This helps you assess behavior consistently instead of relying only on whether a final answer sounds convincing.
 
 ### How Evaluators work:
 
 1. **The agent runs:** Splunk Agent Observability records the user's request, model turns, tool calls and results, and final response in a session.
-2. **An evaluator reads eligible evidence:** Some evaluators score an individual LLM or tool span. Others evaluate the whole session. **Action Completion is session-level**, so it can consider the original goal and the investigation's final outcome together.
+2. **An evaluator reads eligible evidence:** Some evaluators score an individual LLM or tool span. Others evaluate the whole session.
 3. **A judge applies one criterion:** The judge compares the recorded behavior with that evaluator's rubric.
 4. **The evaluator returns a result:** Review both the score and its explanation. The explanation identifies the behavior that influenced the result and helps you locate supporting or conflicting evidence in the trace.
 
-Evaluator sampling controls how many eligible sessions are scored after an evaluator is enabled. This workshop uses **100%,** so every comparison run receives a result. Applying the evaluator to **past logs** backfills the Part 1 session that already exists; it does not require another agent run.
+Evaluator sampling controls how many eligible sessions are scored after an evaluator is enabled. This workshop uses **100%,** so every comparison run receives a result.
 
 ### SLM and LLM judges
 
@@ -38,9 +36,9 @@ This workshop uses **Action Completion (SLM)** so you can receive fast, economic
 
 ### Why Evaluators matter:
 
-Agent responses can vary even when the prompt is unchanged. Evaluators provide a repeatable lens for comparing designs, finding incomplete behavior, and measuring whether a playbook or structured workflow changed the result. By using the same alert prompt in Parts 1, 2, and 3, you reduce task variation and make the comparison more meaningful.
+Agent **responses can vary** even when the prompt is **unchanged**. Evaluators provide a repeatable lens for comparing designs, finding incomplete behavior, and measuring whether a playbook or structured workflow changed the result.
 
-A score is a diagnostic signal, not ground truth. A high score does not prove that every claim is correct, and a low score does not explain the root cause by itself. Always read the explanation, inspect the trace and tool results, and verify that the final response is supported by evidence.
+A **score** is a diagnostic signal, not ground truth. A high score does not prove that every claim is correct, and a low score does not explain the root cause by itself. Always read the explanation, inspect the trace and tool results, and verify that the final response is supported by evidence.
 
 Splunk Agent Observability offers evaluators for different aspects of agent quality. To keep this workshop focused, you will configure only **Action Completion (SLM)**. It measures whether the session achieved the user's full goal, making it well suited to comparing the same high-error alert across all three parts.
 
@@ -61,8 +59,6 @@ Splunk Agent Observability offers evaluators for different aspects of agent qual
 4. Click **Apply** to save your evaluator selection. The toggle does not take effect until you apply.
 5. When Agent Observability asks whether to compute the evaluator on **past logs** or existing chats, apply it to those existing sessions.
 
-
-
 ## Workshop evaluator
 
 
@@ -77,47 +73,6 @@ Action Completion considers the user's goal, the tool-supported investigation, a
 
 After you apply Action Completion and confirm scoring of existing chats, wait for its result to appear on the Part 1 session you already ran. Do not re-run the investigation just to get a score.
 
-### Review the run in Splunk Agent Observability
-
-When scoring finishes, open the [Splunk Agent Observability console](https://console.multitenant.galileocloud.io) and navigate to:
-
-1. **Project:** the shared workshop project (`sre-agent-wkshp`)
-2. **Agent Stream:** your instance name from `echo $INSTANCE` (for example, `shw-2cb1`)
-3. **Sessions:** open the Part 1 session you already ran (for example, `chat-9265e3375c8b | part1_agent`)
-
-Select that session. A prompt with the environment often produces multiple tool rounds, even when the final answer remains incomplete:
-
-```text
-Agent (~20s)
-├── Agent:agent
-│   ├── should_continue
-│   └── tools
-│       └── o11y_get_apm_services
-├── Agent:agent
-│   ├── should_continue
-│   └── tools
-│       └── o11y_get_apm_service_errors_and_requests
-├── Agent:agent
-│   └── should_continue
-```
-
-If the environment is missing, expect a shallower trace, such as one `o11y_get_apm_environments` call followed by a request for the environment.
-
-The center panel shows the chat query and final response. Open the **Evaluators** tab on the right and find **Action Completion (SLM)**. Review both its score and explanation.
-
-Then open every `tools` span. Inspect MCP inputs, result status, and output JSON. Compare that evidence with the chat response to understand why the session did or did not complete the requested investigation. A detailed answer can still score poorly when the trace shows that the agent stopped before reaching a supported conclusion.
-
-Verify the scored Part 1 session:
-
-1. Wait for past-log scoring to finish on the Part 1 session you already ran.
-2. Open Splunk Agent Observability **Agent Stream** and select that same session.
-3. Expand the session's trace tree and inspect the tool sequence, inputs, results, and final answer.
-4. Open the **Evaluators** tab and record the **Action Completion (SLM)** score and explanation.
-5. Save the trace evidence, final conclusion, and Action Completion result for comparison with Parts 2 and 3.
-
-{{< tabs >}}
-{{% tab title="What good looks like" %}}
-
 A strong run reaches a supported conclusion, addresses every part of the alert prompt, and receives a high **Action Completion** result.
 
 A shallow run (missing environment) is still useful baseline data:
@@ -131,30 +86,23 @@ A deeper run can still score poorly. For example:
 - The chat cites real values, such as 68 errors in the last hour.
 - **Action Completion (SLM)** remains low, for example **2%**, because the agent stops at a summary and proposes next steps instead of completing the investigation.
 
-{{% /tab %}}
-{{% tab title="When scores are missing" %}}
-
 If the Action Completion result does not appear:
 
 1. Confirm you applied **Action Completion (SLM)** to **existing chats** / **past logs**, not **Not Now**
-2. Check **Configure Evaluators** — the Action Completion toggle is still on and you clicked **Apply**
+2. Check **Configure Evaluators**: the Action Completion toggle is still on and you clicked **Apply**
 3. Verify sampling is **100%** under **Evaluator Sampling** in the same pane
 4. Wait a few minutes for past-log scoring to finish, then refresh the session
 5. Ask your facilitator to confirm the **LLM integration** is configured in Splunk Agent Observability
-
-{{% /tab %}}
-{{< /tabs >}}
 
 {{< notice title="Tip" style="tip" >}}
 Part 1 has no playbook, so results vary across runs and participants. A detailed response can still score poorly on **Action Completion** when the trace ends before the investigation reaches a supported conclusion.
 {{< /notice >}}
 
-## Workshop recap
+## Configure Evaluators Recap
 
 - Configured **Action Completion (SLM)** as the workshop's single evaluator.
-- Applied it to the existing Part 1 session instead of running the investigation again.
-- Reviewed the score and explanation alongside the session trace, tool results, and final response.
-- Saved the Part 1 result as the baseline for the same alert in Parts 2 and 3.
+- Applied it to the existing Part 1 session.
+- Reviewed the score alongside the session trace, tool results, and final response.
 
 ---
 
