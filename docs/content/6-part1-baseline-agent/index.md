@@ -34,8 +34,6 @@ If you want to skim the code before running:
 
 ## Run your first investigation
 
-Confirm that you completed [Configure Environment]({{< relref "5-configure-agent-environment" >}}): the virtual environment is active, `.env` identifies your agent stream, and both doctor commands report `Ready`.
-
 Investigate service `paymentservice` in environment `splunk-hipster`:
 
 {{< tabs >}}
@@ -115,9 +113,8 @@ If the terminal trace is no longer visible, recover the evidence in either of th
   ```bash
   ls -t ~/troubleshooting-agent/shared/logs/investigations/*.jsonl | head -1
   ```
+
 {{< /notice >}}
-
-
 
 ## Splunk Agent Observability
 
@@ -139,17 +136,13 @@ Each investigation creates a **session** named like `chat-abc123 | part1_agent` 
 
 ### Metrics, traces, logs, and events vs Agent streams
 
-**Splunk Observability** records metrics, traces, logs, and events for `paymentservice`. The agent queries those signals through Splunk Observability MCP tools (`o11y_`*).
 
-**Splunk Agent Observability** does not store those application signals. It stores an **Agent stream**, a named collection of sessions for this workshop instance. Each session contains one investigation: the chat, an agent trace, and spans for LLM turns and MCP calls.
-
-
-| Splunk Observability | What it tells you (the app)                                        | In an Agent stream                               | Difference                                           |
-| -------------------- | ------------------------------------------------------------------ | ------------------------------------------------ | ---------------------------------------------------- |
-| **Metrics**          | Time series: error rate, latency, request volume                   | Token counts, later **Action Completion**        | App RED vs agent quality/cost — not the same numbers |
-| **Traces**           | One user request across services (`paymentservice` → dependencies) | One agent interaction (reason → tools → answer)  | App request vs investigation workflow                |
-| **Logs**             | Application log lines                                              | Span input/output and the workshop JSONL file    | Syslog/events from the service vs LLM/tool payloads  |
-| **Events**           | Detector firings, alert/incident activity                          | A **session** (one `troubleshooting-agent chat`) | An incident on the app vs a recorded agent run       |
+| Splunk Observability | What it tells you (the app)                                        | In an Agent stream                               | Difference                                          |
+| -------------------- | ------------------------------------------------------------------ | ------------------------------------------------ | --------------------------------------------------- |
+| **Metrics**          | Time series: error rate, latency, request volume                   | Token counts, later **Action Completion**        | App RED vs agent quality/cost                       |
+| **Traces**           | One user request across services (`paymentservice` → dependencies) | One agent interaction (reason → tools → answer)  | App request vs investigation workflow               |
+| **Logs**             | Application log lines                                              | Span input/output and the workshop JSONL file    | Syslog/events from the service vs LLM/tool payloads |
+| **Events**           | Detector firings, alert/incident activity                          | A **session** (one `troubleshooting-agent chat`) | An incident on the app vs a recorded agent run      |
 
 
 **Chat** is the session's query-and-answer view, not a fifth Observability signal.
@@ -158,9 +151,9 @@ Each investigation creates a **session** named like `chat-abc123 | part1_agent` 
 
 After your chat completes, open the [Splunk Agent Observability console](https://console.multitenant.galileocloud.io) and navigate to:
 
-1. **Project** — the shared workshop project (`sre-agent-wkshp`)
-2. **Agent Stream** — your instance name from `echo $INSTANCE` (for example, `shw-2cb1`)
-3. **Sessions** — find the most recent session (named `chat-9265e3375c8b | part1_agent`)
+1. **Project:** the shared workshop project (`sre-agent-wkshp`)
+2. **Agent Stream**: your instance name from `echo $INSTANCE` (for example, `shw-2cb1`)
+3. **Sessions**: find the most recent session (named `chat-9265e3375c8b | part1_agent`)
 
 Select the session. Verify three areas are present: the agent trace tree on the left, the chat query and response in the center, and detail tabs on the right. Nested `o11y_*` spans represent queries against Splunk Observability metrics, traces, logs, or events.
 
@@ -184,14 +177,14 @@ Open `tools` and each nested MCP span. Check its arguments, result status, and J
 Keep the Splunk Agent Observability console open. After each investigation, refresh the session list and select the latest run. Use the same service, environment, and alert scenario across all three parts, then account for changes in live telemetry when you compare them.
 {{< /notice >}}
 
-## Baseline exercise
+## Baseline Exercise Recap
 
 Complete this baseline using `paymentservice` in environment `splunk-hipster`:
 
 
 | Step | Action                                                                                                                                 |
 | ---- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| 1    | Run the high-error alert prompt shown above                                                                                         |
+| 1    | Run the high-error alert prompt shown above                                                                                            |
 | 2    | Record the tools called, relevant tools skipped, and each tool's input scope and time window                                           |
 | 3    | Open [Splunk Agent Observability](https://console.multitenant.galileocloud.io), find the session, and expand every agent and tool span |
 | 4    | Map each conclusion to the MCP result that supports it; mark unsupported claims                                                        |
