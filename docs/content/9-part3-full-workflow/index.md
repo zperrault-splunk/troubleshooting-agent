@@ -105,7 +105,7 @@ Do **not** change `GALILEO_LOG_STREAM` in `.env` when you switch to `part3_agent
 cd ~/troubleshooting-agent
 source .venv/bin/activate
 cd part3_agent
-troubleshooting-agent chat "Troubleshoot the Splunk Observability alert: paymentservice in splunk-hipster environment. Rule: sre agent - High Error rate. Find root cause of the high error rate and confirm whether it is resolved."
+troubleshooting-agent chat "Troubleshoot the Splunk Observability alert: paymentservice in splunk-hipster environment. Rule: obs1386 | sre agent | high error rate. Find root cause of the high error rate."
 ```
 
 {{% /tab %}}
@@ -133,12 +133,16 @@ Side-by-side comparison: Part 2 loads `investigation-report` at the start with t
 
 ## Workshop recap
 
+
+
 ### What you did
 
 - Ran the same high-error alert through the four-node **identify → categorize → investigate → report** workflow.
 - Inspected `load_skill:*` spans to see each playbook enter the prompt only when its graph node needed it.
 - Followed alert context, APM evidence, and Splunk log evidence from separate tool calls into one structured report.
 - Compared Action Completion and trace evidence across the Part 1 baseline, Part 2 playbook injection, and Part 3 structured workflow.
+
+
 
 ### What you learned
 
