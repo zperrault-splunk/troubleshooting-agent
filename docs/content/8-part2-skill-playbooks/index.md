@@ -51,7 +51,7 @@ From `part2_agent`, run the **same high-error alert prompt** used in Part 1. Kee
 cd ~/troubleshooting-agent
 source .venv/bin/activate
 cd part2_agent
-troubleshooting-agent chat "Troubleshoot the Splunk Observability alert: paymentservice in splunk-hipster environment. Rule: sre agent - High Error rate. Find root cause of the high error rate and confirm whether it is resolved."
+troubleshooting-agent chat "Why does paymentservice have errors in the splunk-hipster environment?"
 ```
 
 {{% /tab %}}

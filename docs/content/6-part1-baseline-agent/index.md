@@ -43,7 +43,7 @@ Investigate service `paymentservice` in environment `splunk-hipster`:
 cd ~/troubleshooting-agent
 source .venv/bin/activate
 cd part1_agent
-troubleshooting-agent chat "Troubleshoot the Splunk Observability alert: paymentservice in splunk-hipster environment. Rule: sre agent - High Error rate. Find root cause of the high error rate and confirm whether it is resolved."
+troubleshooting-agent chat "Why does paymentservice have errors in the splunk-hipster environment?"
 ```
 
 {{% /tab %}}
