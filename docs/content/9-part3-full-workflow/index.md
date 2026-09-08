@@ -10,7 +10,7 @@ Run the alert through a four-node LangGraph workflow: **identify → categorize 
 
 Complete [Part 2 — Skill Playbooks]({{< relref "8-part2-skill-playbooks" >}}) first. Its keyword injection and `skill_router` trace provide the comparison baseline.
 
-## Part 2 vs Part 3 — how skills load in Splunk Agent Observability
+## Part 2 vs Part 3: How skills load in Splunk Agent Observability
 
 Both parts inject playbooks into the system prompt; neither exposes skills as MCP tools. Compare their timing and orchestration:
 
@@ -81,9 +81,9 @@ The files remain `SKILL.md`; the orchestration changes:
 | Node            | Skill(s) loaded                                                   | Why here                                                 |
 | --------------- | ----------------------------------------------------------------- | -------------------------------------------------------- |
 | **identify**    | `get-alerts-or-incidents`                                         | Confirm the alert and capture IDs before investigating   |
-| **categorize**  | *(routing only)*                                                  | Code picks product type — no full playbook yet           |
+| **categorize**  | *(routing only)*                                                  | Code picks product type                                  |
 | **investigate** | Product skill (e.g. `troubleshoot-apm-incidents`) + `search-logs` | Product-specific MCP steps + mandatory Splunk log search |
-| **report**      | `troubleshoot-report`                                             | Structured handoff — only after evidence is gathered     |
+| **report**      | `troubleshoot-report`                                             | Structured handoff only after evidence is gathered       |
 
 
 The investigate node also injects `search-logs/indexes.md`, the workshop tenant's Splunk index catalog. Confirm that log queries use a listed index rather than defaulting to `main`.

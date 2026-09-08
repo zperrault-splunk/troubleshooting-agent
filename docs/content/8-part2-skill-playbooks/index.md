@@ -204,7 +204,7 @@ Part 2 playbooks focus on `o11y_*` tools. Log search skills use `splunk_*` in Pa
   - `description` one line: investigate APM latency alerts using service latency metrics
   - `alert_signals` include `latency`, `duration`, `p99`, and `slow`
   - `mcp_tools` list `o11y_search_alerts_or_incidents` and `o11y_get_apm_service_latency`
-3. **When to use** — when the alert or user message mentions high latency, duration, p99, or a slow service.
+3. **When to use**: when the alert or user message mentions high latency, duration, p99, or a slow service.
 4. **Tool sequence**: two steps
   - Search alerts / incidents: capture `eventId` when present; **if empty, continue to step 2**
   - Get APM service latency: **required**; `service_name`, `environment_name`, and `time_range` in `params`
@@ -260,22 +260,6 @@ If the wrong skill loads, check `alert_signals` spelling and re-run with clearer
 - `alert_signals` selects one domain skill, while `investigation-report` supplies a consistent response format for every run.
 - A playbook makes investigation steps more explicit and repeatable without becoming an MCP tool itself.
 - Action Completion and trace evidence together show whether added guidance helped the agent finish more of the same high-error investigation.
-
-
-
-## Intentional gaps (Part 3 preview)
-
-Part 2 intentionally omits capabilities introduced in Part 3:
-
-
-| Capability                          | Part 2                             | Part 3                                                                                      |
-| ----------------------------------- | ---------------------------------- | ------------------------------------------------------------------------------------------- |
-| Graph                               | Single ReAct                       | Four nodes: identify → categorize → investigate → report                                    |
-| Skills per run                      | One domain + report                | Product skill + log search + full report                                                    |
-| Exemplar traces                     | Not in playbooks                   | Yes                                                                                         |
-| Alert anchoring                     | Keyword routing                    | Strict detector / incident matching                                                         |
-| Skill timing in Agent Observability | `skill_router` trace, then `Agent` | `load_skill:*` under each graph node — see [Part 3]({{< relref "9-part3-full-workflow" >}}) |
-
 
 ---
 
