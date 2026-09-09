@@ -1,8 +1,8 @@
 ---
-title: "Part 2 — Skill Playbooks"
+title: "Part 2: Skill Playbooks"
 description: "Run the skill-injected ReAct agent, compare Action Completion with Part 1, and author your own latency playbook."
 weight: 8
-navTitle: "Part 2 — Skill Playbooks"
+navTitle: "Part 2: Skill Playbooks"
 duration: "30 minutes"
 ---
 
@@ -238,7 +238,6 @@ If the wrong skill loads, check `alert_signals` spelling and re-run with clearer
 - Ran the same high-error alert from Part 1 with the supplied `error-rate` playbook and compared Action Completion.
 - Inspected `skill_router` to see the domain and reporting playbooks injected before the ReAct loop.
 - Completed the `latency-spike` playbook with routing signals, required tools, interpretation guidance, and guardrails.
-- Ran a separate latency investigation to verify that your playbook routed correctly and guided the expected MCP calls.
 - Part 2 keeps the Part 1 ReAct graph; skills change the system prompt rather than the Python workflow.
 - `alert_signals` selects one domain skill, while `investigation-report` supplies a consistent response format for every run.
 - A playbook makes investigation steps more explicit and repeatable without becoming an MCP tool itself.
@@ -246,4 +245,4 @@ If the wrong skill loads, check `alert_signals` spelling and re-run with clearer
 
 ---
 
-**Next:** [Part 3 — Full Workflow]({{< relref "9-part3-full-workflow" >}}) — same alert through a structured LangGraph pipeline; skills load **per step**, not upfront like Part 2.
+**Next:** [Part 3: Full Workflow]({{< relref "9-part3-full-workflow" >}}) — same alert through a structured LangGraph pipeline; skills load **per step**, not upfront like Part 2.

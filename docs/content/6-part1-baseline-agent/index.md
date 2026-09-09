@@ -2,7 +2,7 @@
 title: "Part 1: Baseline Agent"
 description: "Run the minimal MCP-only ReAct agent, interpret terminal and Agent Observability traces, and establish a baseline investigation for comparison with Parts 2 and 3."
 weight: 6
-navTitle: "Part 1 — Baseline Agent"
+navTitle: "Part 1: Baseline Agent"
 duration: "20 minutes"
 ---
 
