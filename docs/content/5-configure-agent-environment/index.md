@@ -6,7 +6,7 @@ navTitle: "Configure Environment"
 duration: "10 minutes"
 ---
 
-Your workshop instance and credentials are already configured. Before Part 1, install the agent dependencies. The agent names your Agent Stream from `$INSTANCE` (for example, `shw-2cb1`) so your traces stay separate from other attendees.
+Your workshop instance and credentials are already configured. Before Part 1, install the agent dependencies.
 
 ## Install dependencies
 
@@ -34,10 +34,6 @@ Successfully installed troubleshooting-agent-0.1.0
 
 {{% /tab %}}
 {{< /tabs >}}
-
-{{< notice title="Tip" style="tip" >}}
-Run `source .venv/bin/activate` whenever you open a new SSH session. Your prompt should show `(.venv)` when the environment is active.
-{{< /notice >}}
 
 ## Verify setup
 
@@ -103,4 +99,4 @@ Continue only when both commands report **Ready**. `doctor` verifies the LLM con
 
 ---
 
-**Next:** [Part 1 — Baseline Agent]({{< relref "6-part1-baseline-agent" >}}) — run your first investigation and review traces in the terminal and Splunk Agent Observability.
+**Next:** [Part 1: Baseline Agent]({{< relref "6-part1-baseline-agent" >}}) — run your first investigation and review traces in the terminal and Splunk Agent Observability.

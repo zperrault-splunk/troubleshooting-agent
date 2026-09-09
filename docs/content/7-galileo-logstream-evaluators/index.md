@@ -25,7 +25,7 @@ Evaluator sampling controls how many eligible sessions are scored after an evalu
 
 Splunk Agent Observability can offer evaluator variants backed by a small language model (SLM) or a larger LLM-as-a-judge. Both apply an evaluator-specific rubric, but they differ in model size, latency, and cost.
 
-**Luna** is Splunk's purpose-built SLMs for evaluation. Rather than using a larger general-purpose model for every score, Luna models are optimized to evaluate specific quality criteria. This provides practical benefits:
+**Luna** is Splunk's purpose-built SLM for evaluation. Rather than using a larger general-purpose model for every score, Luna models are optimized to evaluate specific quality criteria. This provides practical benefits:
 
 - **Faster feedback:** Lower inference latency helps scores appear sooner while you iterate on an agent.
 - **Lower evaluation cost:** Efficient models make it practical to score more sessions, including past-log backfills and 100% workshop sampling.
@@ -41,6 +41,16 @@ Agent **responses can vary** even when the prompt is **unchanged**. Evaluators p
 A **score** is a diagnostic signal, not ground truth. A high score does not prove that every claim is correct, and a low score does not explain the root cause by itself. Always read the explanation, inspect the trace and tool results, and verify that the final response is supported by evidence.
 
 Splunk Agent Observability offers evaluators for different aspects of agent quality. To keep this workshop focused, you will configure only **Action Completion (SLM)**. It measures whether the session achieved the user's full goal, making it well suited to comparing the same high-error alert across all three parts.
+
+## Workshop evaluator
+
+
+| Evaluator                                                                                   | Node type | What it tells you                                                                 |
+| ------------------------------------------------------------------------------------------- | --------- | --------------------------------------------------------------------------------- |
+| **[Action Completion](https://docs.galileo.ai/concepts/metrics/agentic/action-completion)** | Session   | Whether the agent fully achieved the investigation goal across the entire session |
+
+
+Action Completion considers the user's goal, the tool-supported investigation, and the final response. A low score can indicate that the agent stopped after describing symptoms, asked the user to approve obvious next steps, contradicted tool output, or failed to address part of the request.
 
 ## Open your agent stream
 
@@ -58,16 +68,6 @@ Splunk Agent Observability offers evaluators for different aspects of agent qual
 3. Turn on **Action Completion (SLM)**. Leave the other evaluators off for this workshop.
 4. Click **Apply** to save your evaluator selection. The toggle does not take effect until you apply.
 5. When Agent Observability asks whether to compute the evaluator on **past logs** or existing chats, apply it to those existing sessions.
-
-## Workshop evaluator
-
-
-| Evaluator                                                                                   | Node type | What it tells you                                                                 |
-| ------------------------------------------------------------------------------------------- | --------- | --------------------------------------------------------------------------------- |
-| **[Action Completion](https://docs.galileo.ai/concepts/metrics/agentic/action-completion)** | Session   | Whether the agent fully achieved the investigation goal across the entire session |
-
-
-Action Completion considers the user's goal, the tool-supported investigation, and the final response. A low score can indicate that the agent stopped after describing symptoms, asked the user to approve obvious next steps, contradicted tool output, or failed to address part of the request.
 
 ## Review scores on your Part 1 session
 
@@ -106,4 +106,4 @@ Part 1 has no playbook, so results vary across runs and participants. A detailed
 
 ---
 
-**Next:** [Part 2 — Skill Playbooks]({{< relref "8-part2-skill-playbooks" >}}) — run the skill-injected agent, compare Action Completion, and author your own playbook.
+**Next:** [Part 2: Skill Playbooks]({{< relref "8-part2-skill-playbooks" >}}) — run the skill-injected agent, compare Action Completion, and author your own playbook.

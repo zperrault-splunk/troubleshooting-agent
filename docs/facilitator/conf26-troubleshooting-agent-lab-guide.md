@@ -3,13 +3,66 @@ session_id: OBS1386
 online_guide: https://zperrault-splunk.github.io/troubleshooting-agent/
 ---
 
-<!-- Content appended after Exercise 3 "Steps" heading in the Word doc -->
+<!-- Workshop exercise text. Word guide: docs/facilitator/conf26 OBS1386 - Lab Guide - 09162026.docx -->
+
+# Exercise 1 – Configure Environment
+
+Your workshop instance and credentials are already configured. Before Part 1, install the agent dependencies and give your Agent Observability agent stream a unique name. That name will let you isolate your traces from other attendees' traces.
+
+## Install dependencies
+
+```bash
+cd ~/troubleshooting-agent
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements-workshop.txt
+pip install -e . --no-deps
+```
+
+> Tip: Run `source .venv/bin/activate` whenever you open a new SSH session. Your prompt should show `(.venv)` when the environment is active.
+
+## Personalize your Agent Observability settings
+
+Create `.env`, then enable Agent Observability on the shared workshop project:
+
+```bash
+cd ~/troubleshooting-agent
+cp .env.example .env
+vi .env
+```
+
+Add or update these lines. You do not need to set `GALILEO_LOG_STREAM` — the agent builds `sre-agent-wkshp-<instance>` from `$INSTANCE` (see Finding Your Instance Details):
+
+```bash
+ENABLE_GALILEO=true
+GALILEO_PROJECT="sre-agent-wkshp"
+```
+
+For example, if `echo $INSTANCE` prints `shw-2cb1`, your Agent Stream will be `sre-agent-wkshp-shw-2cb1`.
+
+> Tip: Keep `GALILEO_PROJECT` unchanged across Parts 1–3. Do not set `GALILEO_LOG_STREAM` unless your facilitator asks you to. The same Agent Stream will hold every session for side-by-side comparison.
+
+Save and exit: press `Esc`, type `:wq`, then press Enter. Verify that the file contains `ENABLE_GALILEO` and `GALILEO_PROJECT`.
+
+## Verify setup
+
+```bash
+cd ~/troubleshooting-agent
+source .venv/bin/activate
+cd part1_agent
+troubleshooting-agent doctor
+troubleshooting-agent mcp-doctor
+```
+
+> Important: Continue only when both commands report `Ready`. `doctor` verifies the LLM connection; `mcp-doctor` verifies the Splunk Observability and Splunk Cloud MCP endpoints and lists the available tools. If either check fails, copy the failure output and ask your facilitator for help.
+
+# Exercise 2 – Part 1 — Baseline Agent
 
 ## Run your first investigation
 
-Make sure you completed Exercise 2 — Configure Environment: virtual environment installed, `.env` configured, and both doctor commands passing.
+Confirm that you completed Exercise 1 — Configure Environment: the virtual environment is active, `.env` identifies your agent stream, and both doctor commands report `Ready`.
 
-Start with a CLI investigation using the workshop defaults — service `paymentservice`, environment `splunk-hipster`:
+Investigate service `paymentservice` in environment `splunk-hipster`:
 
 ```bash
 cd ~/troubleshooting-agent
@@ -22,26 +75,35 @@ You can also paste alert text from the facilitator's demo. Always include servic
 
 ## Read the terminal trace
 
-With `AGENT_LOG_TRACE=true` (the default), every run prints a structured trace to the terminal. As you read it, ask:
+With `AGENT_LOG_TRACE=true` (the default), every run prints a structured trace. Verify:
 
-1. Which MCP tools did the agent call? — Look for `[n] MCP o11y_...` lines.
-2. Which tools did it skip? — A baseline agent often skips traces, logs, or infrastructure correlation.
-3. Were parameters correct? — Service should be `paymentservice`, environment `splunk-hipster` (exact APM names). Time ranges should use `{"start": "-1h", "stop": "now"}` inside a `params` object.
-4. Is the answer grounded? — Does the final response reflect actual JSON from tool results, or does it sound plausible without evidence?
+1. Which MCP tools ran. Find each `[n] MCP o11y_...` line.
+2. Which relevant signals the agent skipped. A baseline run may omit traces, logs, or infrastructure correlation.
+3. Whether each input used the exact APM names: service `paymentservice` and environment `splunk-hipster`.
+4. Whether time ranges appear inside `params` as `{"start": "-1h", "stop": "now"}`.
+5. Whether claims in the final response map to values in tool-result JSON. Treat a plausible claim without trace evidence as ungrounded.
 
 The same events are written to `shared/logs/investigations/<id>.jsonl` for post-workshop review. Each run prints the path at the end (look for `Log file:` in the output).
 
-> Tip: Cleared your terminal before you could review the trace? Open the JSONL log using the `Log file:` path from the end of the run, or list the newest file with `ls -t ~/troubleshooting-agent/shared/logs/investigations/*.jsonl | head -1`. You can also re-run the same chat command — you will get a new trace and Agent Observability session, but the investigation flow is the same.
+> Tip: If the terminal trace is no longer visible, open the JSONL log using the `Log file:` path from the end of the run, or list the newest file with `ls -t ~/troubleshooting-agent/shared/logs/investigations/*.jsonl | head -1`. Re-running the same chat command creates a new terminal trace and Agent Observability session; do not mistake it for the original run.
+
+## Metrics, traces, logs, and events vs Agent streams
+
+Splunk Observability records metrics, traces, logs, and events for `paymentservice`. The agent queries those signals through `o11y_*` tools.
+
+Splunk Agent Observability does not store those application signals. It stores an **Agent stream**, a named collection of sessions for this workshop instance. Each session contains one investigation: the chat, an agent trace, and spans for LLM turns and MCP calls.
+
+> Tip: Same words, two systems. If the agent calls `o11y_get_apm_exemplar_traces`, the returned IDs identify Splunk Observability traces for `paymentservice`. The tree in Agent Stream is the separate agent trace. Nested `o11y_*` spans show which application signals the agent queried.
 
 ## Review the run in Splunk Agent Observability
 
 After your chat completes, open the Splunk Agent Observability console and navigate to:
 
-1. Project — the name you set (for example, `sre-agent-wkshp-shw-2cb1`)
-2. Agent Stream — your log stream from `.env` (for example, `sre-agent-wkshp`)
+1. Project — the shared workshop project (`sre-agent-wkshp`)
+2. Agent Stream — your agent stream from `.env` (for example, `sre-agent-wkshp-shw-2cb1`)
 3. Sessions — find the most recent session (named `chat-9265e3375c8b | part1_agent`)
 
-Select the session to open the trace view. You should see three areas: the trace tree on the left, the chat in the center (user query and agent response), and detail tabs on the right.
+Select the session. Verify three areas are present: the agent trace tree on the left, the chat query and response in the center, and detail tabs on the right. Nested `o11y_*` spans represent queries against Splunk Observability metrics, traces, logs, or events.
 
 Expand the trace tree. A typical Part 1 run looks like this:
 
@@ -55,41 +117,41 @@ Agent
 └── should_continue
 ```
 
-Click `tools` and the nested MCP span to inspect arguments and JSON responses. Compare what Agent Observability captured with what the terminal trace showed — they should tell the same story.
+Open `tools` and each nested MCP span. Check its arguments, result status, and JSON response against the terminal trace. The tool sequence, inputs, results, and final answer should agree across both views.
 
 @screenshot: Part 1 in Agent Stream — https://zperrault-splunk.github.io/troubleshooting-agent/6-part1-baseline-agent/
 
-> Tip: Keep the Splunk Agent Observability console open in a browser tab during the workshop. After each investigation, refresh and locate your session — it is the fastest way to compare Part 1, Part 2, and Part 3 on the same alert in one Agent Stream.
+> Tip: Keep the Splunk Agent Observability console open. After each investigation, refresh the session list and select the latest run. Use the same service, environment, and alert scenario across all three parts, then account for changes in live telemetry when you compare them.
 
 ## Baseline exercise
 
-Work through this checklist using `paymentservice` in environment `splunk-hipster`:
+Complete this baseline using `paymentservice` in environment `splunk-hipster`:
 
 | Step | Action |
 |------|--------|
 | 1 | Run `troubleshooting-agent chat "Why does paymentservice have errors in the splunk-hipster environment?"` |
-| 2 | Read the terminal trace — list tools called vs. tools skipped |
-| 3 | Open Splunk Agent Observability — find your session and expand agent/tool spans |
-| 4 | Answer: Did the agent ground its conclusion in MCP data? |
-| 5 | Answer: Where might it have hallucinated if MCP had returned empty results? |
-| 6 | Save your notes — you will re-run the same scenario in Part 2 and Part 3 |
+| 2 | Record the tools called, relevant tools skipped, and each tool's input scope and time window |
+| 3 | Open Splunk Agent Observability, find the session, and expand every agent and tool span |
+| 4 | Map each conclusion to the MCP result that supports it; mark unsupported claims |
+| 5 | Identify claims that would become hallucinations if the corresponding MCP result were empty |
+| 6 | Save the tool sequence, evidence, failure modes, and final conclusion for comparison with Parts 2 and 3 |
 
-> Important: Part 1 intentionally has no playbook. Expect variation between runs — that is the baseline you are measuring. Parts 2 and 3 add skills and structure to make investigations repeatable.
+> Important: Part 1 intentionally has no playbook. Tool choice and investigation depth can vary between runs. Capture that variation; Parts 2 and 3 add controls intended to make the same investigation more repeatable.
 
-# Exercise 4 – Configure Log Stream Evaluators
+# Exercise 3 – Configure Agent Stream Evaluators
 
 ## Description
 
-You already send agent traces to Splunk Agent Observability from Part 1. In this exercise you turn on log stream evaluators so the platform automatically scores each investigation — not just records it.
+Enable agent stream evaluators, then re-run the Part 1 investigation. Splunk Agent Observability will score the new session while preserving the original trace-only session as your baseline.
 
-Evaluators answer questions that are hard to judge by eye across dozens of runs:
+Use the scores to verify:
 
-- Did the agent pick the right MCP tools for the alert?
-- Did tool calls fail because of bad parameters?
-- Is the final answer grounded in tool output, or does it sound plausible without evidence?
-- Did the agent complete the investigation goal, or stop early?
+- Whether the selected MCP tools match the alert and available signals
+- Whether invalid inputs or execution errors caused tool failures
+- Whether the final answer is grounded in tool output
+- Whether the agent completed the investigation or stopped early
 
-Most out-of-the-box evaluators use an SLM (Luna) or LLM-as-a-judge to score traces. Prefer SLM when configuring evaluators. If evaluator scores stay empty after several minutes, ask your facilitator to verify Integrations in the Splunk Agent Observability console.
+Most built-in evaluators score traces with an SLM (Luna) or an LLM-as-a-judge. Select SLM when available. If a new session remains unscored after several minutes, ask your facilitator to verify Integrations in the Splunk Agent Observability console.
 
 ## Before you start
 
@@ -97,27 +159,27 @@ Most out-of-the-box evaluators use an SLM (Luna) or LLM-as-a-judge to score trac
 |-------------|-----|
 | Part 1 investigation completed | Compare before and after enabling evaluators |
 | `.env` Agent Observability settings saved | Same `GALILEO_PROJECT` and `GALILEO_LOG_STREAM` you used in Part 1 |
-| Splunk Agent Observability console access | Open the project your facilitator shared (or the one you created with `GALILEO_PROJECT`) |
+| Splunk Agent Observability console access | Open the shared project `sre-agent-wkshp`, then your instance Agent Stream |
 
 ## Steps
 
-### Open your log stream
+### Open your agent stream
 
 1. Sign in to the Splunk Agent Observability console.
-2. Open Projects and select your project (for example, `sre-agent-wkshp-shw-2cb1`).
-3. Select Agent Stream in the sidebar — this is the log stream named in your `.env` (for example, `sre-agent-wkshp`).
+2. Open Projects and select the shared project `sre-agent-wkshp`.
+3. Select Agent Stream in the sidebar. Open the stream named in your `.env` (for example, `sre-agent-wkshp-shw-2cb1`).
 4. Confirm you see at least one session from Part 1 (for example, `chat-9265e3375c8b | part1_agent`).
 
 ### Configure evaluators
 
-1. From the log stream view, click Configure Evaluators.
+1. From the agent stream view, click Configure Evaluators.
 2. Search or filter the evaluator list.
 3. Turn on the evaluators listed in the tables below.
 4. When the console offers a choice between LLM and SLM (Luna), select SLM — same scoring intent, with lower latency and cost during the workshop.
 5. Click Apply to save your evaluator selections. Toggles alone do not take effect until you apply.
 6. When Agent Observability asks whether to compute evaluators on past logs, click Not Now. Your Part 1 session stays as the without evaluators baseline; you will run a fresh investigation next so you can compare both traces side by side.
 
-> Tip: Keep your first Part 1 session un-scored on purpose. After you re-run the same chat command, you will have two sessions in the same log stream: one trace only (Part 1) and one trace + evaluator scores (this exercise). That makes the before/after difference easy to see.
+> Tip: Keep the first Part 1 session unscored. After you re-run the same command, the agent stream will contain one trace-only session and one session with trace data and evaluator scores.
 
 > Tip: Many built-in evaluators have an SLM variant powered by Luna models. Use SLM for workshop runs unless your facilitator asks you to compare against the full LLM judge. If you do not see an SLM option for an evaluator, the LLM variant is fine.
 
@@ -155,8 +217,8 @@ troubleshooting-agent chat "Why does paymentservice have errors in the splunk-hi
 
 After your chat completes, open the Splunk Agent Observability console and navigate to:
 
-1. Project — the name you set (for example, `sre-agent-wkshp-shw-2cb1`)
-2. Agent Stream — your log stream from `.env` (for example, `sre-agent-wkshp`)
+1. Project — the shared workshop project (`sre-agent-wkshp`)
+2. Agent Stream — your stream from `.env` (for example, `sre-agent-wkshp-shw-2cb1`)
 3. Sessions — use the session picker (for example, Session 2 of 2) to find your two Part 1 runs: the original (trace only) and the newest (with evaluator scores)
 
 Select the newest session. On the right, open the Evaluators tab to see scores grouped under headings such as Agent Quality. SLM evaluators are labeled with (SLM).
@@ -169,15 +231,15 @@ Work through this checklist using `paymentservice` in environment `splunk-hipste
 |------|--------|
 | 1 | Run the same chat command as Part 1 |
 | 2 | Open Agent Stream — find both sessions using the session picker |
-| 3 | On the newest session, expand the trace tree — confirm multiple tools spans ran |
-| 4 | Click each MCP span — do the numbers and facts in the chat response match the tool JSON? |
+| 3 | Expand the newest session's trace tree and confirm that multiple `tools` spans ran |
+| 4 | For each MCP span, verify the input service, environment, and time window; then map chat claims to result JSON |
 | 5 | Open the Evaluators tab and record scores under Agent Quality |
-| 6 | Compare your sessions — Part 1 baseline (trace only) vs. this run (trace + evaluator scores) |
-| 7 | Save your notes and scores — you will re-run the same scenario in Part 2 and Part 3 |
+| 6 | Compare the Part 1 trace-only baseline with this trace-and-scores run |
+| 7 | Save the tool sequence, failures, evidence, final conclusion, and scores for Parts 2 and 3 |
 
-> Tip: Part 1 intentionally has no playbook, so results can range from weak to strong across runs. A response can sound detailed in the chat panel but still score poorly on Action Completion — evaluators help you see that gap without reading every tool JSON by hand.
+> Tip: Part 1 has no playbook, so results vary across runs. A detailed response can still score poorly on Action Completion when the trace ends before the investigation reaches a supported conclusion.
 
-# Exercise 5 – Part 2 Skill Playbooks
+# Exercise 4 – Part 2 Skill Playbooks
 
 ## Description
 
@@ -201,7 +263,7 @@ Your message → keyword router → SKILL.md → system prompt → ReAct loop (L
 
 ### Run Part 2 agent
 
-Make sure Exercise 3 (Part 1) and Exercise 4 (Configure Evaluators) are done — you will compare against those sessions.
+Make sure Exercise 2 (Part 1) and Exercise 3 (Configure Evaluators) are done — you will compare against those sessions.
 
 From `part2_agent`, run a latency investigation. Use the workshop defaults — service `paymentservice`, environment `splunk-hipster`:
 
@@ -249,7 +311,7 @@ Compare evaluators to Part 1:
 | Evaluator | What to look for |
 |-----------|------------------|
 | Tool selection quality | Did the agent call the tools the playbook names? |
-| Action advancement / completion | Did it get further than Part 1's "please provide environment" or "here are next steps" stops? |
+| Action Completion | Did it get further than Part 1's "please provide environment" or "here are next steps" stops? |
 | Context adherence | Are cited metrics present in MCP tool output? |
 | Instruction adherence | Did it follow the report skill (no raw JSON dumps)? |
 
@@ -304,13 +366,13 @@ Confirm in Splunk Agent Observability:
 
 > Tip: If the wrong skill loads, check alert_signals spelling and re-run with clearer keywords (`5xx`, `errors`, `error rate`) in the prompt.
 
-# Exercise 6 – Part 3 Full Workflow
+# Exercise 5 – Part 3 Full Workflow
 
 ## Description
 
 Part 3 replaces the single ReAct loop with a four-node LangGraph workflow: identify → categorize → investigate → report. The same `SKILL.md` playbook format from Part 2 applies — but when and where skills load in Splunk Agent Observability looks different on purpose.
 
-Complete Exercise 5 (Part 2 Skill Playbooks) first so you have a baseline for keyword injection and the upfront `skill_router` trace.
+Complete Exercise 4 (Part 2 Skill Playbooks) first so you have a baseline for keyword injection and the upfront `skill_router` trace.
 
 ### Part 2 vs Part 3 — how skills load
 
@@ -322,7 +384,7 @@ Complete Exercise 5 (Part 2 Skill Playbooks) first so you have a baseline for ke
 | Agent Observability trace shape | Separate `skill_router` trace, then Agent | `load_skill:*` spans inside each node (`identify`, `investigate`, `report`) |
 | Skills per run | One domain skill + always-on `investigation-report` | Different skills per phase |
 
-> Important: If you just finished Part 2, you may look for a top-level `skill_router` block with every playbook listed upfront. Part 3 does not use that pattern. Skills appear under the node that needs them — that is the production-style workflow the workshop is teaching.
+> Important: Part 3 has no top-level `skill_router` block. Each skill appears under the node that loads it. If `skill_router` appears, verify that you ran the command from `part3_agent`.
 
 Part 3 trace shape (what to look for):
 
@@ -364,7 +426,7 @@ Participants run Part 3 from the CLI with a mock Observability alert — no Slac
 cd ~/troubleshooting-agent
 source .venv/bin/activate
 cd part3_agent
-troubleshooting-agent chat "Troubleshoot the Splunk Observability alert: paymentservice in splunk-hipster environment. DetectorId HNcv52_AwAA. Rule: SRE Agent - PaymentService High Error Rate. Find root cause of the high error rate and confirm whether it is resolved."
+troubleshooting-agent chat "Troubleshoot the Splunk Observability alert: paymentservice in splunk-hipster environment. DetectorId HO6Pg5tAwAM. Rule: sre agent - High Error rate. Find root cause of the high error rate and confirm whether it is resolved."
 ```
 
 > Tip: The workshop prompt mirrors a Slack alert: service (`paymentservice`), environment (`splunk-hipster`), detector ID, and rule name. Part 3 uses these to fetch the alert payload, categorize as APM, run troubleshoot-apm-incidents + search-logs, then format troubleshoot-report.
@@ -375,8 +437,10 @@ Agent Observability sessions are named `chat-… | part3_agent`. Expect `part3_i
 
 1. Open Agent Stream and find a session ending in `part3_agent`.
 2. Expand `part3_investigation` — confirm named nodes (`identify`, `categorize`, `investigate`, `report`), not repeated generic Agent:Agent spans.
-3. Under `identify`, `investigate`, and `report`, expand `load_skill:*` spans — note when each playbook enters the prompt relative to MCP tool calls.
-4. Compare to your Part 2 session on a similar alert — same tools may run, but the trace shape and skill timing should differ.
+3. Expand `load_skill:*` under `identify`, `investigate`, and `report`. Record which skill entered the prompt before each node's MCP calls.
+4. Inspect `identify_tools` for alert resolution. Inspect `investigate_tools` for APM evidence and at least one `splunk_*` log search. Treat an empty result as an observation, not proof that no events exist. First confirm that the query succeeded and used the intended service, environment, index, and alert time window.
+5. In the final report, trace every metric and root-cause statement back to a tool result. Treat unsupported causality or a resolution claim without post-alert evidence as a failure.
+6. Compare with the Part 2 session for the same alert. Tool names may overlap; node ownership and skill timing must differ.
 
 > Tip: Side-by-side comparison: Part 2 loads investigation-report at the start with the domain skill. Part 3 loads troubleshoot-report only in the report node — after investigate has gathered evidence.
 
@@ -387,14 +451,15 @@ Agent Observability sessions are named `chat-… | part3_agent`. Expect `part3_i
 | 1 | Confirm no top-level `skill_router` trace in Part 3 |
 | 2 | Expand `load_skill:*` under identify, investigate, and report nodes |
 | 3 | Confirm Splunk log search (`splunk_*` tools) ran in the investigate node |
-| 4 | Compare evaluator scores to Part 1 and Part 2 on a similar alert |
-| 5 | Save notes — Part 2 = keyword router + upfront skills; Part 3 = graph nodes + per-step skills |
+| 4 | Trace every report claim to a tool result; treat unsupported resolution claims as a failure |
+| 5 | Compare evaluator scores to Part 1 and Part 2 on a similar alert |
+| 6 | Save notes — Part 2 = keyword router + upfront skills; Part 3 = graph nodes + per-step skills |
 
 # Wrap-up – Production-Ready Agent (optional reading)
 
 ## Description
 
-After Part 3, you have a working four-node agent with skills, MCP tools, and Splunk Agent Observability tracing. Part 3 is a teaching workflow — the graph, skills, and MCP wiring are real, but several workshop shortcuts would need hardening before you run this on live incidents at scale.
+The Part 3 implementation is suitable for learning and controlled evaluation. It is not production-ready. The four-node graph, playbooks, MCP calls, and Splunk Agent Observability traces demonstrate the workflow, but they do not provide the availability, security, tenancy, change-control, or safety controls required for live incident operations.
 
 This section summarizes practical next steps. It is optional reading — no lab steps required.
 
@@ -402,9 +467,9 @@ Full detail: https://zperrault-splunk.github.io/troubleshooting-agent/10-product
 
 ### Alert intake and context
 
-- Structured alert ingestion — Replace mock CLI prompts with a durable trigger (Slack Events API, webhook, or queue consumer) and normalize every alert into a typed payload before the graph starts.
-- Anchor IDs early — Production runs should resolve the O11y alert record in code before the identify ReAct loop, so a bad LLM turn cannot burn tool budget searching for context.
-- Resolution / dedup — Skip or shorten investigations when the alert is already cleared, or when the same event_id was handled recently.
+- Structured alert ingestion — Replace the mock CLI prompt with a durable, authenticated trigger (Slack Events API, webhook, or queue consumer) and normalize every alert into a typed payload before the graph starts.
+- Anchor IDs early — Resolve the O11y alert record in deterministic code before spending LLM or MCP tool budget.
+- Resolution / dedup — Use `event_id` as the idempotency key. Deduplicate retries and define when a cleared alert should receive a shortened verification run.
 
 ### Orchestration and skills
 
@@ -425,4 +490,4 @@ Full detail: https://zperrault-splunk.github.io/troubleshooting-agent/10-product
 - Observability of the agent itself — Session IDs, node timings, tool failure rates, and evaluator scores should feed dashboards and alerts.
 - Cost and latency budgets — Set recursion limits, cap parallel MCP calls, and track LLM token usage per investigation.
 
-> Tip: A practical next step after the workshop: pick one alert type (e.g. APM error rate), wire real Slack or webhook intake, add one Agent Observability evaluator for troubleshoot-report completeness, and run shadow mode (agent reports, humans act) until scores stabilize.
+> Tip: Start with one alert type, such as APM error rate. Add authenticated Slack or webhook intake, deterministic alert normalization, bounded tool calls, and an Agent Observability evaluator for `troubleshoot-report` completeness. Run in shadow mode: the agent reports and humans investigate and act. Promote only against explicit accuracy, completeness, latency, failure-rate, and safety criteria; stable evaluator scores alone are insufficient.

@@ -16,15 +16,19 @@ Build a **troubleshooting agent** that investigates observability alerts with an
 - Compare final claims with returned metrics, logs, and alert data to detect unsupported conclusions
 - Evaluate whether the agent selected the right tools, completed the investigation, and produced a report that the evidence supports
 
+
+
 ## What you'll build
 
 The repository contains **three agent implementations** with the same CLI and integrations. Reusing the service, environment, and alert scenario reduces input variance when you compare orchestration and playbook behavior. Live telemetry and model output can still change between runs.
 
-| Part | Focus | Agent shape |
-|------|-------|-------------|
-| **Part 1** | Baseline MCP-only agent | Single ReAct loop — tools only, no playbooks |
-| **Part 2** | Skill playbooks | Same ReAct loop + keyword-injected `SKILL.md` playbooks |
-| **Part 3** | Structured workflow | Four-node LangGraph graph + full skill library |
+
+| Part       | Focus                   | Agent shape                                             |
+| ---------- | ----------------------- | ------------------------------------------------------- |
+| **Part 1** | Baseline MCP-only agent | Single ReAct loop: tools only, no playbooks             |
+| **Part 2** | Skill playbooks         | Same ReAct loop + keyword-injected `SKILL.md` playbooks |
+| **Part 3** | Structured workflow     | Four-node LangGraph graph + full skill library          |
+
 
 Run `troubleshooting-agent` from the directory for the part you are testing. Shared LLM, MCP, and observability integrations live in `shared/workshop_shared/` and are pre-built for you.
 
@@ -38,16 +42,17 @@ The repository is at `~/troubleshooting-agent` on your instance. Follow the work
 
 1. [Connect to EC2]({{< relref "3-connect-ec2" >}})
 2. [Configure Environment]({{< relref "5-configure-agent-environment" >}})
-3. [Part 1 — Baseline Agent]({{< relref "6-part1-baseline-agent" >}})
+3. [Part 1: Baseline Agent]({{< relref "6-part1-baseline-agent" >}})
 4. [Configure Evaluators]({{< relref "7-galileo-logstream-evaluators" >}})
-5. [Part 2 — Skill Playbooks]({{< relref "8-part2-skill-playbooks" >}})
-6. [Part 3 — Full Workflow]({{< relref "9-part3-full-workflow" >}})
+5. [Part 2: Skill Playbooks]({{< relref "8-part2-skill-playbooks" >}})
+6. [Part 3: Full Workflow]({{< relref "9-part3-full-workflow" >}})
 7. [Production-Ready Agent]({{< relref "10-production-ready-agent" >}}) *(optional)*
 8. [FAQ]({{< relref "11-faq" >}})
 
 {{< notice title="Tips" style="tip" >}}
+
 - Run commands from the **part directory** (`part1_agent/`, `part2_agent/`, `part3_agent/`) — the CLI picks up the agent for that part automatically.
-- Workshop demo defaults: service **`paymentservice`**, environment **`splunk-hipster`** — include both in chat prompts during Parts 1 and 2.
+- Workshop demo defaults: service `paymentservice`, environment `splunk-hipster` — include both in chat prompts during Parts 1 and 2.
 - Use `troubleshooting-agent chat "your question"` for investigations during the workshop.
 - If a tool call fails, check `troubleshooting-agent mcp-doctor` first — most issues are credential or gateway configuration.
 - Compare Part 1 and Part 3 responses on the **same alert** to see the impact of skills and graph structure.

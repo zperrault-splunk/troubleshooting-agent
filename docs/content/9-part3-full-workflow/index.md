@@ -1,14 +1,14 @@
 ---
-title: "Part 3 — Full Workflow"
+title: "Part 3: Full Workflow"
 description: "Run the four-node LangGraph agent, compare how skills load per workflow step in Splunk Agent Observability, and contrast with Part 2's upfront keyword router."
 weight: 9
-navTitle: "Part 3 — Full Workflow"
+navTitle: "Part 3: Full Workflow"
 duration: "30 minutes"
 ---
 
 Run the alert through a four-node LangGraph workflow: **identify → categorize → investigate → report**. Part 3 keeps the `SKILL.md` format from Part 2 but loads each playbook only in the node that needs it.
 
-Complete [Part 2 — Skill Playbooks]({{< relref "8-part2-skill-playbooks" >}}) first. Its keyword injection and `skill_router` trace provide the comparison baseline.
+Complete [Part 2: Skill Playbooks]({{< relref "8-part2-skill-playbooks" >}}) first. Its keyword injection and `skill_router` trace provide the comparison baseline.
 
 ## Part 2 vs Part 3: How skills load in Splunk Agent Observability
 
@@ -17,11 +17,11 @@ Both parts inject playbooks into the system prompt; neither exposes skills as MC
 
 |                                     | Part 2                                              | Part 3                                                                          |
 | ----------------------------------- | --------------------------------------------------- | ------------------------------------------------------------------------------- |
-| **Orchestration**                   | Single ReAct loop (same as Part 1)                  | Four-node graph — each step has its own prompt                                  |
+| **Orchestration**                   | Single ReAct loop (same as Part 1)                  | Four-node graph: each step has its own prompt                                   |
 | **Skill selection**                 | Keyword router on your chat/alert text              | Python categorizer on the alert payload (APM / IM / RUM / Synthetics)           |
 | **When skills load**                | **All at once**, before the agent's first LLM turn  | **One step at a time**, when that graph node runs                               |
 | **Agent Observability trace shape** | Separate `skill_router` trace, then `Agent`         | `load_skill:`* spans **inside** each node (`identify`, `investigate`, `report`) |
-| **Skills per run**                  | One domain skill + always-on `investigation-report` | Different skills per phase — see table below                                    |
+| **Skills per run**                  | One domain skill + always-on `investigation-report` | Different skills per phase                                                      |
 
 
 {{< notice title="Don't expect skill_router in Part 3" style="primary" >}}
@@ -42,8 +42,6 @@ Session: chat-… | part2_agent
     ├── tools → o11y_search_alerts_or_incidents
     └── …
 ```
-
-
 
 ### Part 3 trace (what to look for instead)
 
@@ -73,8 +71,6 @@ The files remain `SKILL.md`; the orchestration changes:
 - Part 2 selects a domain playbook with a keyword router and injects the report format up front.
 - Part 3 loads the alert, product, log-search, and report playbooks at their respective workflow nodes.
 
-
-
 ## Skills loaded at each node
 
 
@@ -85,18 +81,9 @@ The files remain `SKILL.md`; the orchestration changes:
 | **investigate** | Product skill (e.g. `troubleshoot-apm-incidents`) + `search-logs` | Product-specific MCP steps + mandatory Splunk log search |
 | **report**      | `troubleshoot-report`                                             | Structured handoff only after evidence is gathered       |
 
-
-The investigate node also injects `search-logs/indexes.md`, the workshop tenant's Splunk index catalog. Confirm that log queries use a listed index rather than defaulting to `main`.
-
 ## Run Part 3
 
-Run Part 3 from the CLI with the same mock Observability alert used in Parts 1 and 2; Slack is not required. The prompt provides the service, environment, and rule name. The **identify** node uses those fields to resolve alert context before investigation.
-
-From `part3_agent`:
-
-{{< notice title="Same agent stream" style="tip" >}}
-Do **not** change `GALILEO_LOG_STREAM` in `.env` when you switch to `part3_agent`. Part 3 sessions appear in the same Agent Stream as Parts 1 and 2 — look for the `part3_agent` suffix in the session name.
-{{< /notice >}}
+Run Part 3 from the CLI with a mock Observability alert. The prompt provides the service, environment, and rule name. The **identify** node uses those fields to resolve alert context before investigation.
 
 {{< tabs >}}
 {{% tab title="Script" open="true" %}}
@@ -112,7 +99,7 @@ troubleshooting-agent chat "Troubleshoot the Splunk Observability alert: payment
 {{< /tabs >}}
 
 {{< notice title="Mock alert fields" style="tip" >}}
-The prompt carries fields expected from an alert integration: **service** (`paymentservice`), **environment** (`splunk-hipster`), and **rule name**. Part 3 uses them to resolve alert context, categorize it as APM, run `troubleshoot-apm-incidents` plus `search-logs`, and then apply `troubleshoot-report`.
+The prompt carries fields expected from an alert integration: **service** (`paymentservice`), **environment** (`splunk-hipster`), and **rule name (**obs1386 | sre agent | high error rate**)**. Part 3 uses them to resolve alert context, categorize it as APM, run `troubleshoot-apm-incidents` plus `search-logs`, and then apply `troubleshoot-report`.
 {{< /notice >}}
 
 Agent Observability sessions are named `chat-… | part3_agent`. Expect `part3_investigation` with `identify` **→** `categorize` **→** `investigate` **→** `report`, not a single ReAct `Agent` trace.
@@ -128,31 +115,18 @@ Agent Observability sessions are named `chat-… | part3_agent`. Expect `part3_i
 7. Compare **Action Completion (SLM)** and its explanation across the Part 1, Part 2, and Part 3 sessions. All three use the same alert prompt.
 
 {{< notice title="Tip" style="tip" >}}
-Side-by-side comparison: Part 2 loads `investigation-report` at the start with the domain skill. Part 3 loads `troubleshoot-report` only in the **report** node — after investigate has gathered evidence.
-{{< /notice >}}
+Side-by-side comparison: Part 2 loads `investigation-report` at the start with the domain skill. Part 3 loads `troubleshoot-report` only in the **report** node after investigate has gathered evidence. {{< /notice >}}
 
-## Workshop recap
-
-
-
-### What you did
-
+## Part 3 Recap
 - Ran the same high-error alert through the four-node **identify → categorize → investigate → report** workflow.
 - Inspected `load_skill:*` spans to see each playbook enter the prompt only when its graph node needed it.
 - Followed alert context, APM evidence, and Splunk log evidence from separate tool calls into one structured report.
 - Compared Action Completion and trace evidence across the Part 1 baseline, Part 2 playbook injection, and Part 3 structured workflow.
-
-
-
-### What you learned
-
 - Part 2 and Part 3 share the `SKILL.md` format but differ in orchestration and skill-loading time.
 - Named graph nodes make routing, evidence collection, and reporting responsibilities visible in the trace.
 - Combining Observability and Splunk evidence produces a stronger investigation than relying on one signal source.
 - A resolution claim requires supporting evidence after the alert window; an empty current-alert result is not enough.
 
-This graph is a workshop implementation, not a production architecture guarantee. The production controls still required are covered in the next chapter.
+This graph is a workshop implementation, not a production architecture guarantee. The production controls still required are covered in the next chapter. For skill authoring details and the full Part 3 skill library, see [AI Skills]({{< relref "2-ai-skills" >}}).
 
-For skill authoring details and the full Part 3 skill library, see [AI Skills]({{< relref "2-ai-skills" >}}).
-
-**Next:** [Production-Ready Agent]({{< relref "10-production-ready-agent" >}}) — what to harden after the workshop before running on live incidents.
+**Next:** [Production-Ready Agent]({{< relref "10-production-ready-agent" >}}): what to harden after the workshop before running on live incidents.
