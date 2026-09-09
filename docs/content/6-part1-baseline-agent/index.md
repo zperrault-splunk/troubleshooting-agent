@@ -1,5 +1,5 @@
 ---
-title: "Part 1 — Baseline Agent"
+title: "Part 1: Baseline Agent"
 description: "Run the minimal MCP-only ReAct agent, interpret terminal and Agent Observability traces, and establish a baseline investigation for comparison with Parts 2 and 3."
 weight: 6
 navTitle: "Part 1 — Baseline Agent"
@@ -21,7 +21,7 @@ Record what the agent does without a playbook. You will compare its tool selecti
 | **Observability** | Terminal trace, JSONL logs, Agent Observability session |
 
 
-If you want to skim the code before running:
+Agent code structure:
 
 
 | File                    | Purpose                                              |
@@ -104,8 +104,6 @@ With `AGENT_LOG_TRACE=true` (the default), every run prints a structured trace. 
 2. Whether each input used the exact APM names: service `paymentservice` and environment `splunk-hipster`.
 3. Whether claims in the final response map to values in tool-result JSON. Treat a plausible claim without trace evidence as ungrounded.
 
-The same events are written to `shared/logs/investigations/<id>.jsonl` for post-workshop review. Each run prints the path at the end (look for `Log file:` in the output).
-
 {{< notice title="Tip" style="tip" >}}
 If the terminal trace is no longer visible, recover the evidence in either of these ways:
 
@@ -137,25 +135,27 @@ Each investigation creates a **session** named like `chat-abc123 | part1_agent` 
 ### Metrics, traces, logs, and events vs Agent streams
 
 
-| Splunk Observability | What it tells you (the app)                                        | In an Agent stream                               | Difference                                          |
-| -------------------- | ------------------------------------------------------------------ | ------------------------------------------------ | --------------------------------------------------- |
-| **Metrics**          | Time series: error rate, latency, request volume                   | Token counts, later **Action Completion**        | App RED vs agent quality/cost                       |
-| **Traces**           | One user request across services (`paymentservice` → dependencies) | One agent interaction (reason → tools → answer)  | App request vs investigation workflow               |
-| **Logs**             | Application log lines                                              | Span input/output and the workshop JSONL file    | Syslog/events from the service vs LLM/tool payloads |
-| **Events**           | Detector firings, alert/incident activity                          | A **session** (one `troubleshooting-agent chat`) | An incident on the app vs a recorded agent run      |
+| Splunk Observability | What it tells you (the app)                                        | In an Agent stream                              | Difference                                          |
+| -------------------- | ------------------------------------------------------------------ | ----------------------------------------------- | --------------------------------------------------- |
+| **Metrics**          | Time series: error rate, latency, request volume                   | Token counts, later **Action Completion**       | App RED vs agent quality/cost                       |
+| **Traces**           | One user request across services (`paymentservice` → dependencies) | One agent interaction (reason → tools → answer) | App request vs investigation workflow               |
+| **Logs**             | Application log lines                                              | Span input/output and the workshop JSONL file   | Syslog/events from the service vs LLM/tool payloads |
+| **Events**           | Detector firings, alert/incident activity                          | A **session**                                   | An incident on the app vs a recorded agent run      |
 
 
-**Chat** is the session's query-and-answer view, not a fifth Observability signal.
 
-## Review the run in Splunk Agent Observability
+
+## Review the chat in Splunk Agent Observability
 
 After your chat completes, open the [Splunk Agent Observability console](https://console.multitenant.galileocloud.io) and navigate to:
 
 1. **Project:** the shared workshop project (`sre-agent-wkshp`)
 2. **Agent Stream**: your instance name from `echo $INSTANCE` (for example, `shw-2cb1`)
 3. **Sessions**: find the most recent session (named `chat-9265e3375c8b | part1_agent`)
+4. **Select** the session.
+5. **Verify** three areas are present: the agent trace tree on the left, the chat query and response in the center, and detail tabs on the right.
 
-Select the session. Verify three areas are present: the agent trace tree on the left, the chat query and response in the center, and detail tabs on the right. Nested `o11y_*` spans represent queries against Splunk Observability metrics, traces, logs, or events.
+Nested `o11y_*` spans represent queries against Splunk Observability metrics, traces, logs, or events.
 
 Expand the trace tree. A typical Part 1 run looks like this:
 
@@ -180,9 +180,8 @@ Keep the Splunk Agent Observability console open. After each investigation, refr
 ## Part 1 Recap
 
 - Ran the shared high-error alert prompt through the baseline LangGraph ReAct agent without a playbook.
-- Reviewed the investigation in the terminal trace, JSONL log, and Splunk Agent Observability session.
-- Recorded the MCP tools called, relevant signals skipped, and each tool's service, environment, and time-window scope.
-- Mapped final-response conclusions to MCP results and identified unsupported claims, empty results, and tool failures.
+- Reviewed the investigation in the terminal trace and Splunk Agent Observability session.
+- Recorded the MCP tools called, and each tool's service, environment, and time-window scope.
 - Observed that the model chooses its own tool sequence and stopping point, so investigation depth can vary between runs.
 - Established the no-playbook baseline for comparing Action Completion, trace evidence, and repeatability with Parts 2 and 3.
 

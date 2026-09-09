@@ -10,7 +10,7 @@ Run the same high-error alert from Part 1 through a ReAct loop with markdown pla
 
 For playbook concepts and design rationale, see [AI Skills]({{< relref "2-ai-skills" >}}).
 
-## Part 1 vs Part 2 — agent differences
+## Part 1 vs Part 2
 
 
 | Component                           | Part 1          | Part 2                                                                   |
@@ -18,24 +18,20 @@ For playbook concepts and design rationale, see [AI Skills]({{< relref "2-ai-ski
 | **Agent loop**                      | LangGraph ReAct | Same ReAct loop                                                          |
 | **Playbooks**                       | None            | One **domain** skill + always-on `investigation-report`                  |
 | **Routing**                         | —               | Keyword match on your chat/alert text (`alert_signals` in SKILL.md YAML) |
-| **Agent Observability session**     | `chat-…         | part1_agent`                                                             |
 | **Extra Agent Observability trace** | —               | `skill_router` — all skills injected **before** the ReAct loop           |
 
 
 ```text
-Your message → keyword router → SKILL.md → system prompt → ReAct loop (LLM + MCP tools)
+New Workflow: Your message → keyword router → SKILL.md → system prompt → ReAct loop (LLM + MCP tools)
 ```
 
-
+Agent code structure:
 | File                                    | Purpose                                                   |
 | --------------------------------------- | --------------------------------------------------------- |
 | `part2_agent/agent.py`                  | Builds prompt with injected skills; logs routing metadata |
 | `part2_agent/skill_inject.py`           | Keyword router and prompt assembly                        |
 | `part2_agent/skills/`                   | Playbook library — you edit skills here                   |
 | `part2_agent/skills/_template/SKILL.md` | Blank template for new playbooks                          |
-
-
-
 
 ## Run Part 2 agent
 
@@ -56,8 +52,6 @@ troubleshooting-agent chat "Why does paymentservice have errors in the splunk-hi
 
 {{% /tab %}}
 {{< /tabs >}}
-
-Verify that the keyword router selects the supplied `error-rate` skill from the alert's error-rate signals. Every Part 2 run must also load `investigation-report`; that skill defines report formatting and is not keyword-matched.
 
 ## Review Part 2 in Splunk Agent Observability
 
@@ -102,8 +96,6 @@ The `error-rate` playbook tells the agent to omit `severity` unless requested, c
 
 On the **Evaluators** tab, compare **Action Completion (SLM)** and its explanation with the Part 1 session. Because both runs use the same alert prompt, differences are more likely to reflect the playbook rather than a change in the task.
 
-Do not optimize for a perfect score. Use the explanation and trace to determine whether the playbook helped the agent finish the investigation instead of stopping at symptoms or proposed next steps.
-
 {{< notice title="Tip" style="tip" >}}
 Filter Agent Stream by session name suffix `part2_agent`, or use the session picker to compare `part1_agent` vs `part2_agent` runs side by side.
 {{< /notice >}}
@@ -118,10 +110,10 @@ The file starts with YAML between `---` lines:
 | Field           | Purpose                                                               |
 | --------------- | --------------------------------------------------------------------- |
 | `name`          | Skill identifier (usually matches the folder name)                    |
-| `description`   | One line — when to use this playbook                                  |
+| `description`   | One line: when to use this playbook                                   |
 | `alert_signals` | Keywords matched against your chat/alert text (lowercase)             |
-| `mcp_tools`     | Tools the playbook expects — guides the model and facilitators        |
-| `rule_patterns` | Optional — document detector name patterns (reference only in Part 2) |
+| `mcp_tools`     | Tools the playbook expects (guides the model)                         |
+| `rule_patterns` | (Optional) document detector name patterns (reference only in Part 2) |
 
 
 Example from `error-rate`:
@@ -147,7 +139,7 @@ Below the YAML block, the markdown body defines the playbook:
 | ------------------ | ----------------------------------------------------------------------------------------- |
 | **When to use**    | Symptoms or alert types that match                                                        |
 | **Tool sequence**  | Ordered MCP steps with parameter hints (`service_name`, `environment_name`, `time_range`) |
-| **Interpretation** | How to read the metrics — not just what to call                                           |
+| **Interpretation** | How to read the metrics                                                                   |
 | **Do not**         | Guardrails (wrong params, skipping steps, inventing data)                                 |
 
 
@@ -236,15 +228,6 @@ troubleshooting-agent chat "Investigate high p99 latency on paymentservice in th
 1. Open the new `part2_agent` session in Agent Stream.
 2. Expand `skill_router` : expect `load_skill:latency-spike` and `load_skill:investigation-report`.
 3. Expand the main trace : expect at least `o11y_search_alerts_or_incidents` and `o11y_get_apm_service_latency` under `tools` spans.
-4. Open **Evaluators** and inspect Action Completion for this run. This validates your skill, but do not use it as the Parts 1–3 apples-to-apples score.
-
-Verify the run:
-
-1. `skill_router` shows `latency-spike` as the domain skill.
-2. The trace includes **two or more** MCP tool calls aligned with your playbook.
-3. The **chat** response cites **interpreted** numbers from tool output (not generic advice).
-4. The reply uses `investigation-report` headings: no raw JSON blocks.
-5. **Action Completion (SLM)** is recorded with an explanation.
 
 {{< notice title="Tip" style="tip" >}}
 If the wrong skill loads, check `alert_signals` spelling and re-run with clearer keywords (`latency`, `p99`, `slow`) in the prompt.
