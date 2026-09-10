@@ -1,6 +1,6 @@
 ---
 title: "Production-Ready Agent"
-description: "Harden the Part 3 troubleshooting workflow for live incidents — alert intake, orchestration, MCP reliability, and operational guardrails."
+description: Harden the Part 3 troubleshooting workflow for live incidents, alert intake, orchestration, MCP reliability, and operational guardrails.
 weight: 10
 navTitle: "Production-Ready Agent"
 duration: "10 minutes"
@@ -8,7 +8,7 @@ duration: "10 minutes"
 
 The Part 3 implementation is suitable for learning and controlled evaluation. It is not production-ready. The four-node graph, playbooks, MCP calls, and Splunk Agent Observability traces demonstrate the workflow, but they do not provide the availability, security, tenancy, change-control, or safety controls required for live incident operations.
 
-Use this page as a hardening checklist after [Part 3 — Full Workflow]({{< relref "9-part3-full-workflow" >}}). There are no lab steps.
+Use this page as a hardening checklist after [Part 3: Full Workflow]({{< relref "9-part3-full-workflow" >}}). There are no lab steps.
 
 ## Workshop architecture and production controls
 
@@ -52,9 +52,9 @@ Start with one alert type, such as APM error rate. Add authenticated Slack or we
 
 ## Related reading
 
-- [Part 3 — Full Workflow]({{< relref "9-part3-full-workflow" >}}) — graph nodes and Agent Observability trace shape
-- [AI Skills]({{< relref "2-ai-skills" >}}) — authoring and testing playbooks
-- [Configure Evaluators]({{< relref "7-galileo-logstream-evaluators" >}}) — quality gates for agent outputs
-- [FAQ]({{< relref "11-faq" >}}) — setup, Parts 1–3, evaluators, and common lab issues
+- [Part 3: Full Workflow]({{< relref "9-part3-full-workflow" >}}) — graph nodes and Agent Observability trace shape
+- [AI Skills]({{< relref "2-ai-skills" >}}): authoring and testing playbooks
+- [Configure Evaluators]({{< relref "7-galileo-logstream-evaluators" >}}): quality gates for agent outputs
+- [FAQ]({{< relref "11-faq" >}}): setup, Parts 1–3, evaluators, and common lab issues
 
-**Next:** [FAQ]({{< relref "11-faq" >}}) — forty questions covering the overall workshop and each part.
+**Next:** [FAQ]({{< relref "11-faq" >}}): questions covering the overall workshop and each part.
