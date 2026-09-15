@@ -18,7 +18,7 @@ For playbook concepts and design rationale, see [AI Skills]({{< relref "2-ai-ski
 | **Agent loop**                      | LangGraph ReAct | Same ReAct loop                                                          |
 | **Playbooks**                       | None            | One **domain** skill + always-on `investigation-report`                  |
 | **Routing**                         | —               | Keyword match on your chat/alert text (`alert_signals` in SKILL.md YAML) |
-| **Extra Agent Observability trace** | —               | `skill_router` — all skills injected **before** the ReAct loop           |
+| **Extra Agent Observability trace** | —               | `skill_router`: all skills injected **before** the ReAct loop           |
 
 
 ```text
@@ -30,7 +30,7 @@ Agent code structure:
 | --------------------------------------- | --------------------------------------------------------- |
 | `part2_agent/agent.py`                  | Builds prompt with injected skills; logs routing metadata |
 | `part2_agent/skill_inject.py`           | Keyword router and prompt assembly                        |
-| `part2_agent/skills/`                   | Playbook library — you edit skills here                   |
+| `part2_agent/skills/`                   | Playbook library                                          |
 | `part2_agent/skills/_template/SKILL.md` | Blank template for new playbooks                          |
 
 ## Run Part 2 agent
@@ -245,4 +245,4 @@ If the wrong skill loads, check `alert_signals` spelling and re-run with clearer
 
 ---
 
-**Next:** [Part 3: Full Workflow]({{< relref "9-part3-full-workflow" >}}) — same alert through a structured LangGraph pipeline; skills load **per step**, not upfront like Part 2.
+**Next:** [Part 3: Full Workflow]({{< relref "9-part3-full-workflow" >}}) : same alert through a structured LangGraph pipeline; skills load **per step**, not upfront like Part 2.
