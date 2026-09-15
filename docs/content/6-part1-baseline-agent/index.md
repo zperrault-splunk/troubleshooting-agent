@@ -137,7 +137,7 @@ Each investigation creates a **session** named like `chat-abc123 | part1_agent` 
 
 | Splunk Observability | What it tells you (the app)                                        | In an Agent stream                              | Difference                                          |
 | -------------------- | ------------------------------------------------------------------ | ----------------------------------------------- | --------------------------------------------------- |
-| **Metrics**          | Time series: error rate, latency, request volume                   | Token counts, later **Action Completion**       | App RED vs agent quality/cost                       |
+| **Metrics**          | Time series: error rate, latency, request volume                   | Token counts, Evaluators                        | App RED vs Agent quality/cost                       |
 | **Traces**           | One user request across services (`paymentservice` → dependencies) | One agent interaction (reason → tools → answer) | App request vs investigation workflow               |
 | **Logs**             | Application log lines                                              | Span input/output and the workshop JSONL file   | Syslog/events from the service vs LLM/tool payloads |
 | **Events**           | Detector firings, alert/incident activity                          | A **session**                                   | An incident on the app vs a recorded agent run      |
@@ -183,8 +183,7 @@ Keep the Splunk Agent Observability console open. After each investigation, refr
 - Reviewed the investigation in the terminal trace and Splunk Agent Observability session.
 - Recorded the MCP tools called, and each tool's service, environment, and time-window scope.
 - Observed that the model chooses its own tool sequence and stopping point, so investigation depth can vary between runs.
-- Established the no-playbook baseline for comparing Action Completion, trace evidence, and repeatability with Parts 2 and 3.
 
 ---
 
-**Next:** [Configure Agent Stream Evaluators]({{< relref "7-galileo-logstream-evaluators" >}}) — enable Action Completion before comparing Parts 2 and 3.
+**Next:** [Configure Agent Stream Evaluators]({{< relref "7-galileo-logstream-evaluators" >}})
